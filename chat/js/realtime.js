@@ -8,6 +8,7 @@ import { playFx } from './fx/engine.js';
 import { previewOf } from './fx/table.js';
 import { onPoolGame, poolResync } from './miniapps/pool.js';
 import { onSlingGame, slResync } from './miniapps/sling.js';
+import { onDdzGame, onDdzHand, onDdzScore, ddzResync } from './miniapps/ddz.js';
 import { onTttGame, tttResync } from './miniapps/ttt.js';
 import { notify, notifyGroupMessage, notifyMessage } from './notify.js';
 import { applyGroupLast, dropGroup, groupLine, groupOf } from './groups/data.js';
@@ -205,6 +206,10 @@ export function startRealtime() {
   ['requester_id', 'addressee_id'].forEach(function (col) {
     ch.on('postgres_changes', { event: '*', schema: 'public', table: 'friendships', filter: col + '=eq.' + me }, onFriendship);
   });
+  // 斗地主（群聊里）：Realtime 对每个订阅者各自套 RLS，ddz_games 只会收到我所在群的桌子；ddz_hands 只有我自己的手牌
+  ch.on('postgres_changes', { event: '*', schema: 'public', table: 'ddz_games', filter: 'group_id=gt.0' }, onDdzGame);
+  ch.on('postgres_changes', { event: '*', schema: 'public', table: 'ddz_hands', filter: 'user_id=eq.' + me }, onDdzHand);
+  ch.on('postgres_changes', { event: '*', schema: 'public', table: 'ddz_scores', filter: 'group_id=gt.0' }, onDdzScore);
   ['player_x', 'player_o'].forEach(function (col) {
     ch.on('postgres_changes', { event: '*', schema: 'public', table: 'ttt_games', filter: col + '=eq.' + me }, onTttGame);
   });
@@ -235,6 +240,7 @@ export async function refreshAll() {
   await loadAll();
   if (S.chat) {
     await fetchLatest(false); markReadIfNeeded(); agentResync();
-    if (S.chat && S.chat.gid == null) { tttResync(); slResync(); poolResync(); } // 小游戏只在私聊里
+    if (S.chat && S.chat.gid == null) { tttResync(); slResync(); poolResync(); } // 双人小游戏只在私聊里
+    else if (S.chat) ddzResync(); // 斗地主只在群聊里
   }
 }

@@ -6,6 +6,7 @@ import { fxParse } from '../fx/table.js';
 import { jumpTo, targetQuoteText } from '../menu.js';
 import { poolFillCard } from '../miniapps/pool.js';
 import { gameKind, slFillCard } from '../miniapps/sling.js';
+import { ddzFillCard, ddzKind } from '../miniapps/ddz.js';
 import { tttFillCard } from '../miniapps/ttt.js';
 import { updateQuote } from '../quote.js';
 import { dropFailed, retrySend } from '../send.js';
@@ -80,7 +81,7 @@ export function updateRow(el, m, prev) {
   if (el._body !== bsig) {
     el._body = bsig;
     var fx = pf && pf.fx;
-    var gk = agent || sys || grp ? null : gameKind(m.body), gid = gk ? gk.id : null; // 群里没有小游戏：邀请消息当普通文字
+    var gk = agent || sys ? null : grp ? ddzKind(m.body) : gameKind(m.body), gid = gk ? gk.id : null; // 群里只有斗地主是卡片，其余小游戏的邀请消息当普通文字；私聊里斗地主的邀请消息是普通文字
     el._gcid = gid; el._gkind = gk ? gk.k : null; el._gsig = null; // 井字棋卡片：不是文字气泡，不套状态装饰
     el._fxb = !!fx || gid != null;
     el._bubble.classList.toggle('fx', !!fx);
@@ -106,7 +107,7 @@ export function updateRow(el, m, prev) {
       el._bubble.removeAttribute('title');
     }
   }
-  if (el._gcid != null) { if (el._gkind === 'sling') slFillCard(el); else if (el._gkind === 'pool') poolFillCard(el); else tttFillCard(el); }
+  if (el._gcid != null) { if (el._gkind === 'sling') slFillCard(el); else if (el._gkind === 'pool') poolFillCard(el); else if (el._gkind === 'ddz') ddzFillCard(el); else tttFillCard(el); }
   updateQuote(el, m);
   refreshCls(el);
   if (!own) { el._meta.hidden = true; return; }
