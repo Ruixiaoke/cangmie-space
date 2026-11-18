@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
   const vapidPublic = Deno.env.get("VAPID_PUBLIC_KEY");
   const vapidPrivate = Deno.env.get("VAPID_PRIVATE_KEY");
   const vapidSubject = Deno.env.get("VAPID_SUBJECT");
-  if (!url || !adminKey || !vapidPublic || !vapidPrivate || !vapidSubject) {
+  if (!url || !adminKey) {
     return reply(req, 500, { error: "not_configured" });
   }
 
@@ -60,6 +60,9 @@ Deno.serve(async (req) => {
   const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
   const { data: auth, error: authErr } = await admin.auth.getUser(token);
   if (authErr || !auth?.user) return reply(req, 401, { error: "not_authenticated" });
+  if (!vapidPublic || !vapidPrivate || !vapidSubject) {
+    return reply(req, 200, { skipped: true, reason: "push_not_configured" });
+  }
   const me = auth.user.id;
 
   // 核对事件，得出收件人、推送内容和去重用的 ref_id
