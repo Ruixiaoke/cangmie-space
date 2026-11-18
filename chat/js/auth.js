@@ -64,6 +64,9 @@ export async function submitAuth(ev) {
       }
     } else {
       res = await sb.auth.signInWithPassword({ email: email, password: password });
+      if (res.error && res.error.code === 'invalid_credentials') {
+        res = await sb.auth.signInWithPassword({ email: username + '@users.local', password: password });
+      }
       if (res.error) { authMsg(authErrText(res.error)); return finishAuthFail(); }
     }
     // 成功：吉祥物欢呼一下，再进入

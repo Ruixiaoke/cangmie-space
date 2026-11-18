@@ -11,7 +11,7 @@ export var AGENT_AVATAR_SRC = '__AGENT_AVATAR__';
 // Web Push 的 VAPID 公钥（公钥可以公开；私钥只放在 Supabase Edge Function 的 secret 里）
 export var VAPID_PUBLIC_KEY = 'BHhMeM39Tgd8G3AkzDyjsbNm0yxcQ5t_6-oUFs-YJCVAMEmTZE6zFL2TLfV9h5IQpQMW7GyNNkY-G7ePO2sKMJo';
 // 用户名对应的邮箱后缀：email = 用户名 + "@" + EMAIL_DOMAIN（如果 Supabase 拒绝这个域名，改这里）
-export var EMAIL_DOMAIN = 'users.local';
+export var EMAIL_DOMAIN = 'ruixiaoke.github.io';
 export var USERNAME_RE = /^[a-z0-9_]{3,20}$/;
 export var PAGE = 50;
 export var EMOJIS = ['😀','😂','🥹','😍','🥰','😘','😋','😎','🤗','🤔','😴','😭','😡','🥺','😅','🙈',
