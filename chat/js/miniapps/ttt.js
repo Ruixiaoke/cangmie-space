@@ -105,6 +105,7 @@ export function tttPerson(id) {
 export var tttV = {
   // 小程序注册信息（+ 面板按这里显示按钮；run = 点按钮时做什么）
   id: 'ttt',
+  scope: 'dm',
   label: '井字棋',
   icon: 'i-grid',
   run: function () { tttStartHere(); },

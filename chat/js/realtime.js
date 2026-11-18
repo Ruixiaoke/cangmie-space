@@ -2,17 +2,19 @@
 
 import { agentResync, onAgentJob } from './agent/live.js';
 import { agentName } from './agent/info.js';
-import { fetchLatest, msgFromRow, nearBottom, renderMsgs, sortMsgs } from './chat/view.js';
+import { fetchLatest, msgFromRow, nearBottom, renderChatHeader, renderMsgs, sortMsgs } from './chat/view.js';
 import { loadAll } from './data.js';
 import { playFx } from './fx/engine.js';
 import { previewOf } from './fx/table.js';
 import { onPoolGame, poolResync } from './miniapps/pool.js';
 import { onSlingGame, slResync } from './miniapps/sling.js';
 import { onTttGame, tttResync } from './miniapps/ttt.js';
-import { notify, notifyMessage } from './notify.js';
+import { notify, notifyGroupMessage, notifyMessage } from './notify.js';
+import { applyGroupLast, dropGroup, groupLine, groupOf } from './groups/data.js';
+import { refreshGroupUi } from './groups/info.js';
 import { markReplyGone, replyPrefix } from './quote.js';
 import { markReadIfNeeded } from './read.js';
-import { S, avatarUrl, nameOf, profileOf, sb } from './state.js';
+import { S, avatarUrl, nameOf, profileOf, rowInChat, sb } from './state.js';
 import { popCheer } from './mascot.js';
 import { cut, isVisible, toast } from './utils.js';
 import { convOf, renderChats } from './views/chats.js';
@@ -20,6 +22,13 @@ import { updateBadges } from './views/tabs.js';
 
 // ===== 实时 =====
 export function applyOwnToConv(row) {
+  if (row.group_id != null) {
+    var g = groupOf(row.group_id);
+    if (!g) return;
+    if (applyGroupLast(g, row) && !row.author) g.unread_count = 0; // 自己发的消息：服务器已经把群读到这一条
+    renderChats(); updateBadges();
+    return;
+  }
   var conv = convOf(row.receiver_id);
   if (!conv) return;
   if (conv.last_id != null && Number(conv.last_id) > row.id) return;
@@ -31,18 +40,77 @@ export function applyOwnToConv(row) {
 function hasPendingTwin(c, row) {
   return c.msgs.some(function (m) { return m.id == null && m.status === 'sending' && m.sender_id === row.sender_id && m.body === row.body; });
 }
+// 群消息（真人、助手回复、系统提示）。同一条可能经「我发的」和「群里的」两路到达，用 id 去重
+async function onGroupMessage(row) {
+  var me = S.me.id, g = groupOf(row.group_id);
+  if (!g) {
+    await loadAll(); // 刚被拉进群的第一条消息：先把群和成员资料取回来
+    g = groupOf(row.group_id);
+    if (!g) return;
+  }
+  var sys = row.author === 'system';
+  var mine = row.sender_id === me && !row.author;
+  var c = S.chat, open = !!(c && c.gid === row.group_id);
+  if (applyGroupLast(g, row)) {
+    if (mine) g.unread_count = 0;
+    else if (!sys && !(open && isVisible())) g.unread_count = (Number(g.unread_count) || 0) + 1;
+  }
+  var fresh = false;
+  if (open && !c.ids.has(row.id)) {
+    if (!(mine && hasPendingTwin(c, row))) {
+      fresh = true;
+      var nm = msgFromRow(row);
+      c.ids.add(row.id); c.msgs.push(nm); sortMsgs(); renderMsgs({ stick: nearBottom() });
+      if (isVisible() && !nm.author && !mine) playFx(nm);
+    }
+  }
+  renderChats(); updateBadges();
+  if (sys) scheduleLoadAll(); // 有人进出 / 改名 / 开关助手：成员和资料重新取一次
+  if (mine || sys) return;
+  if (open && isVisible()) { markReadIfNeeded(); return; }
+  if (!fresh && open) return;
+  var rp = await replyPrefix(row);
+  notifyGroupMessage(row, g, rp);
+  if (isVisible() && !open) toast(g.name + '｜' + cut(groupLine(row), 24));
+}
+// 群或成员表变了：名字 / 助手开关 / 群主直接更新；加入新群重新取；被移出就关掉
+function onGroupRow(p) {
+  var row = p.new;
+  if (!row || row.id == null) return;
+  var g = groupOf(row.id);
+  if (!g) return;
+  g.name = row.name; g.owner_id = row.owner_id; g.agents = row.agents; g.updated_at = row.updated_at;
+  renderChats();
+  if (S.chat && S.chat.gid === row.id) { renderChatHeader(); refreshGroupUi(); }
+}
+function onMemberRow(p) {
+  var me = S.me.id;
+  if (p.eventType === 'DELETE') {
+    var old = p.old || {};
+    if (old.group_id != null && (old.user_id == null || old.user_id === me)) dropGroup(old.group_id, false);
+    return;
+  }
+  var row = p.new || {};
+  if (p.eventType === 'INSERT') { scheduleLoadAll(); return; }
+  // UPDATE：别的设备读了这个群，同步未读数
+  var g = groupOf(row.group_id);
+  if (g && Number(g.unread_count) > 0 && g.last_id != null && Number(row.last_read_id) >= Number(g.last_id)) {
+    g.unread_count = 0; renderChats(); updateBadges();
+  }
+}
 async function onMessageInsert(row) {
+  if (row.group_id != null) return; // 群消息走 onGroupMessage
   var me = S.me.id;
   if (row.sender_id === me) {
     // 自己在别处（另一个标签页 / 设备）发的
-    if (S.chat && S.chat.peer === row.receiver_id && !S.chat.ids.has(row.id) && !hasPendingTwin(S.chat, row)) {
+    if (S.chat && rowInChat(S.chat, row) && !S.chat.ids.has(row.id) && !hasPendingTwin(S.chat, row)) {
       S.chat.ids.add(row.id); S.chat.msgs.push(msgFromRow(row)); sortMsgs(); renderMsgs({ stick: nearBottom() });
     }
     applyOwnToConv(row);
-    if (row.author && !(S.chat && S.chat.peer === row.receiver_id) && isVisible()) toast(agentName(row.author) + '回复了你：' + cut(row.body, 24)); // 提问的人不在这个聊天里
+    if (row.author && !(S.chat && rowInChat(S.chat, row)) && isVisible()) toast(agentName(row.author) + '回复了你：' + cut(row.body, 24)); // 提问的人不在这个聊天里
     return;
   }
-  var open = S.chat && S.chat.peer === row.sender_id;
+  var open = S.chat && S.chat.gid == null && S.chat.peer === row.sender_id;
   var conv = convOf(row.sender_id);
   if (!conv || !profileOf(row.sender_id)) {
     await loadAll(); // 新好友的第一条消息：先把资料取回来
@@ -73,7 +141,15 @@ async function onMessageInsert(row) {
 }
 function onMessageUpdate(row) {
   var me = S.me.id;
-  if (S.chat && (row.sender_id === S.chat.peer || row.receiver_id === S.chat.peer)) {
+  if (row.group_id != null) {
+    // 群里被引用的消息删除后 reply_to 变空
+    if (S.chat && S.chat.gid === row.group_id) {
+      var gx = S.chat.msgs.find(function (m) { return m.id === row.id; });
+      if (gx && markReplyGone(gx, row)) renderMsgs({ stick: false });
+    }
+    return;
+  }
+  if (S.chat && S.chat.gid == null && (row.sender_id === S.chat.peer || row.receiver_id === S.chat.peer)) {
     var rx = S.chat.msgs.find(function (m) { return m.id === row.id; });
     if (rx && markReplyGone(rx, row)) renderMsgs({ stick: false }); // 被引用的消息删除后 reply_to 变空
   }
@@ -113,12 +189,19 @@ export function startRealtime() {
   var me = S.me.id;
   var ch = sb.channel('chat-' + me + '-' + Date.now());
   function msg(event, col, handler) {
-    ch.on('postgres_changes', { event: event, schema: 'public', table: 'messages', filter: col + '=eq.' + me }, function (p) { handler(p.new); });
+    // 群消息的 sender_id 也是我（我发的 / 我叫出来的助手回复）：这两路只管私聊，群消息走下面 group_id 的订阅
+    ch.on('postgres_changes', { event: event, schema: 'public', table: 'messages', filter: col + '=eq.' + me }, function (p) { if (p.new && p.new.group_id == null) handler(p.new); });
   }
   msg('INSERT', 'receiver_id', onMessageInsert);
   msg('INSERT', 'sender_id', onMessageInsert);
   msg('UPDATE', 'sender_id', onMessageUpdate);
   msg('UPDATE', 'receiver_id', onMessageUpdate);
+  // 群消息：Realtime 对每个订阅者各自套 RLS，所以 group_id > 0 只会收到我所在群的消息
+  ch.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'group_id=gt.0' }, function (p) { onGroupMessage(p.new); });
+  ch.on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages', filter: 'group_id=gt.0' }, function (p) { onMessageUpdate(p.new); });
+  ch.on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'groups' }, onGroupRow);
+  ch.on('postgres_changes', { event: '*', schema: 'public', table: 'group_members', filter: 'user_id=eq.' + me }, onMemberRow);
+  ch.on('postgres_changes', { event: '*', schema: 'public', table: 'agent_jobs', filter: 'group_id=gt.0' }, onAgentJob);
   ['requester_id', 'addressee_id'].forEach(function (col) {
     ch.on('postgres_changes', { event: '*', schema: 'public', table: 'friendships', filter: col + '=eq.' + me }, onFriendship);
   });
@@ -150,5 +233,8 @@ export function stopRealtime() {
 export async function refreshAll() {
   if (!S.me) return;
   await loadAll();
-  if (S.chat) { await fetchLatest(false); markReadIfNeeded(); tttResync(); slResync(); poolResync(); agentResync(); }
+  if (S.chat) {
+    await fetchLatest(false); markReadIfNeeded(); agentResync();
+    if (S.chat && S.chat.gid == null) { tttResync(); slResync(); poolResync(); } // 小游戏只在私聊里
+  }
 }

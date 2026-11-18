@@ -1,6 +1,8 @@
 // 输入框里打 @ 弹出的小列表：选一个 agent，插入 "@榴莲 "
 
 import { autosize } from '../composer.js';
+import { enabledAgents, groupOf } from '../groups/data.js';
+import { S } from '../state.js';
 import { $, clear, h } from '../utils.js';
 import { AGENTS, makeAgentAvatar } from './info.js';
 
@@ -11,9 +13,14 @@ import { AGENTS, makeAgentAvatar } from './info.js';
 var TOKEN_RE = /(^|[^A-Za-z0-9_.])[@＠]([^\s@＠]{0,10})$/;
 var st = { open: false, list: [], idx: 0, start: 0 };
 
+// 群聊里只列出这个群已经打开的助手
+function available() {
+  var c = S.chat;
+  return c && c.gid != null ? enabledAgents(groupOf(c.gid)) : AGENTS;
+}
 function matches(q) {
   var l = q.toLowerCase();
-  return AGENTS.filter(function (a) {
+  return available().filter(function (a) {
     if (l === '') return true;
     return a.keys.some(function (k) { return k.toLowerCase().indexOf(l) === 0; }) && q !== a.name;
   });

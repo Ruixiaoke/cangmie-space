@@ -5,17 +5,29 @@ import { svgIcon } from './menu.js';
 import { APP, layoutApp } from './miniapps/host.js';
 import { openLeaderboard } from './miniapps/leaderboard.js';
 import { poolRankGame } from './miniapps/pool.js';
-import { listMiniApps } from './miniapps/registry.js';
-import { $, h } from './utils.js';
+import { appsForScope } from './miniapps/registry.js';
+import { S } from './state.js';
+import { $, clear, h } from './utils.js';
 
 // ===== "+" 工具面板 =====
 // 以后加工具：新建 miniapps/<名字>.js，再到 miniapps/registry.js 的 listMiniApps() 里加一行即可（图标用 SVG 符号 id，run 里调用 openApp(id, params)）
 // 排行榜不是小程序（没有 mount），但也放在这个面板里；开着哪个游戏就先看哪张榜
-var RANK_TOOL = { label: '排行榜', img: 'rank/icon-rank.png', run: function () { openLeaderboard(APP.cur ? (APP.cur.id === 'pool' ? poolRankGame() : APP.cur.id) : 'ttt'); } };
-function plusTools() { return listMiniApps().concat([RANK_TOOL]); }
-export function buildPlusPanel() {
-  var g = $('toolGrid');
-  plusTools().forEach(function (t) {
+var RANK_TOOL = { scope: 'dm', label: '排行榜', img: 'rank/icon-rank.png', run: function () { openLeaderboard(APP.cur ? (APP.cur.id === 'pool' ? poolRankGame() : APP.cur.id) : 'ttt'); } };
+// 只列出和当前会话（私聊 / 群聊）匹配的工具；排行榜只在私聊里
+function plusTools() {
+  var scope = S.chat && S.chat.gid != null ? 'group' : 'dm';
+  return appsForScope(scope).concat(scope === 'dm' ? [RANK_TOOL] : []);
+}
+// 打开会话时重建；一个工具都没有（比如现在的群聊）就把 + 按钮藏起来
+export function refreshPlusPanel() {
+  var g = clear($('toolGrid')), tools = plusTools();
+  $('plusBtn').hidden = tools.length === 0;
+  if (!tools.length) setPanel(null);
+  fillPlus(g, tools);
+}
+export function buildPlusPanel() { fillPlus($('toolGrid'), plusTools()); }
+function fillPlus(g, tools) {
+  tools.forEach(function (t) {
     var b = h('button', { type: 'button', 'aria-label': t.label }, t.img ? h('img', { class: 'tool-img', src: t.img, alt: '', draggable: 'false' }) : svgIcon(t.icon), h('span', { text: t.label }));
     b.addEventListener('pointerdown', function (ev) { ev.preventDefault(); }); // 不抢输入框焦点
     b.addEventListener('click', function () { closePanels(); t.run(); });

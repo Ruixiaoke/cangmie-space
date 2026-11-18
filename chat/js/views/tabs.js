@@ -1,6 +1,7 @@
 // 标签页 / 角标 / 标题
 
-import { renderChatHeader } from '../chat/view.js';
+import { renderChatHeader, renderMsgs } from '../chat/view.js';
+import { refreshGroupUi } from '../groups/info.js';
 import { S } from '../state.js';
 import { $ } from '../utils.js';
 import { incomingRequests, renderChats, totalUnread } from './chats.js';
@@ -33,5 +34,8 @@ export function renderAll() {
   renderSearchResult();
   if (S.tab === 'me') renderMe();
   updateBadges();
-  if (S.chat) renderChatHeader();
+  if (S.chat) {
+    renderChatHeader();
+    if (S.chat.gid != null) { if (S.chat.loaded) renderMsgs({ stick: false, quiet: true }); refreshGroupUi(); } // 成员资料更新后，名字和头像跟着变
+  }
 }

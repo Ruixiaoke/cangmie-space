@@ -9,7 +9,7 @@ import { gameKind, slFillCard } from '../miniapps/sling.js';
 import { tttFillCard } from '../miniapps/ttt.js';
 import { updateQuote } from '../quote.js';
 import { dropFailed, retrySend } from '../send.js';
-import { S, makeAvatar, profileOf } from '../state.js';
+import { S, makeAvatar, nameOf, profileOf } from '../state.js';
 import { clear, fmtStamp, h } from '../utils.js';
 import { convOf, peerFromConv } from '../views/chats.js';
 
@@ -58,26 +58,29 @@ export function buildDeco(box, st, on) {
   }
 }
 export function updateRow(el, m, prev) {
-  var agent = isAgentMsg(m);
-  var own = m.sender_id === S.me.id && !agent;
+  var agent = isAgentMsg(m), sys = m.author === 'system';
+  var grp = !!(S.chat && S.chat.gid != null);
+  var own = m.sender_id === S.me.id && !agent && !sys;
   var gap = !prev || (new Date(m.created_at) - new Date(prev.created_at) > 5 * 60000);
   el._stamp.hidden = !gap;
   if (gap) el._stamp.textContent = fmtStamp(m.created_at);
   // 头像：资料重新加载后头像路径变了就重建
-  var ap = agent ? null : own ? S.me : (profileOf(m.sender_id) || (convOf(m.sender_id) ? peerFromConv(convOf(m.sender_id)) : null));
-  var akey = agent ? 'a|' + m.author : (own ? 'o|' : 'p|') + (ap && ap.avatar_path || '');
-  if (el._akey !== akey) { el._akey = akey; clear(el._av).appendChild(agent ? makeAgentAvatar(40, m.author) : makeAvatar(ap, 40)); }
-  // 榴莲：头像右边、气泡上面的名字（两边的人看到的都一样）
-  el._name.hidden = !agent;
-  if (agent && el._name.textContent !== agentName(m.author)) el._name.textContent = agentName(m.author);
+  var ap = agent || sys ? null : own ? S.me : (profileOf(m.sender_id) || (convOf(m.sender_id) ? peerFromConv(convOf(m.sender_id)) : null));
+  var akey = sys ? 's|' : agent ? 'a|' + m.author : (own ? 'o|' : 'p|') + (ap && ap.avatar_path || '') + (ap && !ap.avatar_path ? '|' + ap.id : '');
+  if (el._akey !== akey) { el._akey = akey; clear(el._av); if (!sys) el._av.appendChild(agent ? makeAgentAvatar(40, m.author) : makeAvatar(ap, 40)); }
+  // 助手 / 群里别人的名字：头像右边、气泡上面（两边的人看到的都一样）
+  var nm = agent ? agentName(m.author) : (grp && !own && !sys ? nameOf(m.sender_id) : '');
+  el._name.hidden = !nm;
+  if (nm && el._name.textContent !== nm) el._name.textContent = nm;
+  el._name.classList.toggle('plain', !agent);
   el._m = m;
-  var pf = agent ? null : fxParse(m.body); // 榴莲的回复永远是普通文字：不当特效 / 小游戏解析
+  var pf = agent || sys ? null : fxParse(m.body); // 助手的回复和系统提示永远是普通文字：不当特效 / 小游戏解析
   var q = pf && pf.tid != null ? targetQuoteText(pf.tid) : '';
-  var bsig = (agent ? 'A|' : '') + m.body + '|' + q;
+  var bsig = (agent ? 'A|' : sys ? 'S|' : '') + (grp ? 'G|' : '') + m.body + '|' + q;
   if (el._body !== bsig) {
     el._body = bsig;
     var fx = pf && pf.fx;
-    var gk = agent ? null : gameKind(m.body), gid = gk ? gk.id : null;
+    var gk = agent || sys || grp ? null : gameKind(m.body), gid = gk ? gk.id : null; // 群里没有小游戏：邀请消息当普通文字
     el._gcid = gid; el._gkind = gk ? gk.k : null; el._gsig = null; // 井字棋卡片：不是文字气泡，不套状态装饰
     el._fxb = !!fx || gid != null;
     el._bubble.classList.toggle('fx', !!fx);
@@ -107,8 +110,10 @@ export function updateRow(el, m, prev) {
   updateQuote(el, m);
   refreshCls(el);
   if (!own) { el._meta.hidden = true; return; }
+  // 群里没有逐条已读：发送成功后不显示 已读 / 未读，只留 发送中 / 发送失败
+  if (grp && m.status === 'sent') { el._meta.hidden = true; el._sig = null; return; }
   el._meta.hidden = false;
-  var sig = m.status + '|' + (m.read_at ? 1 : 0);
+  var sig = m.status + '|' + (grp ? 0 : m.read_at ? 1 : 0);
   if (el._sig === sig) return;
   el._sig = sig;
   clear(el._meta);

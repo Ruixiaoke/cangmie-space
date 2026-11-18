@@ -202,6 +202,7 @@ function plLoadImages() {
 var PV = null; // 当前打开的这一局的界面状态
 export var poolV = {
   id: 'pool',
+  scope: 'dm',
   label: '台球',
   strip: 'hidden',
   flush: true,

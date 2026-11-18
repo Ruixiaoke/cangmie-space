@@ -11,6 +11,7 @@ import { $, clear } from '../utils.js';
 // 小程序是聊天页里一整层，垫在消息后面；消息半透明地漂在上面，点击和长按穿透下去。
 // 注册：在 miniapps/registry.js 的 listMiniApps() 里加一项；每个小程序 = { id, label, icon, run(), mount(box, params), unmount(), same(a, b) }。
 // 打开：openApp(id, params)；同一时间只有一个。
+// scope：'dm'（私聊）或 'group'（群聊），+ 面板只列出和当前会话匹配的；
 // 可选字段：strip: 'hidden' = 消息带子默认完全收起（0 高），顶栏右侧出现"消息"按钮，点开恢复成约 30% 高，再点收起；收起时来了新消息，按钮上显示未读数；
 // flush: true = 小程序内容贴边，不要宿主的内边距。
 export var APP = { cur: null, scroll: null, stripOpen: false, base: 0 };
@@ -61,6 +62,7 @@ export function layoutApp() {
 export function openApp(id, params) {
   var def = getMiniApp(id);
   if (!def || !S.chat) return false;
+  if (def.scope !== (S.chat.gid != null ? 'group' : 'dm')) return false; // 私聊的小游戏不能在群里开，反过来也一样
   params = params || {};
   if (APP.cur) {
     if (APP.cur.id === id && def.same && def.same(APP.cur.params, params)) return true; // 已经开着：保持

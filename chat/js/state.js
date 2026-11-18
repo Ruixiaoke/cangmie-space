@@ -12,14 +12,25 @@ export var S = {
   me: null,
   profiles: new Map(),     // id -> {id, username, nickname, avatar_path}
   convs: [],               // list_conversations() 的结果（每个好友一行）
+  groups: [],              // list_groups() 的结果（每个群一行）
   friendships: [],         // 我的所有 friendships 行
   tab: 'chats',
-  chat: null,              // 当前打开的会话
+  chat: null,              // 当前打开的会话：私聊 { peer, gid: null }，群聊 { peer: null, gid }
   channel: null,
   hadSubscribed: false,
   tempSeq: 0
 };
 
+// 当前打开的是群聊吗
+export function isGroupChat(c) { return !!c && c.gid != null; }
+// 会话的稳定键（私聊 p<对方 id>，群聊 g<群 id>）：异步回来之后核对「还是不是刚才那个会话」
+export function convKey(c) { return c ? (c.gid != null ? 'g' + c.gid : 'p' + c.peer) : null; }
+// 一条消息行（数据库行或本地乐观消息）属于这个打开的会话吗
+export function rowInChat(c, row) {
+  if (!c || !row) return false;
+  if (c.gid != null) return row.group_id === c.gid;
+  return row.group_id == null && (row.sender_id === c.peer || row.receiver_id === c.peer);
+}
 export function avatarUrl(path) {
   if (!path) return null;
   try { return sb.storage.from('avatars').getPublicUrl(path).data.publicUrl; } catch (e) { return null; }

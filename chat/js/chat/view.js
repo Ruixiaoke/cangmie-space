@@ -15,22 +15,38 @@ import { closeActMenu } from '../menu.js';
 import { closeApp, openApp } from '../miniapps/host.js';
 import { closeLeaderboard } from '../miniapps/leaderboard.js';
 import { closeNotifications } from '../notify.js';
-import { closePanels } from '../plus.js';
+import { closePanels, refreshPlusPanel } from '../plus.js';
 import { jumpToQuote, markReplyGone, resetQuoteUi } from '../quote.js';
 import { markReadIfNeeded } from '../read.js';
 import { applySkin } from '../skins/index.js';
 import { sand, sandDisable, sandKill, sandNew } from '../skins/sand.js';
-import { S, makeAvatar, profileOf, sb } from '../state.js';
+import { S, convKey, makeAvatar, profileOf, sb } from '../state.js';
 import { emptyState } from '../mascot.js';
 import { $, clear, h, isVisible, toast } from '../utils.js';
 import { convOf, peerFromConv } from '../views/chats.js';
+import { groupOf, memberIds } from '../groups/data.js';
+import { closeGroupInfo } from '../groups/info.js';
+import { makeGroupAvatar } from '../groups/ui.js';
 
 // ===== 聊天页 =====
 function chatKey(m) { return m.key; }
 export function renderChatHeader() {
   var c = S.chat; if (!c) return;
+  var who = document.querySelector('#chat .who'), av = $('chatAvatar');
+  var isG = c.gid != null;
+  who.classList.toggle('gtap', isG); av.classList.toggle('gtap', isG);
+  if (isG) {
+    var g = groupOf(c.gid);
+    clear(av).appendChild(makeGroupAvatar(g || { member_ids: [] }, 40));
+    clear($('chatName')).appendChild(h('span', { class: 'gname', text: g ? g.name : '群聊' }));
+    if (g) $('chatName').appendChild(h('span', { class: 'gcount', text: '(' + memberIds(g).length + ')' }));
+    $('chatUser').textContent = '';
+    ['role', 'tabindex', 'aria-label'].forEach(function (a, i) { who.setAttribute(a, ['button', '0', '群信息'][i]); });
+    return;
+  }
+  ['role', 'tabindex', 'aria-label'].forEach(function (a) { who.removeAttribute(a); });
   var p = profileOf(c.peer) || (convOf(c.peer) ? peerFromConv(convOf(c.peer)) : null);
-  clear($('chatAvatar')).appendChild(makeAvatar(p, 40));
+  clear(av).appendChild(makeAvatar(p, 40));
   $('chatName').textContent = p ? p.nickname : '好友';
   $('chatUser').textContent = p ? '@' + p.username : '';
 }
@@ -41,10 +57,22 @@ export async function openChat(peerId, fromHistory) {
     await loadAll();
     if (!convOf(peerId)) return toast('你们还不是好友');
   }
-  if (S.chat && S.chat.peer === peerId) return;
-  S.chat = { peer: peerId, msgs: [], ids: new Set(), nodes: new Map(), hasMore: false, loadingOlder: false, loaded: false,
+  return openConv({ peer: peerId, gid: null }, fromHistory);
+}
+export async function openGroup(gid, fromHistory) {
+  if (!S.me || !groupOf(gid)) {
+    // 可能刚被拉进群，先刷新一次
+    await loadAll();
+    if (!groupOf(gid)) return toast('你不在这个群里');
+  }
+  return openConv({ peer: null, gid: gid }, fromHistory);
+}
+async function openConv(id, fromHistory) {
+  if (S.chat && convKey(S.chat) === convKey(id)) return;
+  S.chat = { peer: id.peer, gid: id.gid, msgs: [], ids: new Set(), nodes: new Map(), hasMore: false, loadingOlder: false, loaded: false,
     bstate: {}, bshow: {}, btstate: {}, btshow: {}, finfo: {}, bev: [], fxApplied: new Set(), agentJobs: {} };
-  if (!fromHistory) { try { history.pushState({ chat: peerId }, ''); } catch (e) { /* 忽略 */ } }
+  var key = convKey(S.chat);
+  if (!fromHistory) { try { history.pushState({ chat: key }, ''); } catch (e) { /* 忽略 */ } }
   $('chat').hidden = false;
   closePanels();
   $('input').value = '';
@@ -55,16 +83,18 @@ export async function openChat(peerId, fromHistory) {
   clear($('chatEmpty'));
   $('olderRow').hidden = true;
   renderChatHeader();
-  closeNotifications('msg-' + peerId);
+  refreshPlusPanel();
+  closeNotifications(id.gid != null ? 'grp-' + id.gid : 'msg-' + id.peer);
   applySkin();
   startDecay();
   await fetchLatest(true);
-  if (S.chat && S.chat.peer === peerId) { markReadIfNeeded(); agentResync(); }
+  if (S.chat && convKey(S.chat) === key) { markReadIfNeeded(); agentResync(); }
 }
 export function closeChat() {
   if (!S.chat) return;
   closeLeaderboard();
   closeApp();
+  closeGroupInfo();
   S.chat = null;
   stopFx(); stopDecay(); closeActMenu(); resetLive();
   sandDisable();
@@ -76,7 +106,12 @@ export function closeChat() {
 }
 
 export function msgFromRow(r) {
-  return { key: 'm' + r.id, id: r.id, sender_id: r.sender_id, receiver_id: r.receiver_id, body: r.body, created_at: r.created_at, read_at: r.read_at, reply_to: r.reply_to == null ? null : r.reply_to, author: r.author || null, status: 'sent' };
+  return { key: 'm' + r.id, id: r.id, sender_id: r.sender_id, receiver_id: r.receiver_id, group_id: r.group_id == null ? null : r.group_id, body: r.body, created_at: r.created_at, read_at: r.read_at, reply_to: r.reply_to == null ? null : r.reply_to, author: r.author || null, status: 'sent' };
+}
+// 当前会话的消息查询：群聊按 group_id，私聊按双方
+function convQuery(c) {
+  var q = sb.from('messages').select('*');
+  return c.gid != null ? q.eq('group_id', c.gid) : q.or(peerFilter(c.peer));
 }
 function peerFilter(peer) {
   var me = S.me.id;
@@ -112,9 +147,9 @@ export function sortMsgs() {
 }
 export async function fetchLatest(first) {
   var c = S.chat; if (!c) return;
-  var peer = c.peer;
-  var r = await sb.from('messages').select('*').or(peerFilter(peer)).order('id', { ascending: false }).limit(PAGE);
-  if (!S.chat || S.chat.peer !== peer) return;
+  var key = convKey(c);
+  var r = await convQuery(c).order('id', { ascending: false }).limit(PAGE);
+  if (!S.chat || convKey(S.chat) !== key) return;
   if (r.error) return toast(errText(r.error));
   var rows = r.data || [];
   if (first) c.hasMore = rows.length === PAGE;
@@ -130,9 +165,9 @@ export async function loadOlder() {
   if (!oldest) return;
   c.loadingOlder = true;
   $('olderRow').hidden = false;
-  var box = $('msgs'), prevH = box.scrollHeight, prevTop = box.scrollTop, peer = c.peer;
-  var r = await sb.from('messages').select('*').or(peerFilter(peer)).lt('id', oldest.id).order('id', { ascending: false }).limit(PAGE);
-  if (!S.chat || S.chat.peer !== peer) return;
+  var box = $('msgs'), prevH = box.scrollHeight, prevTop = box.scrollTop, key = convKey(c);
+  var r = await convQuery(c).lt('id', oldest.id).order('id', { ascending: false }).limit(PAGE);
+  if (!S.chat || convKey(S.chat) !== key) return;
   c.loadingOlder = false;
   $('olderRow').hidden = true;
   if (r.error) return toast(errText(r.error));
@@ -193,7 +228,7 @@ export function renderMsgs(opts) {
   if (sand.on && fresh.length && isVisible()) sandNew(fresh);
   if (evQueued) setTimeout(settleBev, 0);
 }
-function notAgent(m) { return !isAgentMsg(m); }
+function notAgent(m) { return !m.author; } // 助手的回复和系统提示都不参与特效 / 气泡状态
 function buildRow(m) {
   var el = h('div', { class: 'row' });
   el._stamp = h('div', { class: 'stamp', hidden: true });
@@ -235,11 +270,11 @@ function stClasses(st) {
 }
 export function refreshCls(el) {
   var m = el._m, c = S.chat; if (!m || !S.me) return;
-  var agent = isAgentMsg(m);
-  var own = m.sender_id === S.me.id && !agent;
-  var st = c && !agent ? rowState(c, m) : NORMAL;
+  var agent = isAgentMsg(m), sys = m.author === 'system';
+  var own = m.sender_id === S.me.id && !agent && !sys;
+  var st = c && !agent && !sys ? rowState(c, m) : NORMAL;
   var sc = el._fxb ? '' : stClasses(st); // 特效气泡本身不加装饰
-  el.className = 'row ' + (own ? 'own' : 'peer') + (agent ? ' agent' : '') + (m.status === 'sending' ? ' sending' : '') + (m.status === 'failed' ? ' failed' : '') + (el._gcid != null ? ' row-game' : '') + sc +
+  el.className = 'row ' + (sys ? 'sys' : own ? 'own' : 'peer') + (agent ? ' agent' : '') + (m.status === 'sending' ? ' sending' : '') + (m.status === 'failed' ? ' failed' : '') + (el._gcid != null ? ' row-game' : '') + sc +
     (el._sd === 'gone' ? ' sand-gone' : el._sd === 'build' ? ' sand-build' : '');
   if (el._dk !== sc) { el._dk = sc; buildDeco(el._deco, st, !!sc); }
 }

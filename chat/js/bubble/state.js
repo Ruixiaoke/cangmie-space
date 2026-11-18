@@ -135,9 +135,16 @@ export function bubbleFold(msgs, now) {
     var combo = false;
     if (run.ts.length === 3 && run.ts[2] - run.ts[0] <= COMBO_MS) { combo = true; run.ts = []; }
     // 对战：对方刚发过同样的特效，10 秒内回敬
-    var counter = !!(prev && prev.sender !== s && prev.tok === tok && ts - prev.ts >= 0 && ts - prev.ts <= COUNTER_MS);
+    var grp = m.receiver_id == null; // 群里：没有「对方」，没指定目标的特效只播全屏动画，不改任何人的气泡；指定了某条消息就改那条消息的发送者
+    var counter = !grp && !!(prev && prev.sender !== s && prev.tok === tok && ts - prev.ts >= 0 && ts - prev.ts <= COUNTER_MS);
     prev = { sender: s, tok: tok, ts: ts };
     var rec = info[m.key] = { combo: combo, counter: counter, ev: null, x: null, tid: null, uid: uid };
+    if (grp) {
+      if (p.tid == null) return;
+      var gt = byId[p.tid];
+      if (!gt || gt.sender_id === s) return;
+      uid = gt.sender_id; rec.uid = uid;
+    }
     if (p.tid != null) {
       var tm = byId[p.tid];
       // 只认已加载、而且是被打中的人发的普通消息

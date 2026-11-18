@@ -4,12 +4,16 @@ import { poolV } from './pool.js';
 import { slV } from './sling.js';
 import { tttV } from './ttt.js';
 
+// 每个小程序有 scope：'dm' = 只在私聊里（双人回合制小游戏），'group' = 只在群聊里（以后的多人游戏）
 export function listMiniApps() {
   return [
     tttV,
     slV,
     poolV
   ];
+}
+export function appsForScope(scope) {
+  return listMiniApps().filter(function (a) { return a.scope === scope; });
 }
 export function getMiniApp(id) {
   var apps = listMiniApps();

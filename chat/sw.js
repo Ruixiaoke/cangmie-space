@@ -12,13 +12,14 @@ self.addEventListener('notificationclick', (event) => {
     for (const c of wins) {
       if (c.url.indexOf(self.registration.scope) === 0) {
         try { await c.focus(); } catch (e) { /* 忽略 */ }
-        c.postMessage({ type: 'notification-click', peer: data.peer || null, tab: data.tab || null });
+        c.postMessage({ type: 'notification-click', peer: data.peer || null, group: data.group || null, tab: data.tab || null });
         return;
       }
     }
     // 没有已打开的页面：新开一个，带上参数，页面登录后会自己跳转
     const url = new URL('./', self.registration.scope);
-    if (data.peer) url.searchParams.set('peer', data.peer);
+    if (data.group) url.searchParams.set('group', data.group);
+    else if (data.peer) url.searchParams.set('peer', data.peer);
     else if (data.tab) url.searchParams.set('tab', data.tab);
     await self.clients.openWindow(url.href);
   })());
@@ -41,7 +42,7 @@ self.addEventListener('push', (event) => {
     // 苹果平台：正常情况下服务器已经因为这台设备在前台而没有推送（见 send-push 的 active_until）；
     // 万一仍然收到（心跳刚好过期的竞态），Safari 收到推送却什么都没显示可能撤销推送权限，所以照常显示。
     if (visible && !isApple()) {
-      mine.forEach((c) => c.postMessage({ type: 'push', peer: d.peer || null, tab: d.tab || null, tag: d.tag || null }));
+      mine.forEach((c) => c.postMessage({ type: 'push', peer: d.peer || null, group: d.group || null, tab: d.tab || null, tag: d.tag || null }));
       return;
     }
     await self.registration.showNotification(d.title || '藏咩空间', {
@@ -50,7 +51,7 @@ self.addEventListener('push', (event) => {
       renotify: !!d.tag,
       icon: icon,
       badge: icon,
-      data: { peer: d.peer || null, tab: d.tab || null }
+      data: { peer: d.peer || null, group: d.group || null, tab: d.tab || null }
     });
   })());
 });

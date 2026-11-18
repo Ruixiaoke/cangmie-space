@@ -3,6 +3,7 @@
 import { agentName } from './agent/info.js';
 import { VAPID_PUBLIC_KEY } from './config.js';
 import { previewOf } from './fx/table.js';
+import { groupLine } from './groups/data.js';
 import { S, avatarUrl, profileOf, sb } from './state.js';
 import { cut, isVisible } from './utils.js';
 import { notifOn } from './views/me.js';
@@ -143,5 +144,16 @@ export function notifyMessage(m, prefix) {
     tag: 'msg-' + m.sender_id,
     icon: p && avatarUrl(p.avatar_path),
     data: { peer: m.sender_id }
+  });
+}
+// 群消息：标题是群名，正文「昵称：预览」；点开直接进这个群
+export function notifyGroupMessage(m, g, prefix) {
+  var p = profileOf(m.sender_id);
+  notify({
+    title: g ? g.name : '群聊',
+    body: cut((prefix || '') + groupLine(m), 80),
+    tag: 'grp-' + m.group_id,
+    icon: m.author ? undefined : p && avatarUrl(p.avatar_path),
+    data: { group: m.group_id }
   });
 }

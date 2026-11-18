@@ -389,7 +389,6 @@ end $$;
 call pg_temp.as_user('c9000000-0000-0000-0000-00000000000d');
 do $$ begin
   if public.leave_group(current_setting('grp.id')::bigint) then raise exception 'carol still there'; end if;
-  if (select owner_id from public.groups where id = current_setting('grp.id')::bigint) is not null then null; end if;
 end $$;
 -- dave 退群后他看不到群了；carol 是最后一个，退群后群和消息、任务、记忆都没了
 call pg_temp.as_user('c9000000-0000-0000-0000-00000000000c');
