@@ -25,14 +25,14 @@ export function mentionedAgent(body) {
 var AVATAR_FALLBACKS = ['../agent/avatar.png', '../agent/avatar.jpg', '../agent/avatar.webp'];
 export function makeAgentAvatar(size, author) {
   var box = h('div', { class: 'avatar agent-av', style: size ? 'width:' + size + 'px;height:' + size + 'px' : null });
-  var cands = AGENT_AVATAR_SRC.indexOf('?v=') > 0 ? [AGENT_AVATAR_SRC] : AVATAR_FALLBACKS.slice(); // 没替换占位符（本地调试）时逐个试扩展名
+  var cands = author === 'ye_ying' ? ['../agent/ye-ying-avatar.png']
+    : AGENT_AVATAR_SRC.indexOf('?v=') > 0 ? [AGENT_AVATAR_SRC] : AVATAR_FALLBACKS.slice();
   var i = 0;
   function useDrawn() {
     box.classList.add('drawn');
     box.textContent = agentName(author).charAt(0);
     box.setAttribute('aria-hidden', 'true');
   }
-  if (author === 'ye_ying') { useDrawn(); return box; }
   var img = h('img', { alt: '', draggable: 'false' });
   img.addEventListener('error', function () {
     i++;

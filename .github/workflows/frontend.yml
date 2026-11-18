@@ -7,6 +7,7 @@ on:
       - "index.html"
       - "chat/**"
       - "agent/avatar.*"
+      - "agent/ye-ying-avatar.png"
       - "*.png"
       - "*.jpg"
       - "*.jpeg"
@@ -46,6 +47,7 @@ jobs:
           cp -R chat _site/
           # 沈剑心的头像：只发布 agent/ 里的头像文件（人设 persona.md 等不上线）
           mkdir _site/agent
+          cp agent/ye-ying-avatar.png _site/agent/
           AGENT_AVATAR=""
           for ext in png jpg jpeg webp; do
             if [ -f "agent/avatar.$ext" ]; then
