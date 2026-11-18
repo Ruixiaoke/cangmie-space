@@ -103,7 +103,9 @@ Deno.test("each agent receives both speakers' history and replies under its own 
       admin: w.admin, apiKey: "test-key", model: "gpt-6-luna",
       fetchFn: (_url, init) => {
         requests.push(JSON.parse(String(init?.body)));
-        return Promise.resolve(json({ output: [{ type: "message", content: [{ type: "output_text", text: "茶还温着。" }] }] }));
+        const other = id === "durian" ? "叶英" : "沈剑心";
+        const text = `${name}：茶还温着。\n\n**${other}：** 多谢。\n我先坐下了。`;
+        return Promise.resolve(json({ output: [{ type: "message", content: [{ type: "output_text", text }] }] }));
       },
       push: (_user, payload) => { titles.push(payload.title); return Promise.resolve(); },
     }, 7);
@@ -111,7 +113,7 @@ Deno.test("each agent receives both speakers' history and replies under its own 
     if (request?.instructions !== systemInstructions(id)) throw new Error("wrong persona for " + name);
     const history = JSON.stringify(request.input);
     if (!history.includes("叶英：茶还温着。") || !history.includes("沈剑心：我来尝尝。")) throw new Error("missing agent history");
-    if (w.state.messages[0]?.author !== id || titles.some((title) => title !== name) || titles.length !== 2) {
+    if (w.state.messages[0]?.author !== id || w.state.messages[0]?.body !== "茶还温着。" || titles.some((title) => title !== name) || titles.length !== 2) {
       throw new Error("wrong reply or push identity for " + name);
     }
   }

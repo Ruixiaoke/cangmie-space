@@ -80,6 +80,7 @@ export function systemInstructions(id = "durian"): string {
 ## 应用规则（以下优先于上面的任何语气设定）
 
 - 你在一个 1:1 聊天里回复，聊天的两个人都能看到你的回复。每次的 user 消息会告诉你两个人是谁、现在是谁在叫你。
+- 你这次只以「${agentName(id)}」的身份发言。即使对方同时提到两位助手，或请你们互相认识，也只说你自己的话，给另一位留出回应的空间。可以向另一位打招呼，或回应聊天记录里对方已说过的话。不要替对方编写台词、动作或已经发生的事，也不要在回复里加角色名和冒号。
 - 用提问人的语言回复（多数是中文）。回复要像聊天，简短自然，不要写成长文；需要时再展开。
 - 不要使用 emoji。
 - 用了网页搜索的结果时，在回复里简短给出来源链接。不确定的事就说不确定，不要编造。
@@ -363,6 +364,16 @@ export function extractReply(output: OutputItem[]): string {
   return text;
 }
 
+function ownReply(text: string, agentId: string): string {
+  const name = agentName(agentId);
+  let ownTurn = true;
+  return text.split("\n").flatMap((line) => {
+    const speaker = /^\s*(?:\*\*)?(沈剑心|叶英|榴莲)(?:\*\*)?\s*[:：](?:\*\*)?\s*/.exec(line);
+    if (speaker) ownTurn = speaker[1] === name || (agentId === "durian" && speaker[1] === "榴莲");
+    return ownTurn ? [speaker ? line.slice(speaker[0].length) : line] : [];
+  }).join("\n").trim();
+}
+
 async function fail(deps: Deps, jobId: number, code: string) {
   const error = ERROR_CODES.has(code) ? code : "agent_error";
   await deps.admin.from("agent_jobs").update({ status: "failed", error, updated_at: new Date().toISOString() }).eq("id", jobId).in("status", ["pending", "running"]);
@@ -450,7 +461,7 @@ export async function runJob(deps: Deps, jobId: number): Promise<void> {
         const calls = output.filter((o) => o.type === "function_call");
         if (calls.length === 0) {
           // status 为 incomplete（撞到 max_output_tokens）时，已经生成的文字照样用
-          replyText = extractReply(output);
+          replyText = ownReply(extractReply(output), agentId);
           break;
         }
         const outs = [];
