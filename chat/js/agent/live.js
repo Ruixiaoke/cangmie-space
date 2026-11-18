@@ -1,4 +1,4 @@
-// 榴莲的任务状态：提问、实时同步、底部的「榴莲 思考中…」行和失败提示
+// 沈剑心的任务状态：提问、实时同步、底部的「沈剑心 思考中…」行和失败提示
 
 import { fetchLatest, nearBottom, scrollToBottom } from '../chat/view.js';
 import { errText } from '../errors.js';
@@ -15,7 +15,7 @@ var timer = 0, doneTimer = 0;
 function otherOf(job) { return job.asker === S.me.id ? job.peer : job.asker; }
 function active(job) { return job.status === 'pending' || job.status === 'running'; }
 function startedAt(job) { var t = Date.parse(job.created_at || ''); return isNaN(t) ? (job.localAt || Date.now()) : t; }
-// 之后有没有榴莲的回复（job.message_id 之后出现的榴莲消息）
+// 之后有没有沈剑心的回复（job.message_id 之后出现的沈剑心消息）
 function replied(c, job) {
   var mid = job.message_id == null ? -1 : job.message_id;
   return c.msgs.some(function (m) { return m.id != null && m.id > mid && isAgentMsg(m); });
@@ -44,7 +44,7 @@ export function liveView(c) {
   return null;
 }
 function noteText(job) {
-  return job.error === 'agent_unconfigured' ? '榴莲还没接通' : '榴莲走神了，再问一次吧';
+  return job.error === 'agent_unconfigured' ? '沈剑心还没接通' : '沈剑心走神了，再问一次吧';
 }
 
 export function renderLive() {
@@ -59,10 +59,10 @@ export function renderLive() {
     box._v = sig;
     clear(box);
     if (v === 'think') {
-      box.appendChild(h('div', { class: 'agent-think', role: 'status', 'aria-label': '榴莲思考中' },
+      box.appendChild(h('div', { class: 'agent-think', role: 'status', 'aria-label': '沈剑心思考中' },
         h('div', { class: 'av-slot' }, makeAgentAvatar(40)),
         h('div', { class: 'agent-think-body' },
-          h('span', { class: 'agent-name', text: '榴莲' }),
+          h('span', { class: 'agent-name', text: '沈剑心' }),
           h('span', { class: 'agent-think-txt' }, '思考中', h('span', { class: 'dots', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'))))));
     } else {
       box.appendChild(h('div', { class: 'agent-note', role: 'status', text: noteText(c.job) }));
@@ -145,6 +145,6 @@ export async function askAgent(row) {
   if (inv && inv.error) {
     // 没能叫醒函数：任务留在 pending，由 3 分钟超时兜底；先让提问的人看到失败提示
     if (S.chat && S.chat.peer === peer && S.chat.job && S.chat.job.id === job.id) setJob(S.chat, Object.assign({}, S.chat.job, { status: 'failed', error: 'invoke_failed' }));
-    toast('没能联系上榴莲，再问一次吧');
+    toast('没能联系上沈剑心，再问一次吧');
   }
 }

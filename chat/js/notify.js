@@ -137,7 +137,7 @@ export async function closeNotifications(tag) {
 export function notifyMessage(m, prefix) {
   var p = profileOf(m.sender_id);
   notify({
-    title: m.author ? '榴莲' : p ? p.nickname : '新消息',
+    title: m.author ? '沈剑心' : p ? p.nickname : '新消息',
     body: cut((prefix || '') + (m.author ? m.body : previewOf(m.body)), 80),
     tag: 'msg-' + m.sender_id,
     icon: p && avatarUrl(p.avatar_path),

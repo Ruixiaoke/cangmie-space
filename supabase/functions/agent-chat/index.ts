@@ -1,4 +1,4 @@
-// 榴莲（Durian）：聊天里的 AI 助手（Supabase Edge Function，Deno）
+// 沈剑心：聊天里的 AI 助手（Supabase Edge Function，Deno）
 //
 // 流程：前端先用 agent_ask(消息 id) 建任务，再带着用户自己的 JWT 调用本函数 { job: 任务 id }。
 // 函数核对调用者就是提问的人、任务还是 pending，把它改成 running，立刻回 202，
@@ -6,7 +6,7 @@
 // 回复作为一条 author = 'durian' 的消息写进聊天，任务改成 done；任何失败都改成 failed 并带一个短代码。
 //
 // 平台注入：SUPABASE_URL、SUPABASE_SERVICE_ROLE_KEY。需要设置的 secret：
-//   OPENAI_API_KEY（没有的话任务以 agent_unconfigured 失败，前端显示「榴莲还没接通」）
+//   OPENAI_API_KEY（没有的话任务以 agent_unconfigured 失败，前端显示「沈剑心还没接通」）
 //   OPENAI_MODEL（可选，默认 gpt-6-luna）
 //   VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY / VAPID_SUBJECT（推送，和 send-push 共用；没有就不推送）
 //

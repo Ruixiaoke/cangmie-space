@@ -40,7 +40,7 @@ export function renderChats() {
       makeAvatar(peerFromConv(c)),
       h('div', { class: 'info' },
         h('div', { class: 'name', text: c.peer_nickname }),
-        h('div', { class: 'line2', text: c.last_author ? '榴莲：' + String(c.last_body).replace(/\s+/g, ' ') : (own ? '你: ' : '') + previewOf(c.last_body) })),
+        h('div', { class: 'line2', text: c.last_author ? '沈剑心：' + String(c.last_body).replace(/\s+/g, ' ') : (own ? '你: ' : '') + previewOf(c.last_body) })),
       side));
   });
 }

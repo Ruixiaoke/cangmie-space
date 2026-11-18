@@ -77,11 +77,11 @@ jobs:
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
         run: supabase functions deploy send-push --remote="$SUPABASE_PROJECT_REF" --yes
 
-      # 榴莲：人设 agent/persona.md 是唯一真相来源，部署前重新生成 persona.gen.ts（Edge Function 只会打包 supabase/functions 里的文件）
+      # 沈剑心：人设 agent/persona.md 是唯一真相来源，部署前重新生成 persona.gen.ts（Edge Function 只会打包 supabase/functions 里的文件）
       - name: Generate agent persona module
         run: python3 agent/gen-persona.py
 
-      # 密钥只放在环境变量里，不回显。没有 OPENAI_API_KEY 时只警告：函数照常部署，榴莲会显示「还没接通」
+      # 密钥只放在环境变量里，不回显。没有 OPENAI_API_KEY 时只警告：函数照常部署，沈剑心会显示「还没接通」
       - name: Set agent secrets
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -90,7 +90,7 @@ jobs:
           OPENAI_MODEL: ${{ secrets.OPENAI_MODEL }}
         run: |
           if [ -z "$OPENAI_API_KEY" ]; then
-            echo "::warning::缺少仓库 secret OPENAI_API_KEY，榴莲暂时无法回复（聊天里会显示「榴莲还没接通」）"
+            echo "::warning::缺少仓库 secret OPENAI_API_KEY，沈剑心暂时无法回复（聊天里会显示「沈剑心还没接通」）"
           else
             supabase secrets set --remote="$SUPABASE_PROJECT_REF" --yes "OPENAI_API_KEY=$OPENAI_API_KEY" "OPENAI_MODEL=${OPENAI_MODEL:-gpt-6-luna}" > /dev/null
             echo "agent secrets updated"

@@ -39,7 +39,7 @@ async function onMessageInsert(row) {
       S.chat.ids.add(row.id); S.chat.msgs.push(msgFromRow(row)); sortMsgs(); renderMsgs({ stick: nearBottom() });
     }
     applyOwnToConv(row);
-    if (row.author && !(S.chat && S.chat.peer === row.receiver_id) && isVisible()) toast('榴莲回复了你：' + cut(row.body, 24)); // 提问的人不在这个聊天里
+    if (row.author && !(S.chat && S.chat.peer === row.receiver_id) && isVisible()) toast('沈剑心回复了你：' + cut(row.body, 24)); // 提问的人不在这个聊天里
     return;
   }
   var open = S.chat && S.chat.peer === row.sender_id;
@@ -60,7 +60,7 @@ async function onMessageInsert(row) {
     if (!c.ids.has(row.id)) {
       var nm = msgFromRow(row);
       c.ids.add(row.id); c.msgs.push(nm); sortMsgs(); renderMsgs({ stick: nearBottom() });
-      if (isVisible() && !nm.author) playFx(nm); // 榴莲的回复不触发特效
+      if (isVisible() && !nm.author) playFx(nm); // 沈剑心的回复不触发特效
     }
   }
   renderChats(); updateBadges();

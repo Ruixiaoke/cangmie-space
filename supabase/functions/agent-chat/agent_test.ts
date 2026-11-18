@@ -40,7 +40,7 @@ const mem = (title: string, content: string, pinned = false, updated_at = "2026-
 
 function world(opts: { asker?: string; peer?: string; mems?: Mem[]; hist?: Record<string, unknown>[]; question?: string } = {}) {
   const asker = opts.asker ?? ASKER, peer = opts.peer ?? PEER;
-  const question = opts.question ?? "@榴莲 上次说的爬山是哪天？顺便查下明天天气";
+  const question = opts.question ?? "@沈剑心 上次说的爬山是哪天？顺便查下明天天气";
   const state = {
     job: { id: 7, asker, peer, message_id: 100, status: "running" } as Record<string, unknown>,
     memories: opts.mems ?? [mem("小红·口味", "她不吃香菜")],
@@ -119,7 +119,7 @@ Deno.test("tool loop: search_chats -> remember -> final text with web citation; 
   if (!r0.instructions.includes("你是沈剑心") || r0.instructions.includes("小红") || !r0.instructions.includes("不要使用 emoji")) throw new Error("instructions");
   if (r0.previous_response_id) throw new Error("first request must not chain");
   const text0 = r0.input[0].content;
-  if (!text0.includes("【小红·口味】她不吃香菜") || !text0.includes("「小红」和「小明」") || !text0.includes("@榴莲 上次说的爬山是哪天") || text0.includes("小红：@榴莲")) throw new Error("input context: " + text0);
+  if (!text0.includes("【小红·口味】她不吃香菜") || !text0.includes("「小红」和「小明」") || !text0.includes("@沈剑心 上次说的爬山是哪天") || text0.includes("小红：@沈剑心")) throw new Error("input context: " + text0);
   const r1 = requests[1] as { previous_response_id: string; input: { type: string; call_id: string; output: string }[] };
   if (r1.previous_response_id !== "resp_1" || r1.input[0].type !== "function_call_output" || r1.input[0].call_id !== "call_a") throw new Error("chaining 1");
   if (!r1.input[0].output.includes("周末去爬山") || !r1.input[0].output.includes("2026-11-14 10:30") || !r1.input[0].output.includes("小明")) throw new Error("search output: " + r1.input[0].output);
@@ -136,10 +136,10 @@ Deno.test("tool loop: search_chats -> remember -> final text with web citation; 
   if (msg.author !== "durian" || msg.sender_id !== ASKER || msg.receiver_id !== PEER) throw new Error("reply row");
   if (!msg.body.startsWith("周六。明天多云") || !msg.body.includes("https://weather.example/cn")) throw new Error("reply body (citation appended): " + msg.body);
   if (w.state.job.status !== "done" || w.state.job.reply_id !== 200) throw new Error("job not done: " + JSON.stringify(w.state.job));
-  // 推送给双方，标题榴莲
+  // 推送给双方，标题沈剑心
   if (pushes.length !== 2) throw new Error("expected 2 pushes");
   const [p0, p1] = pushes as [string, { title: string; peer: string }][];
-  if (p0[1].title !== "榴莲" || p0[0] !== ASKER || p0[1].peer !== PEER || p1[0] !== PEER || p1[1].peer !== ASKER) throw new Error("push targets");
+  if (p0[1].title !== "沈剑心" || p0[0] !== ASKER || p0[1].peer !== PEER || p1[0] !== PEER || p1[1].peer !== ASKER) throw new Error("push targets");
 });
 
 Deno.test("missing OPENAI_API_KEY -> failed agent_unconfigured, no network", async () => {
@@ -239,7 +239,7 @@ Deno.test("history (c): per-message truncation, agent rows longer, whole block c
   const one = buildHistoryBlock([row(1, ASKER, null, "甲".repeat(500)), row(2, ASKER, "durian", "乙".repeat(500))], names);
   const [l1, l2] = lines(one);
   if (!l1.endsWith("甲".repeat(HISTORY_USER_CHARS) + "…") || l1.includes("甲".repeat(HISTORY_USER_CHARS + 1))) throw new Error("user truncation");
-  if (!l2.includes("榴莲：") || !l2.endsWith("乙".repeat(HISTORY_AGENT_CHARS) + "…") || l2.includes("乙".repeat(HISTORY_AGENT_CHARS + 1))) throw new Error("agent truncation");
+  if (!l2.includes("沈剑心：") || !l2.endsWith("乙".repeat(HISTORY_AGENT_CHARS) + "…") || l2.includes("乙".repeat(HISTORY_AGENT_CHARS + 1))) throw new Error("agent truncation");
   const short = buildHistoryBlock([row(1, PEER, null, "短")], names);
   if (short.includes("…")) throw new Error("short must not get an ellipsis");
   const many = Array.from({ length: 20 }, (_, i) => row(i + 1, i % 2 ? ASKER : PEER, null, String(i).padStart(2, "0") + "丙".repeat(199)));
@@ -299,16 +299,16 @@ Deno.test("incomplete response (max_output_tokens) still uses the text produced"
 
 Deno.test("user input: history excludes the current question, mentions nothing from other pairs", async () => {
   const hist = [
-    { id: 100, sender_id: ASKER, author: null, body: "@榴莲 现在这个问题", created_at: "2026-11-18T01:00:00Z" },
+    { id: 100, sender_id: ASKER, author: null, body: "@沈剑心 现在这个问题", created_at: "2026-11-18T01:00:00Z" },
     { id: 99, sender_id: PEER, author: null, body: "前一句话", created_at: "2026-11-18T00:59:00Z" },
   ];
-  const w = world({ hist, question: "@榴莲 现在这个问题" });
+  const w = world({ hist, question: "@沈剑心 现在这个问题" });
   let text = "";
   await runJob({
     admin: w.admin, apiKey: "k", model: "m", push: noPush,
     fetchFn: ((_u: string, init: RequestInit) => { text = (JSON.parse(String(init.body)).input[0].content as string); return Promise.resolve(json({ id: "r", output: [{ type: "message", content: [{ type: "output_text", text: "好" }] }] })); }) as unknown as typeof fetch,
   }, 7);
-  if (!text.includes("小明：前一句话") || text.split("@榴莲 现在这个问题").length !== 2) throw new Error(text);
+  if (!text.includes("小明：前一句话") || text.split("@沈剑心 现在这个问题").length !== 2) throw new Error(text);
   const direct = buildUserInput({ askerName: "甲", peerName: "乙", now: new Date("2026-11-18T01:00:00Z"), mems: [], history: [], names: {}, question: "q" });
   if (!direct.includes("2026-11-18 09:00") || !direct.includes("（还没有）") || !direct.includes("（没有）")) throw new Error(direct);
 });

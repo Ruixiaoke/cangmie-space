@@ -44,7 +44,7 @@ jobs:
           for f in *.png *.jpg *.jpeg *.gif *.webp; do cp "$f" _site/; done
           # 每个小程序一个目录
           cp -R chat _site/
-          # 榴莲的头像：只发布 agent/ 里的头像文件（人设 persona.md 等不上线）
+          # 沈剑心的头像：只发布 agent/ 里的头像文件（人设 persona.md 等不上线）
           mkdir _site/agent
           AGENT_AVATAR=""
           for ext in png jpg jpeg webp; do
@@ -56,7 +56,7 @@ jobs:
             fi
           done
           if [ -z "$AGENT_AVATAR" ]; then
-            echo "::warning::agent/ 里没有头像文件（avatar.png / .jpg / .webp），榴莲会显示默认头像"
+            echo "::warning::agent/ 里没有头像文件（avatar.png / .jpg / .webp），沈剑心会显示默认头像"
           fi
           export AGENT_AVATAR
 

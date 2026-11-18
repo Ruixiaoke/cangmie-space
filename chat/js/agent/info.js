@@ -1,12 +1,12 @@
-// 榴莲：身份、头像、判断消息是不是它写的、把文字渲染成带安全链接的节点
+// 沈剑心：身份、头像、判断消息是不是它写的、把文字渲染成带安全链接的节点
 
 import { AGENT_AVATAR_SRC } from '../config.js';
 import { h } from '../utils.js';
 
-// ===== 榴莲 =====
+// ===== 沈剑心 =====
 // AGENTS 是列表：以后加别的 agent，只要在这里加一项（id 要和数据库里 messages.author 的取值一致）
 export var AGENTS = [
-  { id: 'durian', name: '榴莲', mention: '@榴莲', keys: ['榴莲', 'liulian', 'durian'] }
+  { id: 'durian', name: '沈剑心', mention: '@沈剑心', keys: ['沈剑心', 'shenjianxin', '榴莲', 'liulian', 'durian'] }
 ];
 export function agentById(id) {
   for (var i = 0; i < AGENTS.length; i++) if (AGENTS[i].id === id) return AGENTS[i];
@@ -14,10 +14,10 @@ export function agentById(id) {
 }
 // 消息是不是 agent 写的（author 只可能由服务器写入）
 export function isAgentMsg(m) { return !!(m && m.author && agentById(m.author)); }
-export function agentName(author) { var a = agentById(author); return a ? a.name : '榴莲'; }
+export function agentName(author) { var a = agentById(author); return a ? a.name : '沈剑心'; }
 export function mentionedAgent(body) {
   var s = String(body || '');
-  for (var i = 0; i < AGENTS.length; i++) if (s.indexOf(AGENTS[i].mention) >= 0) return AGENTS[i];
+  for (var i = 0; i < AGENTS.length; i++) if ((s.indexOf(AGENTS[i].mention) >= 0 || (AGENTS[i].id === 'durian' && s.indexOf('@榴莲') >= 0))) return AGENTS[i];
   return null;
 }
 
@@ -29,7 +29,7 @@ export function makeAgentAvatar(size) {
   var i = 0;
   function useDrawn() {
     box.classList.add('drawn');
-    box.textContent = '榴';
+    box.textContent = '沈';
     box.setAttribute('aria-hidden', 'true');
   }
   var img = h('img', { alt: '', draggable: 'false' });

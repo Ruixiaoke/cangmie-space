@@ -1,4 +1,4 @@
-// 榴莲的任务执行：拼提示词、跑 OpenAI Responses API 的工具循环、写回复、更新任务状态
+// 沈剑心的任务执行：拼提示词、跑 OpenAI Responses API 的工具循环、写回复、更新任务状态
 //
 // 和 HTTP / 鉴权 / 推送的细节分开，依赖（数据库、fetch、推送）全部从参数传入，方便本地用假的实现测试。
 //
@@ -30,7 +30,7 @@ export const REASONING_EFFORT = "low";
 export const SEARCH_CONTEXT_SIZE = "low"; // web_search 工具
 export const HISTORY_LIMIT = 20; // 取最近几条消息
 export const HISTORY_USER_CHARS = 200; // 真人消息每条最多留多少字
-export const HISTORY_AGENT_CHARS = 300; // 榴莲自己的回复每条最多留多少字
+export const HISTORY_AGENT_CHARS = 300; // 沈剑心自己的回复每条最多留多少字
 export const HISTORY_BLOCK_CHARS = 3000; // 整个聊天记录块的上限，超了先丢最旧的
 export const MEMORY_INLINE_CHARS = 1500; // 所有记忆内容合计不超过它，就全文放进提示词
 export const MEMORY_BLOCK_CHARS = 2000; // 整个记忆块的硬上限
@@ -232,7 +232,7 @@ export function buildMemoryBlock(mems: Memory[]): string {
 // 聊天记录块：每条截短，整块不超过 HISTORY_BLOCK_CHARS，超了丢最旧的。rows 按时间从旧到新
 export function buildHistoryBlock(rows: HistoryRow[], names: Names): string {
   const lines = rows.map((m) => {
-    const who = m.author ? "榴莲" : names[m.sender_id] ?? "?";
+    const who = m.author ? "沈剑心" : names[m.sender_id] ?? "?";
     return `[${stamp(m.created_at)}] ${who}：${clip(m.body, m.author ? HISTORY_AGENT_CHARS : HISTORY_USER_CHARS)}`;
   });
   const kept: string[] = [];
@@ -285,7 +285,7 @@ async function runTool(deps: Deps, job: Job, names: Names, name: string, rawArgs
       const { data, error } = await deps.admin.rpc("agent_search_messages", { p_a: job.asker, p_b: job.peer, p_query: query, p_limit: limit });
       if (error) return JSON.stringify({ error: "search_failed" });
       // deno-lint-ignore no-explicit-any
-      return JSON.stringify({ results: (data ?? []).map((r: any) => ({ at: stamp(r.created_at), from: r.author ? "榴莲" : names[r.sender_id] ?? "?", text: r.body })) });
+      return JSON.stringify({ results: (data ?? []).map((r: any) => ({ at: stamp(r.created_at), from: r.author ? "沈剑心" : names[r.sender_id] ?? "?", text: r.body })) });
     }
     if (name === "game_status") return await gameStatus(deps.admin, job.asker, job.peer, names, args);
     if (name === "game_leaderboard") return await gameRecord(deps.admin, job.asker, job.peer, names, args);
@@ -470,7 +470,7 @@ export async function runJob(deps: Deps, jobId: number): Promise<void> {
     // 推送给两个人（正在前台的设备由 pushToUser 跳过）；失败不影响任务
     const preview = Array.from(replyText.replace(/\s+/g, " ")).slice(0, 80).join("");
     await Promise.all([[j.asker, j.peer], [j.peer, j.asker]].map(([to, other]) =>
-      deps.push(to, { title: "榴莲", body: preview, tag: "agent-" + jobId, peer: other }).catch(() => {})
+      deps.push(to, { title: "沈剑心", body: preview, tag: "agent-" + jobId, peer: other }).catch(() => {})
     ));
   } catch (e) {
     const code = e instanceof AgentError ? e.code : "agent_error";

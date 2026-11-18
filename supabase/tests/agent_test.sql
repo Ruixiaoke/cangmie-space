@@ -1,4 +1,4 @@
--- 榴莲（messages.author、agent_jobs、agent_memories、agent_ask、agent_search_messages）的测试，CI 在临时 Postgres 上运行
+-- 沈剑心（messages.author、agent_jobs、agent_memories、agent_ask、agent_search_messages）的测试，CI 在临时 Postgres 上运行
 -- 自带数据：开头清理上一次的测试用户，结尾再清理
 \set ON_ERROR_STOP on
 \set QUIET on
@@ -65,14 +65,14 @@ do $$
 declare plain public.messages; ask public.messages; toDave public.messages;
 begin
   plain := public.send_message('a9000000-0000-0000-0000-00000000000b', '今天吃什么');
-  ask   := public.send_message('a9000000-0000-0000-0000-00000000000b', '@榴莲 今天吃什么');
-  toDave := public.send_message('a9000000-0000-0000-0000-00000000000d', '@榴莲 你好');
+  ask   := public.send_message('a9000000-0000-0000-0000-00000000000b', '@沈剑心 今天吃什么');
+  toDave := public.send_message('a9000000-0000-0000-0000-00000000000d', '@沈剑心 你好');
   perform set_config('agent.plain', plain.id::text, false);
   perform set_config('agent.ask', ask.id::text, false);
   perform set_config('agent.toDave', toDave.id::text, false);
 end $$;
 
--- 没有 @榴莲
+-- 没有 @沈剑心
 call pg_temp.expect(format($$select public.agent_ask(%s)$$, current_setting('agent.plain')), 'agent_not_mentioned');
 -- 不存在的消息
 call pg_temp.expect($$select public.agent_ask(999999999)$$, 'agent_forbidden');
@@ -89,7 +89,7 @@ call pg_temp.as_user('a9000000-0000-0000-0000-00000000000c');
 do $$
 declare m public.messages;
 begin
-  m := public.send_message('a9000000-0000-0000-0000-00000000000b', '@榴莲 hi');
+  m := public.send_message('a9000000-0000-0000-0000-00000000000b', '@沈剑心 hi');
   perform set_config('agent.carolMsg', m.id::text, false);
 end $$;
 reset role;
@@ -118,7 +118,7 @@ call pg_temp.expect(format($$select public.agent_ask(%s)$$, current_setting('age
 do $$
 declare m public.messages;
 begin
-  m := public.send_message('a9000000-0000-0000-0000-00000000000b', '@榴莲 再问一个');
+  m := public.send_message('a9000000-0000-0000-0000-00000000000b', '@沈剑心 再问一个');
   perform set_config('agent.ask2', m.id::text, false);
 end $$;
 call pg_temp.expect(format($$select public.agent_ask(%s)$$, current_setting('agent.ask2')), 'agent_busy');
@@ -127,7 +127,7 @@ call pg_temp.as_user('a9000000-0000-0000-0000-00000000000b');
 do $$
 declare m public.messages;
 begin
-  m := public.send_message('a9000000-0000-0000-0000-00000000000a', '@榴莲 我也问');
+  m := public.send_message('a9000000-0000-0000-0000-00000000000a', '@沈剑心 我也问');
   perform set_config('agent.askB', m.id::text, false);
 end $$;
 call pg_temp.expect(format($$select public.agent_ask(%s)$$, current_setting('agent.askB')), 'agent_busy');
@@ -186,7 +186,7 @@ begin
   -- alice 已经有 3 个任务（含失败的）；再补 47 个凑满 50
   for i in 1..47 loop
     insert into public.messages (sender_id, receiver_id, body)
-    values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000b', '@榴莲 批量 ' || i) returning id into m;
+    values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000b', '@沈剑心 批量 ' || i) returning id into m;
     insert into public.agent_jobs (asker, peer, message_id, status) values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000b', m, 'done');
   end loop;
   if (select count(*) from public.agent_jobs where asker = 'a9000000-0000-0000-0000-00000000000a') <> 50 then
@@ -196,7 +196,7 @@ call pg_temp.as_user('a9000000-0000-0000-0000-00000000000a');
 do $$
 declare m public.messages;
 begin
-  m := public.send_message('a9000000-0000-0000-0000-00000000000b', '@榴莲 第五十一个');
+  m := public.send_message('a9000000-0000-0000-0000-00000000000b', '@沈剑心 第五十一个');
   perform set_config('agent.ask51', m.id::text, false);
 end $$;
 call pg_temp.expect(format($$select public.agent_ask(%s)$$, current_setting('agent.ask51')), 'agent_rate_limited');
@@ -235,7 +235,7 @@ drop policy agent_test_tmp_ins on public.messages;
 drop policy agent_test_tmp_upd on public.messages;
 revoke insert, update on public.messages from authenticated;
 
--- ===== 榴莲的回复（平台管理员角色写入，这里用超级用户代替）：4000 字上限只对 author 行 =====
+-- ===== 沈剑心的回复（平台管理员角色写入，这里用超级用户代替）：4000 字上限只对 author 行 =====
 do $$
 declare r public.messages;
 begin
@@ -257,7 +257,7 @@ begin
   exception when check_violation then null; end;
 end $$;
 
--- 双方都能看到榴莲的回复，第三个人看不到
+-- 双方都能看到沈剑心的回复，第三个人看不到
 call pg_temp.as_user('a9000000-0000-0000-0000-00000000000a');
 do $$ begin
   if not exists (select 1 from public.messages where id = current_setting('agent.reply')::bigint and author = 'durian') then raise exception 'alice should see the reply'; end if; end $$;
@@ -268,7 +268,7 @@ end $$;
 call pg_temp.as_user('a9000000-0000-0000-0000-00000000000c');
 do $$ begin
   if exists (select 1 from public.messages where author = 'durian') then raise exception 'carol must not see agent messages'; end if; end $$;
--- 前端用 id 集合 + author 非空 查出哪些「最后一条」是榴莲的
+-- 前端用 id 集合 + author 非空 查出哪些「最后一条」是沈剑心的
 reset role;
 insert into public.messages (sender_id, receiver_id, body, author)
 values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000b', '最后一条', 'durian');

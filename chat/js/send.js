@@ -18,8 +18,8 @@ import { $, lsGet, lsSet, toast } from './utils.js';
 export async function sendCurrent() {
   var c = S.chat; if (!c) return;
   var input = $('input');
-  // 全角 "＠榴莲"（中文输入法常见）统一成半角，才能叫到榴莲
-  var body = input.value.replace(/^[ \t\r\n]+|[ \t\r\n]+$/g, '').replace(/＠榴莲/g, '@榴莲');
+  // 全角 "＠沈剑心"（中文输入法常见）统一成半角，才能叫到沈剑心
+  var body = input.value.replace(/^[ \t\r\n]+|[ \t\r\n]+$/g, '').replace(/＠(沈剑心|榴莲)/g, '@$1');
   if (!body) return;
   if (body.length > 2000) return toast(ERR_TEXT.message_too_long);
   input.value = '';
@@ -66,7 +66,7 @@ async function doSend(m) {
   }
   applyOwnToConv(row);
   firePush('message', row.id);
-  askAgent(row); // 带 @榴莲 的消息：存好之后叫榴莲（没有 @ 时什么也不做）
+  askAgent(row); // 带 @沈剑心 的消息：存好之后叫沈剑心（没有 @ 时什么也不做）
   var flag = 'chat.firstSent.' + S.me.id;
   if (!lsGet(flag)) { lsSet(flag, '1'); popCheer('好耶！'); }
 }
