@@ -3,7 +3,7 @@
 // 注意：目录名以下划线开头，Supabase 不会把它当成一个可调用的函数部署，只会在被 import 时一起打包。
 import webpush from "npm:web-push@3.6.7";
 
-export const ALLOWED_ORIGINS = ["https://rickzhou0527.github.io"];
+export const ALLOWED_ORIGINS = ["https://ruixiaoke.github.io"];
 const LOCAL_ORIGIN_RE = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 
 export type Payload = { title: string; body: string; tag: string; peer?: string; tab?: string };
