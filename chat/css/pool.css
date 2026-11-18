@@ -1,0 +1,80 @@
+/* 9球 / 8球台球：HUD、球桌画布、底部操作行；聊天里的卡片预览；开局选玩法浮层 */
+.gc-pool{flex:none;position:relative;width:44px;height:44px;border-radius:12px;background:#1d8f67;box-shadow:inset 0 0 0 3px #8a5530;display:flex;align-items:center;justify-content:center}
+.gc-pball{display:block;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 34% 30%,rgba(255,255,255,.7),rgba(255,255,255,0) 45%),linear-gradient(#f8f4ea 0 28%,#f2c200 28% 72%,#f8f4ea 72%);box-shadow:0 2px 3px rgba(0,0,0,.35),inset -2px -3px 4px rgba(0,0,0,.25)}
+.gc-pball.e8{background:radial-gradient(circle at 34% 30%,rgba(255,255,255,.7),rgba(255,255,255,0) 45%),radial-gradient(circle at 50% 50%,#f8f4ea 0 30%,#1d1d1f 31%)}
+.pl{flex:1;min-height:0;width:100%;display:flex;flex-direction:column}
+.pl-hud{flex:none;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:6px;padding:0 66px 0 60px;height:48px}
+.pl-pl{display:flex;align-items:center;gap:6px;min-width:0}
+.pl-pl.r{justify-content:flex-end}
+.pl-av{position:relative;width:40px;height:40px;padding:2px;border-radius:50%;border:2px solid transparent;transition:border-color .2s var(--ease),box-shadow .2s var(--ease)}
+.pl-av .avatar{width:32px!important;height:32px!important}
+.pl-av.turn{border-color:var(--pink);box-shadow:0 0 0 3px color-mix(in srgb,var(--pink) 28%,transparent)}
+.pl-score{font-size:var(--fs-xl);font-weight:700;color:var(--t1);min-width:16px;text-align:center;font-variant-numeric:tabular-nums}
+.pl-score.bump{animation:pl-bump .5s ease-out}
+@keyframes pl-bump{0%{transform:scale(1)}35%{transform:scale(1.55);color:var(--pink,#ff8fab)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.pl-score.bump{animation:none}}
+.pl-mid{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:96px}
+.pl-stat{font-size:var(--fs-sm);font-weight:600;color:var(--t2);white-space:nowrap}
+.pl-stat.you{color:var(--pink-text)}
+.pl-chips{display:flex;gap:3px}
+.pl-chip{display:block;width:11px;height:11px;border-radius:50%;box-shadow:inset -1px -1.5px 2px rgba(0,0,0,.3),0 0 0 1px rgba(0,0,0,.25);transition:opacity .2s var(--ease),transform .2s var(--ease)}
+.pl-chip.out{opacity:.18;transform:scale(.7)}
+.pl-chip.next{box-shadow:inset -1px -1.5px 2px rgba(0,0,0,.3),0 0 0 1.5px var(--pink)}
+.pl-chip.n1{background:#f2c200}.pl-chip.n2{background:#1f55d6}.pl-chip.n3{background:#d62f2f}.pl-chip.n4{background:#6c35b5}.pl-chip.n5{background:#f08a1c}.pl-chip.n6{background:#1c8c46}.pl-chip.n7{background:#8a2234}.pl-chip.n8{background:#1d1d1f}
+.pl-chip.n9{background:linear-gradient(#f8f4ea 0 28%,#f2c200 28% 72%,#f8f4ea 72%)}
+.pl-hud.e8{padding:0 62px 0 56px}
+.pl-sc{display:flex;flex-direction:column;align-items:center;min-width:26px}
+.pl-hud.e8 .pl-score{line-height:1.1}
+.pl-grp{font-style:normal;font-size:10px;font-weight:700;line-height:1.2;padding:0 4px;border-radius:6px;white-space:nowrap;color:#fff}
+.pl-grp.solid{background:#1f55d6}
+.pl-grp.stripe{background:#d98a00;color:#1d1d1f}
+.pl-grp[hidden]{display:none}
+.pl-chips.e8{display:grid;grid-template-columns:repeat(8,10px);gap:2px 2px}
+.pl-chips.e8 .pl-chip{width:10px;height:10px}
+.pl-chip.n10,.pl-chip.n11,.pl-chip.n12,.pl-chip.n13,.pl-chip.n14,.pl-chip.n15{background:linear-gradient(#f8f4ea 0 28%,var(--sb) 28% 72%,#f8f4ea 72%)}
+.pl-chip.n10{--sb:#1f55d6}.pl-chip.n11{--sb:#d62f2f}.pl-chip.n12{--sb:#6c35b5}.pl-chip.n13{--sb:#f08a1c}.pl-chip.n14{--sb:#1c8c46}.pl-chip.n15{--sb:#8a2234}
+.pl-stage{position:relative;flex:1;min-width:0;min-height:150px;overflow:hidden}
+.pl-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;-webkit-user-select:none;user-select:none}
+.pl-stage canvas.pl-mag{inset:auto;width:88px;height:88px;border-radius:50%;box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:none}
+.pl-hint,.pl-note{position:absolute;left:0;right:0;margin:0 auto;width:max-content;max-width:calc(100% - 16px);padding:5px 12px;border-radius:999px;background:var(--toast-bg);color:var(--toast-fg);font-size:var(--fs-xs);pointer-events:none;text-align:center}
+.pl-hint{bottom:8px;white-space:nowrap}
+.pl-note{top:8px;opacity:0;transition:opacity .35s var(--ease)}
+.pl-note.on{opacity:1}
+/* 底部操作行：微调条 / 力度 / 出杆 / 认输，每个触控区都不小于 44px */
+.pl-ctl{flex:none;display:flex;align-items:center;gap:8px;padding:0 10px;height:52px}
+.pl-ctl.off .pl-fine,.pl-ctl.off .pl-pw{opacity:.45}
+.pl-ctl.ended .pl-fine,.pl-ctl.ended .pl-pw,.pl-ctl.ended .pl-go,.pl-ctl.ended .pl-rs{display:none}
+.pl-ctl [hidden]{display:none!important}
+.pl-fine{flex:none;position:relative;width:104px;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;box-sizing:border-box;border-radius:var(--r-ctl);color:var(--t2);font-size:22px;line-height:1;touch-action:none;cursor:ew-resize;
+  background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--t1) 30%,transparent) 0 1px,transparent 1px 12px) 0 50%/auto 40% no-repeat,var(--g-chip);
+  border:1px solid var(--rim);box-shadow:inset 0 1px 0 var(--hi),inset 0 -1px 0 var(--lo),var(--sh-1);transition:opacity .2s var(--ease)}
+.pl-fine::after{content:'';position:absolute;left:50%;top:7px;bottom:7px;width:2px;margin-left:-1px;border-radius:1px;background:var(--pink)}
+.pl-fine span{position:relative;z-index:1}
+.pl-pw{flex:1;min-width:84px;height:48px;display:flex;align-items:center;touch-action:none;cursor:pointer;transition:opacity .2s var(--ease)}
+.pl-pwtr{position:relative;flex:1;height:14px;border-radius:7px;background:color-mix(in srgb,var(--t1) 12%,transparent);border:1px solid var(--rim)}
+.pl-pwf{position:absolute;inset:0;border-radius:7px;background:linear-gradient(to right,#2fa36b,#f2c200 60%,#d62f2f)}
+.pl-pwk{position:absolute;top:50%;width:36px;height:30px;margin-top:-15px;display:flex;align-items:center;justify-content:center;border-radius:15px;font-size:var(--fs-xs);font-weight:700;color:var(--t1);font-variant-numeric:tabular-nums;background:var(--g-solid);border:1px solid var(--rim);box-shadow:var(--sh-1)}
+.pl-go{flex:none;width:84px;height:48px;padding:0 4px;font-size:var(--fs-md,16px)}
+.pl-rs{flex:none;min-width:44px;height:48px;padding:0 6px;background:none;border:0;box-shadow:none;color:var(--t2);font-size:var(--fs-sm)}
+.pl-rs.sure{color:var(--red-text);font-weight:600}
+.pl-again{flex:1;height:48px}
+
+/* 开局选玩法：和排行榜同样的底部浮层（样式复用 .rk-card / .rk-head / .rk-x） */
+#poolPick{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;justify-content:flex-end;background:color-mix(in srgb,var(--t1) 34%,transparent);opacity:0;transition:opacity .24s var(--ease)}
+#poolPick.show{opacity:1}
+#poolPick[hidden]{display:none}
+#poolPick.show .rk-card{transform:none}
+.pk-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.pk-btn{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:176px;padding:14px 8px 12px;color:var(--t1);background:var(--g-chip);border:1px solid var(--rim);border-radius:var(--r-ctl);box-shadow:inset 0 1px 0 var(--hi),inset 0 -1px 0 var(--lo),var(--sh-1);transition:transform .16s var(--ease),border-color .16s var(--ease)}
+.pk-btn:active{transform:scale(.97)}
+.pk-btn.last{border-color:var(--pink);box-shadow:inset 0 1px 0 var(--hi),0 0 0 2px color-mix(in srgb,var(--pink) 35%,transparent),var(--sh-1)}
+.pk-btn:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.pk-btn b{font-size:var(--fs-xl);font-weight:700}
+.pk-desc{font-size:var(--fs-xs);color:var(--t2);text-align:center;line-height:1.35}
+.pk-ic{display:flex;align-items:center;justify-content:center;width:88px;height:88px}
+.pk-img{width:88px;height:88px;object-fit:contain;display:block}
+.pk-ball{position:relative;display:flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:50%;box-shadow:0 4px 8px rgba(0,0,0,.3),inset -5px -7px 10px rgba(0,0,0,.28)}
+.pk-ball::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 34% 30%,rgba(255,255,255,.7),rgba(255,255,255,0) 45%)}
+.pk-ball.nine{background:linear-gradient(#f8f4ea 0 24%,#f2c200 24% 76%,#f8f4ea 76%)}
+.pk-ball.eight{background:#1d1d1f}
+.pk-ball i{position:relative;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#fbf8f0;color:#1b1b1d;font-style:normal;font-weight:700;font-size:22px}

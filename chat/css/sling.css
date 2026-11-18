@@ -1,0 +1,37 @@
+/* 弹弓大战：HUD、画布、弹药栏；聊天里的卡片预览 */
+#toolGrid button .tool-img{width:32px;height:32px;object-fit:contain;margin:-2px 0}
+.gc-sl{flex:none;position:relative;width:44px;height:44px;border-radius:12px;background:color-mix(in srgb,var(--t1) 10%,transparent);display:flex;align-items:center;justify-content:center}
+.gc-sl img{width:34px;height:34px;object-fit:contain}
+.gc-score{position:absolute;right:-6px;bottom:-6px;min-width:26px;padding:1px 5px;border-radius:10px;background:var(--g-solid);border:1px solid var(--rim);box-shadow:var(--sh-1);font-size:var(--fs-xs);font-weight:600;line-height:1.4;color:var(--t1);text-align:center}
+.sl{flex:1;min-height:0;width:calc(100% + 32px);margin:0 -16px;display:flex;flex-direction:column;gap:8px}
+.sl-msg{margin:auto;padding:0 24px;text-align:center;color:var(--t2)}
+.sl-hud{flex:none;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;padding:0 68px 0 58px;min-height:44px}
+.sl-pl{display:flex;align-items:center;gap:8px;min-width:0}
+.sl-pl.r{justify-content:flex-end}
+.sl-av{position:relative;width:40px;height:40px;padding:2px;border-radius:50%;border:2px solid transparent;transition:border-color .2s var(--ease),box-shadow .2s var(--ease)}
+.sl-av .avatar{width:32px!important;height:32px!important}
+.sl-av.turn{border-color:var(--pink);box-shadow:0 0 0 3px color-mix(in srgb,var(--pink) 28%,transparent)}
+.sl-score{font-size:var(--fs-xl);font-weight:700;color:var(--t1);min-width:16px;text-align:center;font-variant-numeric:tabular-nums}
+.sl-mid{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:84px}
+.sl-stat{font-size:var(--fs-sm);font-weight:600;color:var(--t2);white-space:nowrap}
+.sl-stat.you{color:var(--pink-text)}
+.sl-wind{display:flex;align-items:center;gap:6px;min-height:16px;font-size:var(--fs-xs);color:var(--t2);white-space:nowrap}
+.sl-wind svg{display:block;color:var(--t2)}
+.sl-stage{position:relative;flex:1;min-height:150px;margin:0 12px;overflow:hidden;border-radius:var(--r-card);border:1px solid var(--rim);box-shadow:var(--sh-1);background:var(--g-card)}
+.sl-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;-webkit-user-select:none;user-select:none}
+.sl-hint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);padding:5px 12px;border-radius:999px;background:var(--toast-bg);color:var(--toast-fg);font-size:var(--fs-xs);pointer-events:none;white-space:nowrap}
+.sl-stage.shake{animation:tttShake .5s var(--ease)}
+.sl-bar{flex:none;display:flex;align-items:center;gap:8px;padding:0 12px;min-height:48px}
+.sl-ammo{flex:1;min-width:0;display:flex;gap:6px}
+.sl-chip{flex:1;min-width:0;min-height:46px;display:flex;align-items:center;justify-content:center;gap:4px;padding:2px 4px;font-size:var(--fs-xs);font-weight:500;color:var(--t1);background:var(--g-chip);border:1px solid var(--rim);border-radius:var(--r-ctl);box-shadow:inset 0 1px 0 var(--hi),inset 0 -1px 0 var(--lo),var(--sh-1);transition:transform .16s var(--ease),border-color .16s var(--ease)}
+.sl-chip img{width:26px;height:26px;object-fit:contain;flex:none}
+.sl-chip.on{border-color:var(--pink);box-shadow:0 0 0 2px color-mix(in srgb,var(--pink) 40%,transparent),var(--sh-1)}
+.sl-chip:active{transform:scale(.97)}
+.sl-act{flex:none;display:flex;align-items:center}
+.sl-act .btn.quiet{background:none;border:0;box-shadow:none;color:var(--t2);text-decoration:underline;text-underline-offset:3px;padding:6px 8px}
+.sl-act .btn.quiet.sure{color:var(--red-text);font-weight:600}
+.sl-ammo[hidden]{display:none}
+.sl-bar:has(.sl-ammo[hidden]){justify-content:center}
+.sl-bar:has(.sl-ammo[hidden]) .sl-act{flex:1;justify-content:center}
+.sl-bar:has(.sl-ammo[hidden]) .sl-act .btn{flex:1;max-width:240px}
+@media (prefers-reduced-motion:reduce){.sl-stage.shake{animation:none}}

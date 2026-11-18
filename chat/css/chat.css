@@ -1,0 +1,48 @@
+/* 聊天页与气泡 */
+/* 聊天页 */
+/* 聊天页用纯色背景（白天纯白、晚上纯深色），对方气泡换成自己的底色，避免在白底上看不见 */
+#chat{position:absolute;inset:0;z-index:5;background:var(--chat-bg);--bub-peer:var(--chat-bub-peer);--bub-bd:var(--chat-bub-bd)}
+#chat .top{gap:8px;padding-left:8px}
+#chat .back{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--t2);border-radius:var(--r-ctl);transition:transform .16s var(--ease)}
+#chat .back:active{transform:translateY(1px) scale(.98)}
+#chat .top .avatar{width:40px;height:40px}
+#chat .who{flex:1;min-width:0}
+#chat .who b{display:block;font-size:var(--fs-md);font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#chat .who span{font-size:var(--fs-xs);color:var(--t2)}
+#msgs{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:12px 16px 8px}
+#olderRow{text-align:center;font-size:var(--fs-xs);color:var(--t3);padding:8px}
+.row{display:flex;flex-direction:column;margin-bottom:8px}
+.line{display:flex;gap:8px;align-items:flex-start;max-width:100%}
+.row.own .line{flex-direction:row-reverse}
+.av-slot{flex:none;width:var(--av);height:var(--av)}
+.row .avatar{width:var(--av);height:var(--av)}
+.col{display:flex;flex-direction:column;min-width:0;max-width:calc(100% - 48px)}
+.row.own .col{align-items:flex-end}
+.row.peer .col{align-items:flex-start}
+
+/* 签名：时间分隔线是一根躺在玻璃上的巧克力蘸边饼干棒（只用在这里） */
+.stamp{align-self:center;display:flex;align-items:center;gap:8px;font-size:var(--fs-xs);color:var(--t2);margin:16px 0 12px;font-variant-numeric:tabular-nums}
+.stamp::after{
+  content:"";flex:none;width:120px;height:8px;border-radius:4px;
+  background:
+    linear-gradient(rgba(255,255,255,.4),rgba(255,255,255,0) 55%),
+    linear-gradient(90deg,var(--biscuit-a) 0,var(--biscuit-b) 34%,var(--choco-a) 34%,var(--choco-b) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(0,0,0,.22),0 1px 1px rgba(24,14,6,.28),0 3px 5px rgba(24,14,6,.12);
+}
+
+/* 气泡不用 backdrop-filter：用半透明分层填充 + 高光模拟磨砂，滚动才顺 */
+.bubble{
+  max-width:100%;padding:8px 12px;font-size:var(--fs-md);line-height:1.5;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;
+  border:1px solid var(--bub-bd);border-radius:var(--r-bub);-webkit-user-select:text;user-select:text;-webkit-touch-callout:default;
+  background-color:var(--bub-peer);background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%);
+  box-shadow:inset 0 1px 0 var(--bub-hi),inset 0 -1px 0 var(--bub-lo),0 1px 2px rgba(24,14,6,.1),0 3px 8px rgba(24,14,6,.06);
+}
+.row.own .bubble{background-color:var(--bub-own);border-bottom-right-radius:var(--r-tail)}
+.row.peer .bubble{border-bottom-left-radius:var(--r-tail)}
+.row.sending .bubble{opacity:.65}
+.row.failed .bubble{background-color:var(--bub-fail)}
+.meta{font-size:var(--fs-xs);color:var(--t3);margin-top:4px;padding:0 4px;display:flex;gap:8px;align-items:center}
+.meta.read{color:var(--ok)}
+.meta.fail{color:var(--red-text);font-weight:500}
+.meta button{font-size:var(--fs-xs);font-weight:500;text-decoration:underline;color:var(--t2)}
+

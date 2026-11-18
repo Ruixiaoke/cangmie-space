@@ -1,0 +1,5 @@
+/* 不支持 backdrop-filter 的回退 */
+/* 不支持 backdrop-filter 的浏览器：玻璃退成更不透明的纯色填充 */
+@supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  .top,#tabbar,#composer,#emojiPanel,#plusPanel,.panel,#view-friends .card,.auth-card{background:var(--g-solid)}
+}

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#FFF8E7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1f1a1d" media="(prefers-color-scheme: dark)">
+<title>藏咩空间</title>
+<style>
+  :root{
+    --cream:#FFF8E7; --pink:#FF8FAB; --pink2:#FFC2D1; --choco:#6B3E26;
+    --biscuit:#E9B872; --ink:#4a3426; --yellow:#FFF1BF;
+    --line:#4a3426; --surface:#fff; --glow:#FFE3EC; --pink-text:#FF8FAB; color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --cream:#1f1a1d; --pink2:#4a2f3b; --choco:#f3cfae; --ink:#f3e8e0; --yellow:#4d4326;
+      --line:#a08b95; --surface:#2b2428; --glow:#3a2433; --pink-text:#ff9db6; color-scheme:dark;
+    }
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{min-height:100%}
+  body{
+    background:radial-gradient(circle at 50% 0%,var(--glow) 0%,var(--cream) 60%) fixed;
+    color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Apple SD Gothic Neo","Noto Sans KR","Microsoft YaHei",system-ui,sans-serif;
+    user-select:none;
+  }
+  #bg{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .float{position:absolute;bottom:-40px;font-size:20px;opacity:.45;animation:up linear infinite}
+  @keyframes up{to{transform:translateY(-115vh) rotate(30deg)}}
+
+  main{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:48px 16px 40px}
+  header{text-align:center;margin-bottom:28px}
+  h1{font-size:30px;font-weight:900;color:var(--choco);letter-spacing:2px}
+  h1 span{display:inline-block;animation:bob 1.8s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-6px)}}
+  .sub{margin-top:8px;font-size:15px;color:var(--pink-text);font-weight:700}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .app{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    aspect-ratio:1/1;padding:14px;text-align:center;text-decoration:none;color:var(--ink);
+    background:var(--surface);border:3px solid var(--line);border-radius:22px;box-shadow:0 6px 0 var(--line);
+    animation:pop .5s cubic-bezier(.3,1.6,.5,1) both;
+  }
+  .app:nth-child(2){animation-delay:.08s}.app:nth-child(3){animation-delay:.16s}.app:nth-child(4){animation-delay:.24s}
+  @keyframes pop{from{opacity:0;transform:scale(.85) translateY(10px)}}
+  a.app:active{transform:translateY(5px);box-shadow:0 1px 0 var(--line)}
+  .icon{
+    width:64px;height:64px;border-radius:18px;border:3px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:34px;
+  }
+  .name{font-size:17px;font-weight:800}
+  .desc{font-size:12px;opacity:.7;line-height:1.4}
+  .app[hidden]{display:none}
+  .app.soon{background:transparent;border-style:dashed;box-shadow:none;opacity:.6}
+  .app.soon .icon{background:transparent;border-style:dashed}
+
+  footer{text-align:center;margin-top:32px;font-size:13px;opacity:.6}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<main>
+  <header>
+    <h1><span>藏</span><span>咩</span>空间</h1>
+    <p class="sub">点一个打开吧 ♡</p>
+  </header>
+
+  <nav class="grid">
+    <a class="app" href="chat/">
+      <div class="icon" style="background:var(--yellow)">💬</div>
+      <div class="name">聊天</div>
+      <div class="desc">和好朋友说说话</div>
+    </a>
+    <div class="app soon" aria-disabled="true">
+      <div class="icon">✨</div>
+      <div class="name">敬请期待</div>
+      <div class="desc">下一个惊喜在路上</div>
+    </div>
+  </nav>
+
+  <footer>made with ♡</footer>
+</main>
+<script>
+(function(){
+  const bg=document.getElementById('bg'), items=['💗','⚔️','✨','☁️','💕'];
+  for(let i=0;i<14;i++){
+    const s=document.createElement('span');
+    s.className='float';
+    s.textContent=items[i%items.length];
+    s.style.left=Math.random()*100+'%';
+    s.style.animationDuration=(9+Math.random()*9)+'s';
+    s.style.animationDelay=(-Math.random()*18)+'s';
+    bg.appendChild(s);
+  }
+})();
+</script>
+</body>
+</html>

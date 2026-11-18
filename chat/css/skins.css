@@ -1,0 +1,9 @@
+/* 皮肤：沙子 */
+/* 皮肤：沙子（粒子画在 #sandCv 上，消息 DOM 在粒子聚拢完之前先隐藏） */
+#sandCv{position:absolute;z-index:6;pointer-events:none}
+#msgs.sand .av-slot,#msgs.sand .meta,#msgs.sand .stamp{transition:opacity .35s}
+.row.sand-gone .av-slot,.row.sand-gone .meta,.row.sand-gone .stamp{opacity:0}
+.row.sand-gone .bw,.row.sand-build .bw{visibility:hidden}
+#msgs.sand-rm .bw{transition:opacity .3s}
+#msgs.sand-rm .row.sand-gone .bw,#msgs.sand-rm .row.sand-build .bw{visibility:visible;opacity:0}
+

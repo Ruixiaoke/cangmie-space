@@ -1,0 +1,56 @@
+/* 胜场排行榜：入口小圆钮 + 浮层（见 miniapps/leaderboard.js） */
+
+/* 入口：和右上角的关闭钮对称，放在小程序区域左上角 */
+.rk-btn{
+  display:flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;
+  color:var(--t2);background:var(--g-card);border:1px solid var(--rim);border-radius:50%;
+  box-shadow:inset 0 1px 0 var(--hi),inset 0 -1px 0 var(--lo),var(--sh-1);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);
+  transition:transform .16s var(--ease);
+}
+.rk-btn:active{transform:scale(.94)}
+.rk-btn img{width:28px;height:28px;object-fit:contain;display:block}
+.rk-fb{font-size:var(--fs-sm);font-weight:600;color:var(--pink-text)}
+.rk-fab{position:absolute;top:calc(var(--app-top) + 10px);left:10px;z-index:1}
+
+/* 浮层：盖住聊天页，从底部升起的卡片 */
+#rankSheet{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;justify-content:flex-end;background:color-mix(in srgb,var(--t1) 34%,transparent);opacity:0;transition:opacity .24s var(--ease)}
+#rankSheet.show{opacity:1}
+#rankSheet[hidden]{display:none}
+.rk-card{
+  display:flex;flex-direction:column;max-height:min(86%,640px);width:100%;max-width:520px;margin:0 auto;
+  padding:16px 16px calc(var(--safe-b) + 16px);color:var(--t1);
+  background:var(--g-solid);border:1px solid var(--rim);border-bottom:0;border-radius:var(--r-panel) var(--r-panel) 0 0;
+  box-shadow:inset 0 1px 0 var(--hi),var(--sh-2);transform:translateY(24px);transition:transform .28s var(--ease);
+}
+#rankSheet.show .rk-card{transform:none}
+.rk-card:focus{outline:none}
+.rk-head{display:flex;align-items:baseline;gap:8px;min-height:44px;padding-right:48px;position:relative}
+.rk-head h3{margin:0;font-size:var(--fs-xl);font-weight:700}
+.rk-sub{font-size:var(--fs-xs);color:var(--t3)}
+.rk-x{position:absolute;top:0;right:-6px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--t2);border-radius:50%}
+.rk-x:active{background:var(--g-chip)}
+.rk-tabs{display:flex;gap:4px;padding:4px;margin:4px 0 8px;border:1px solid var(--hair);border-radius:var(--r-ctl);background:var(--field-bg);box-shadow:inset 0 1px 3px rgba(24,14,6,.12),inset 0 -1px 0 var(--hi)}
+.rk-tab{flex:1;min-height:40px;padding:6px 4px;font-size:var(--fs-sm);font-weight:500;color:var(--t2);border-radius:8px;transition:background-color .16s var(--ease),color .16s var(--ease)}
+.rk-tab.on{background:var(--pink);color:var(--on-pink);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 1px 2px rgba(24,14,6,.18)}
+.rk-note{margin:0 0 8px;font-size:var(--fs-xs);color:var(--t3)}
+.rk-list{flex:1;min-height:120px;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:6px;margin:0 -4px;padding:2px 4px}
+.rk-msg{margin:auto;padding:24px 0;display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--t2);font-size:var(--fs-sm);text-align:center}
+.rk-hint{padding:10px 0 2px;font-size:var(--fs-xs);color:var(--t3);text-align:center}
+
+.rk-row{flex:none;display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 12px 8px 8px;border:1px solid transparent;border-radius:var(--r-ctl);background:var(--g-chip)}
+.rk-row.me{border-color:var(--pink);background:color-mix(in srgb,var(--pink) 14%,var(--g-solid));box-shadow:0 0 0 1px color-mix(in srgb,var(--pink) 30%,transparent)}
+.rk-rank,.rk-medal{flex:none;width:32px;height:32px}
+.rk-rank{display:flex;align-items:center;justify-content:center;font-size:var(--fs-md);font-weight:700;color:var(--t3);font-variant-numeric:tabular-nums}
+.rk-rank.top{border-radius:50%;color:#fff;background:var(--pink)}
+.rk-rank.top.n1{background:#c9921a}.rk-rank.top.n2{background:#7f8892}.rk-rank.top.n3{background:#a8693a}
+.rk-medal{object-fit:contain;display:block}
+.rk-row .avatar{flex:none;width:36px!important;height:36px!important}
+.rk-who{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.rk-who b{display:flex;align-items:center;gap:6px;font-size:var(--fs-md);font-weight:600;white-space:nowrap}
+.rk-who b i{flex:none;padding:0 6px;font-style:normal;font-size:11px;line-height:16px;font-weight:600;border-radius:8px;color:var(--on-pink);background:var(--pink)}
+.rk-who span{font-size:var(--fs-xs);color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk-wins{flex:none;display:flex;align-items:baseline;gap:3px;color:var(--t1)}
+.rk-wins b{font-size:var(--fs-xl);font-weight:700;font-variant-numeric:tabular-nums}
+.rk-wins span{font-size:var(--fs-xs);color:var(--t2)}
+.rk-row.zero .rk-wins{opacity:.6}
+@media (prefers-reduced-motion:reduce){#rankSheet,.rk-card{transition:none}}

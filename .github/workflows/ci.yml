@@ -1,0 +1,175 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          import glob, os, re, shutil, subprocess, sys, tempfile
+          tmp = tempfile.mkdtemp()
+          failed = 0
+          def check(path, label):
+              global failed
+              r = subprocess.run(["node", "--check", path], capture_output=True, text=True)
+              if r.returncode:
+                  failed = 1
+                  print("::error::%s: JS syntax error\n%s" % (label, r.stderr))
+              else:
+                  print("%s: JS syntax ok" % label)
+          # 页面里的内联 <script>（没有 src、也不是 JSON）
+          for f in ["index.html", "chat/index.html"]:
+              s = open(f, encoding="utf-8").read()
+              n = 0
+              for m in re.finditer(r"<script([^>]*)>(.*?)</script>", s, re.S):
+                  attrs = m.group(1)
+                  if "src=" in attrs or "json" in attrs or not m.group(2).strip():
+                      continue
+                  n += 1
+                  p = os.path.join(tmp, "inline%d.%s" % (n, "mjs" if "module" in attrs else "js"))
+                  open(p, "w", encoding="utf-8").write(m.group(2))
+                  check(p, "%s (inline script %d)" % (f, n))
+          # 拆分后的页面：chat/ 下所有 .js。sw.js 是普通脚本，其余是 ES 模块
+          # （复制成 .mjs 再检查：不依赖 Node 的模块自动识别，任何 Node 版本都一样）
+          for f in sorted(glob.glob("chat/**/*.js", recursive=True)):
+              if os.path.basename(f) == "sw.js":
+                  check(f, f)
+              else:
+                  p = os.path.join(tmp, f.replace("/", "__") + ".mjs")
+                  shutil.copy(f, p)
+                  check(p, f)
+          sys.exit(failed)
+          PY
+
+      - name: Lint ES modules
+        run: |
+          dirs=""
+          for d in chat/js; do [ -d "$d" ] && dirs="$dirs $d"; done
+          [ -n "$dirs" ] && npx -y eslint@9 $dirs || echo "no module directories to lint"
+
+      - name: Supabase placeholders present
+        run: |
+          for d in chat; do
+            grep -rq '__SUPABASE_URL__' "$d"
+            grep -rq '__SUPABASE_ANON_KEY__' "$d"
+            echo "$d: placeholders ok (deploy will inject repo variables)"
+          done
+
+      - name: Chat images exist
+        run: |
+          missing=0
+          for f in $(grep -rohE '[A-Za-z0-9_-][A-Za-z0-9_./-]*\.(png|jpg|jpeg|webp|gif|svg)' chat --include='*.html' --include='*.js' --include='*.css' --include='manifest.webmanifest' | sort -u); do
+            case "$f" in http*|//*|agent/*) continue;; esac # agent/ 头像在仓库根目录，由下一步单独检查
+            if [ ! -f "chat/$f" ]; then echo "::error::chat references $f but chat/$f does not exist"; missing=1; fi
+          done
+          [ "$missing" = 0 ] && echo "chat images ok"
+          exit $missing
+
+      - name: Agent avatar exists
+        run: |
+          shopt -s nullglob
+          files=(agent/avatar.png agent/avatar.jpg agent/avatar.jpeg agent/avatar.webp)
+          found=""
+          for f in "${files[@]}"; do [ -f "$f" ] && found="$f" && break; done
+          if [ -z "$found" ]; then echo "::error::agent/ 里没有头像文件（avatar.png / .jpg / .webp）"; exit 1; fi
+          echo "agent avatar: $found"
+
+      - name: No secret keys committed
+        run: |
+          if grep -rnE 'sb_secret_|service_role|postgresql://[^ ]+:[^@ ]+@' --include='*.html' --include='*.js' --include='*.sql' --include='*.yml' --exclude=ci.yml . ; then
+            echo "::error::Possible secret found in the repo"; exit 1
+          fi
+          echo "no secrets found"
+
+  functions:
+    name: Edge Function checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: 2.x
+
+      - name: Type check send-push
+        run: deno check supabase/functions/send-push/index.ts
+
+      - name: Type check agent-chat
+        run: deno check supabase/functions/agent-chat/index.ts
+
+      - name: Persona module is in sync with agent/persona.md
+        run: python3 agent/gen-persona.py --check
+
+      - name: Test agent-chat (mocked OpenAI and database)
+        run: deno test supabase/functions/agent-chat/agent_test.ts
+
+  backend:
+    name: Backend checks
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare Supabase-like environment (roles, auth/storage stubs, realtime publication)
+        run: psql -v ON_ERROR_STOP=1 -q -f supabase/ci/stubs.sql
+
+      - name: Apply migrations (twice, to check they are re-runnable)
+        run: |
+          for pass in 1 2; do
+            for f in supabase/migrations/*.sql; do
+              echo "pass $pass: $f"
+              psql -v ON_ERROR_STOP=1 -q -f "$f"
+            done
+          done
+
+      - name: Mimic Supabase default grants
+        run: psql -v ON_ERROR_STOP=1 -c "grant usage on schema public to anon; grant select, insert, update, delete on all tables in schema public to anon;"
+
+      - name: Run tests
+        run: |
+          for f in supabase/tests/*.sql; do
+            echo "== $f"
+            psql -v ON_ERROR_STOP=1 -At -f "$f"
+          done
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 3.1.0
+
+      - name: Preview migrations on production (dry run)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::warning::SUPABASE_DB_URL not available, skipping production dry run"
+            exit 0
+          fi
+          supabase db push --remote="$SUPABASE_DB_URL" --skip-vault --dry-run

@@ -1,0 +1,40 @@
+/* 榴莲：@ 选择器、榴莲的气泡、思考中、失败提示 */
+:root{--bub-agent:#eef2d4;--agent-ink:#4b5a1f;--agent-bd:rgba(110,130,40,.28)}
+:root[data-theme="dark"]{--bub-agent:rgba(78,92,52,.82);--agent-ink:#cfe0a0;--agent-bd:rgba(200,225,140,.28)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bub-agent:rgba(78,92,52,.82);--agent-ink:#cfe0a0;--agent-bd:rgba(200,225,140,.28)}}
+
+/* 头像：有图用图，没有就画一个「榴」 */
+.avatar.agent-av{background:var(--bub-agent);border-color:var(--agent-bd)}
+.avatar.agent-av.drawn{display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px;color:var(--agent-ink)}
+
+/* 榴莲的气泡：靠左，颜色和对方的区分开，名字在气泡上面 */
+.agent-name[hidden]{display:none}
+.agent-name{font-size:var(--fs-xs);line-height:1.2;font-weight:500;color:var(--agent-ink);margin:0 0 3px 4px}
+.row.agent .bubble{background-color:var(--bub-agent);border-color:var(--agent-bd);border-bottom-left-radius:var(--r-tail);user-select:text;-webkit-user-select:text}
+.row.agent .col{align-items:flex-start}
+.agent-link{color:var(--pink-text);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
+
+/* 思考中（两边都显示）和失败提示，放在消息列表最下面 */
+#agentLive{padding:0 0 8px}
+.agent-think{display:flex;gap:8px;align-items:flex-start}
+.agent-think-body{display:flex;flex-direction:column;min-width:0}
+.agent-think-txt{display:inline-flex;align-items:center;gap:1px;margin:0 0 0 4px;padding:8px 12px;border-radius:var(--r-bub);border-bottom-left-radius:var(--r-tail);
+  background:var(--bub-agent);border:1px solid var(--agent-bd);font-size:var(--fs-md);line-height:1.5;color:var(--t2)}
+.agent-think-body .agent-name{margin-bottom:3px}
+.dots{display:inline-flex;gap:3px;margin-left:3px}
+.dots i{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.35;animation:agentDot 1.2s ease-in-out infinite}
+.dots i:nth-child(2){animation-delay:.2s}
+.dots i:nth-child(3){animation-delay:.4s}
+@keyframes agentDot{0%,70%,100%{opacity:.3;transform:translateY(0)}35%{opacity:1;transform:translateY(-2px)}}
+@media (prefers-reduced-motion:reduce){.dots i{animation:none;opacity:.7}}
+.agent-note{text-align:center;font-size:var(--fs-xs);color:var(--t3);padding:6px 12px}
+
+/* @ 选择器：贴在输入栏上沿，每一项至少 44px 高 */
+#atPop{position:absolute;left:8px;right:8px;bottom:calc(100% + 6px);z-index:6;max-width:360px;display:flex;flex-direction:column;padding:4px;border-radius:var(--r-card);
+  background:var(--g-solid);border:1px solid var(--rim);box-shadow:inset 0 1px 0 var(--hi),var(--sh-2)}
+#atPop[hidden]{display:none}
+#atPop button{display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 10px;border-radius:var(--r-ctl);text-align:left;color:var(--t1);font-size:var(--fs-md)}
+#atPop button.on,#atPop button:active{background:color-mix(in srgb,var(--t1) 8%,transparent)}
+#atPop .avatar{width:32px;height:32px;flex:none}
+#atPop .avatar.agent-av.drawn{font-size:15px}
+#atPop .at-name{font-weight:600}

@@ -1,0 +1,89 @@
+name: Deploy frontend (GitHub Pages)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "chat/**"
+      - "agent/avatar.*"
+      - "*.png"
+      - "*.jpg"
+      - "*.jpeg"
+      - "*.gif"
+      - "*.webp"
+      - ".github/workflows/frontend.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build site
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+        run: |
+          mkdir _site
+          cp index.html _site/
+          shopt -s nullglob
+          for f in *.png *.jpg *.jpeg *.gif *.webp; do cp "$f" _site/; done
+          # 每个小程序一个目录
+          cp -R chat _site/
+          # 榴莲的头像：只发布 agent/ 里的头像文件（人设 persona.md 等不上线）
+          mkdir _site/agent
+          AGENT_AVATAR=""
+          for ext in png jpg jpeg webp; do
+            if [ -f "agent/avatar.$ext" ]; then
+              cp "agent/avatar.$ext" _site/agent/
+              # 内容哈希做版本号：头像一换，地址就变，浏览器和 CDN 不会继续用旧图
+              AGENT_AVATAR="../agent/avatar.$ext?v=$(sha256sum "agent/avatar.$ext" | cut -c1-10)"
+              break
+            fi
+          done
+          if [ -z "$AGENT_AVATAR" ]; then
+            echo "::warning::agent/ 里没有头像文件（avatar.png / .jpg / .webp），榴莲会显示默认头像"
+          fi
+          export AGENT_AVATAR
+
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::warning::SUPABASE_URL / SUPABASE_ANON_KEY 仓库变量未设置，访问次数统计将不会启用"
+          fi
+
+          python3 - <<'PY'
+          import os, pathlib
+          # 页面拆成了 js/ 模块，占位符可能在 .html 也可能在 .js 里：_site 下都替换
+          for p in list(pathlib.Path("_site").rglob("*.html")) + list(pathlib.Path("_site").rglob("*.js")):
+              s = p.read_text(encoding="utf-8")
+              s = s.replace("__SUPABASE_URL__", os.environ.get("SUPABASE_URL", "").rstrip("/"))
+              s = s.replace("__SUPABASE_ANON_KEY__", os.environ.get("SUPABASE_ANON_KEY", ""))
+              # 没有头像时不替换，页面会退回默认路径并在加载失败时显示备用头像
+              if os.environ.get("AGENT_AVATAR"):
+                  s = s.replace("__AGENT_AVATAR__", os.environ["AGENT_AVATAR"])
+              p.write_text(s, encoding="utf-8")
+          PY
+
+          ls -laR _site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

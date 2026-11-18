@@ -1,0 +1,24 @@
+/* 提示与 吉祥物 喊一声 */
+/* 提示 */
+#toast{
+  position:absolute;top:calc(var(--safe-t) + 12px);left:50%;transform:translate(-50%,-16px);z-index:30;
+  max-width:calc(100% - 32px);padding:12px 16px;background:var(--toast-bg);color:var(--toast-fg);border-radius:var(--r-card);font-size:var(--fs-sm);font-weight:500;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),var(--sh-2);text-align:center;pointer-events:none;
+  /* 收起时完全隐藏：只靠位移的话，空的提示框会在屏幕顶上露出一条边 */
+  opacity:0;visibility:hidden;
+  transition:transform .24s var(--ease),opacity .2s var(--ease),visibility 0s linear .24s;
+}
+#toast.show{transform:translate(-50%,0);opacity:1;visibility:visible;transition:transform .24s var(--ease),opacity .2s var(--ease),visibility 0s}
+/* 开心的时候 吉祥物蹦出来喊一声（内容，可以俏皮一点，但不再大幅回弹） */
+#pop{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+#pop .cheer-pop{display:flex;flex-direction:column;align-items:center;animation:cheerPop 1.6s var(--ease) both}
+#pop .mascot,#pop .mascot-fallback{width:168px;height:168px;font-size:120px;filter:drop-shadow(0 6px 10px rgba(24,14,6,.22))}
+#pop .shout{margin-top:-4px;padding:4px 24px;background:var(--g-card);border:1px solid var(--rim);border-radius:var(--r-card);box-shadow:inset 0 1px 0 var(--hi),inset 0 -1px 0 var(--lo),var(--sh-2);font-size:var(--fs-2xl);font-weight:600;color:var(--pink-text)}
+@keyframes cheerPop{0%{opacity:0;transform:scale(.6) translateY(48px) rotate(-5deg)}24%{opacity:1;transform:scale(1.05) translateY(-8px) rotate(2deg)}40%{transform:scale(1) translateY(0)}78%{opacity:1;transform:scale(1) translateY(0)}100%{opacity:0;transform:scale(.9) translateY(-24px)}}
+@media (prefers-reduced-motion:reduce){
+  .bob,.hero.cheer{animation:none!important}
+  #pop .cheer-pop{animation-duration:.01s;animation-delay:1.2s}
+  .drp,.hrt,.wsp,.zz{animation:none}
+  .row.st-hot .bw>.bubble,.row.st-hot .bw>.deco{animation:none!important}
+  .drp{opacity:.9;transform:translateY(8px)}
+}

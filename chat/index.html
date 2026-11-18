@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>藏咩空间</title>
+<meta name="theme-color" content="#f4e3c8" media="(prefers-color-scheme: light)" id="tcLight">
+<meta name="theme-color" content="#1c120d" media="(prefers-color-scheme: dark)" id="tcDark">
+<script id="theme-init">(function(){try{var t=localStorage.getItem('chat.theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);var c=t==='dark'?'#1c120d':'#f4e3c8';document.getElementById('tcLight').content=c;document.getElementById('tcDark').content=c}}catch(e){}})()</script>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="藏咩空间">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/auth.css">
+<link rel="stylesheet" href="css/lists.css">
+<link rel="stylesheet" href="css/chat.css">
+<link rel="stylesheet" href="css/quote.css">
+<link rel="stylesheet" href="css/effects.css">
+<link rel="stylesheet" href="css/menu.css">
+<link rel="stylesheet" href="css/skins.css">
+<link rel="stylesheet" href="css/feedback.css">
+<link rel="stylesheet" href="css/plus-miniapps.css">
+<link rel="stylesheet" href="css/sling.css">
+<link rel="stylesheet" href="css/pool.css">
+<link rel="stylesheet" href="css/rank.css">
+<link rel="stylesheet" href="css/agent.css">
+<link rel="stylesheet" href="css/fallback.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></symbol>
+  <symbol id="i-plus-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24"><path d="M9 17 4 12l5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+</defs></svg>
+<div id="shell">
+
+  <section id="boot" class="screen center">
+    <div class="hero bob" id="bootHero"></div>
+    <p class="hint" style="text-align:center">载入中…</p>
+  </section>
+
+  <section id="unconfigured" class="screen center" hidden>
+    <div class="hero" id="unconfHero"></div>
+    <h1 style="font-size:var(--fs-xl);font-weight:600;line-height:1.3">后端未配置</h1>
+    <p class="hint" style="text-align:center">这个页面还没有连上 Supabase。部署时会自动填入地址；本地调试请在浏览器控制台设置 chat.devSupabaseUrl 和 chat.devSupabaseAnonKey（localStorage）后刷新。</p>
+    <a class="hub-link" href="../"><svg class="i" aria-hidden="true"><use href="#i-chevron-left"/></svg>回到小程序</a>
+  </section>
+
+  <section id="auth" class="screen" hidden>
+    <a class="hub-link" href="../"><svg class="i" aria-hidden="true"><use href="#i-chevron-left"/></svg>小程序</a>
+    <div class="hero bob" id="heroBox"></div>
+    <h1>藏咩空间</h1>
+    <p class="sub">和好朋友说说话</p>
+    <div class="auth-card">
+    <div class="seg" role="tablist">
+      <button type="button" id="segLogin" class="on" role="tab">登录</button>
+      <button type="button" id="segRegister" role="tab">注册</button>
+    </div>
+    <form id="authForm" novalidate>
+      <input class="field" id="fUser" type="text" placeholder="用户名（小写字母、数字、下划线）" maxlength="20"
+             autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next">
+      <input class="field" id="fNick" type="text" placeholder="昵称（可选，最多 20 个字）" maxlength="20" autocomplete="nickname" hidden>
+      <input class="field" id="fPass" type="password" placeholder="密码（至少 6 位）" maxlength="72"
+             autocomplete="current-password" enterkeyhint="go">
+      <p class="hint" id="regHint" hidden>用户名注册后不能修改，好友会用它来找到你。</p>
+      <p class="msg" id="authMsg" role="alert"></p>
+      <button class="btn" type="submit" id="authSubmit">登录</button>
+    </form>
+    </div>
+  </section>
+
+  <section id="app" class="screen" hidden>
+    <div id="views">
+      <div class="view" id="view-chats">
+        <div class="top"><a class="hub-link" href="../"><svg class="i" aria-hidden="true"><use href="#i-chevron-left"/></svg>小程序</a><h2>消息</h2></div>
+        <div class="scroll" id="chatList"></div>
+      </div>
+      <div class="view" id="view-friends" hidden>
+        <div class="top"><a class="hub-link" href="../"><svg class="i" aria-hidden="true"><use href="#i-chevron-left"/></svg>小程序</a><h2>好友</h2></div>
+        <div class="scroll">
+          <form class="search" id="searchForm" novalidate>
+            <input class="field" id="searchInput" type="text" placeholder="输入对方的用户名" maxlength="20"
+                   autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="search">
+            <button class="btn small" type="submit" id="searchBtn" style="min-height:48px">搜索</button>
+          </form>
+          <div id="searchResult"></div>
+          <div id="friendsBody"></div>
+        </div>
+      </div>
+      <div class="view" id="view-me" hidden>
+        <div class="top"><a class="hub-link" href="../"><svg class="i" aria-hidden="true"><use href="#i-chevron-left"/></svg>小程序</a><h2>我的</h2></div>
+        <div class="scroll" id="meBody"></div>
+      </div>
+    </div>
+    <nav id="tabbar">
+      <button type="button" data-tab="chats" class="on"><svg class="i" aria-hidden="true"><use href="#i-chat"/></svg>消息<span class="badge" id="badgeChats" hidden></span></button>
+      <button type="button" data-tab="friends"><svg class="i" aria-hidden="true"><use href="#i-users"/></svg>好友<span class="badge" id="badgeFriends" hidden></span></button>
+      <button type="button" data-tab="me"><svg class="i" aria-hidden="true"><use href="#i-user"/></svg>我的</button>
+    </nav>
+  </section>
+
+  <section id="chat" class="screen" hidden>
+    <div class="top">
+      <button type="button" class="back" id="chatBack" aria-label="返回"><svg class="i" aria-hidden="true"><use href="#i-chevron-left"/></svg></button>
+      <div id="chatAvatar"></div>
+      <div class="who"><b id="chatName"></b><span id="chatUser"></span></div>
+    </div>
+    <div id="appLayer" hidden><div id="appBody"></div><button type="button" id="appClose" aria-label="关闭"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+    <div id="msgs">
+      <div id="olderRow" hidden>加载更早的消息…</div>
+      <div id="rows"></div>
+      <div id="agentLive" hidden></div>
+      <div id="chatEmpty"></div>
+    </div>
+    <div id="emojiPanel" hidden>
+      <div class="panel-label">特效表情</div>
+      <div id="fxRow"></div>
+      <div class="panel-label">表情</div>
+      <div id="emojiGrid"></div>
+    </div>
+    <div id="plusPanel" hidden><div id="toolGrid"></div></div>
+    <div id="fxStage" hidden></div>
+    <div id="actMenu" role="menu" hidden></div>
+    <div id="fxPick" role="menu" aria-label="选一个表情" hidden></div>
+    <div id="composer">
+      <div id="atPop" role="listbox" aria-label="选择要叫的助手" hidden></div>
+      <div id="qbar" hidden><span id="qbarText"></span><button type="button" id="qbarX" aria-label="取消引用"><svg class="i" aria-hidden="true"><use href="#i-x-circle"/></svg></button></div>
+      <button type="button" class="icon-btn" id="emojiBtn" aria-label="表情"><svg class="i" aria-hidden="true"><use href="#i-smile"/></svg></button>
+      <textarea id="input" rows="1" maxlength="2000" placeholder="说点什么…" enterkeyhint="send"></textarea>
+      <button type="button" class="icon-btn" id="plusBtn" aria-label="更多功能" aria-expanded="false"><svg class="i" aria-hidden="true"><use href="#i-plus-circle"/></svg></button>
+      <button type="button" class="btn" id="sendBtn">发送</button>
+    </div>
+    <div id="qsheet" hidden><div class="qs" role="dialog" aria-label="被引用的消息"><div class="qs-name" id="qsName"></div><div class="qs-text" id="qsText"></div><button type="button" class="btn small ghost" id="qsClose">关闭</button></div></div>
+  </section>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="pop" hidden></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
