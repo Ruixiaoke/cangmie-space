@@ -19,7 +19,7 @@ export async function sendCurrent() {
   var c = S.chat; if (!c) return;
   var input = $('input');
   // 全角 "＠沈剑心"（中文输入法常见）统一成半角，才能叫到沈剑心
-  var body = input.value.replace(/^[ \t\r\n]+|[ \t\r\n]+$/g, '').replace(/＠(沈剑心|榴莲)/g, '@$1');
+  var body = input.value.replace(/^[ \t\r\n]+|[ \t\r\n]+$/g, '').replace(/＠(沈剑心|榴莲|叶英)/g, '@$1');
   if (!body) return;
   if (body.length > 2000) return toast(ERR_TEXT.message_too_long);
   input.value = '';

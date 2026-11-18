@@ -6,7 +6,8 @@ import { h } from '../utils.js';
 // ===== 沈剑心 =====
 // AGENTS 是列表：以后加别的 agent，只要在这里加一项（id 要和数据库里 messages.author 的取值一致）
 export var AGENTS = [
-  { id: 'durian', name: '沈剑心', mention: '@沈剑心', keys: ['沈剑心', 'shenjianxin', '榴莲', 'liulian', 'durian'] }
+  { id: 'durian', name: '沈剑心', mention: '@沈剑心', keys: ['沈剑心', 'shenjianxin', '榴莲', 'liulian', 'durian'] },
+  { id: 'ye_ying', name: '叶英', mention: '@叶英', keys: ['叶英', 'yeying', '大庄主'] }
 ];
 export function agentById(id) {
   for (var i = 0; i < AGENTS.length; i++) if (AGENTS[i].id === id) return AGENTS[i];
@@ -16,22 +17,22 @@ export function agentById(id) {
 export function isAgentMsg(m) { return !!(m && m.author && agentById(m.author)); }
 export function agentName(author) { var a = agentById(author); return a ? a.name : '沈剑心'; }
 export function mentionedAgent(body) {
-  var s = String(body || '');
-  for (var i = 0; i < AGENTS.length; i++) if ((s.indexOf(AGENTS[i].mention) >= 0 || (AGENTS[i].id === 'durian' && s.indexOf('@榴莲') >= 0))) return AGENTS[i];
-  return null;
+  var match = /[@＠](沈剑心|榴莲|叶英)/.exec(String(body || ''));
+  return match ? agentById(match[1] === '叶英' ? 'ye_ying' : 'durian') : null;
 }
 
 // 头像：优先用 agent/ 目录里的图（部署时带内容哈希，换图后自动刷新）；加载失败就换成画出来的备用头像
 var AVATAR_FALLBACKS = ['../agent/avatar.png', '../agent/avatar.jpg', '../agent/avatar.webp'];
-export function makeAgentAvatar(size) {
+export function makeAgentAvatar(size, author) {
   var box = h('div', { class: 'avatar agent-av', style: size ? 'width:' + size + 'px;height:' + size + 'px' : null });
   var cands = AGENT_AVATAR_SRC.indexOf('?v=') > 0 ? [AGENT_AVATAR_SRC] : AVATAR_FALLBACKS.slice(); // 没替换占位符（本地调试）时逐个试扩展名
   var i = 0;
   function useDrawn() {
     box.classList.add('drawn');
-    box.textContent = '沈';
+    box.textContent = agentName(author).charAt(0);
     box.setAttribute('aria-hidden', 'true');
   }
+  if (author === 'ye_ying') { useDrawn(); return box; }
   var img = h('img', { alt: '', draggable: 'false' });
   img.addEventListener('error', function () {
     i++;

@@ -66,7 +66,7 @@ export function updateRow(el, m, prev) {
   // 头像：资料重新加载后头像路径变了就重建
   var ap = agent ? null : own ? S.me : (profileOf(m.sender_id) || (convOf(m.sender_id) ? peerFromConv(convOf(m.sender_id)) : null));
   var akey = agent ? 'a|' + m.author : (own ? 'o|' : 'p|') + (ap && ap.avatar_path || '');
-  if (el._akey !== akey) { el._akey = akey; clear(el._av).appendChild(agent ? makeAgentAvatar(40) : makeAvatar(ap, 40)); }
+  if (el._akey !== akey) { el._akey = akey; clear(el._av).appendChild(agent ? makeAgentAvatar(40, m.author) : makeAvatar(ap, 40)); }
   // 榴莲：头像右边、气泡上面的名字（两边的人看到的都一样）
   el._name.hidden = !agent;
   if (agent && el._name.textContent !== agentName(m.author)) el._name.textContent = agentName(m.author);

@@ -19,6 +19,7 @@
 //   提示词缓存 https://developers.openai.com/api/docs/guides/prompt-caching ：缓存按相同的前缀命中，所以 instructions 和 tools 必须
 //     每次都完全一样；prompt_cache_key 只影响路由 / 计费归类，不保证命中；GPT-5.6 及以后最短可缓存 1024 token
 import { PERSONA } from "./persona.gen.ts";
+import { PERSONA as YE_YING_PERSONA } from "./ye-ying.gen.ts";
 import { BOARD_GAMES, gameHint, gameRecord, gameStatus } from "./games.ts";
 
 // ---- 调参：全部数字集中在这里 ----
@@ -64,15 +65,17 @@ export type Deps = {
   timeoutMs?: number;
 };
 
-type Job = { id: number; asker: string; peer: string; message_id: number; status: string };
+type Job = { id: number; asker: string; peer: string; message_id: number; status: string; agent_id?: string };
 type Names = Record<string, string>;
 export type Memory = { title: string; content: string; pinned: boolean; updated_at: string };
 export type HistoryRow = { id?: number; sender_id: string; author: string | null; body: string; created_at: string };
 
 // 完全静态：人设 + 固定规则。不放名字、日期、任何和这一对好友有关的东西，这样所有请求的前缀都一样，可以被缓存。
 // 这次是谁在叫、两个人叫什么，放在 user input 里（buildUserInput）。
-export function systemInstructions(): string {
-  return PERSONA.trimEnd() + `
+function agentName(id: string): string { return id === "ye_ying" ? "叶英" : "沈剑心"; }
+
+export function systemInstructions(id = "durian"): string {
+  return (id === "ye_ying" ? YE_YING_PERSONA : PERSONA).trimEnd() + `
 
 ## 应用规则（以下优先于上面的任何语气设定）
 
@@ -232,7 +235,7 @@ export function buildMemoryBlock(mems: Memory[]): string {
 // 聊天记录块：每条截短，整块不超过 HISTORY_BLOCK_CHARS，超了丢最旧的。rows 按时间从旧到新
 export function buildHistoryBlock(rows: HistoryRow[], names: Names): string {
   const lines = rows.map((m) => {
-    const who = m.author ? "沈剑心" : names[m.sender_id] ?? "?";
+    const who = m.author ? agentName(m.author) : names[m.sender_id] ?? "?";
     return `[${stamp(m.created_at)}] ${who}：${clip(m.body, m.author ? HISTORY_AGENT_CHARS : HISTORY_USER_CHARS)}`;
   });
   const kept: string[] = [];
@@ -263,9 +266,9 @@ export function buildUserInput(p: { askerName: string; peerName: string; now: Da
 }
 
 // 稳定的每对好友缓存键：有序用户对的哈希，不带原始 id
-async function cacheKey(lo: string, hi: string): Promise<string> {
+async function cacheKey(lo: string, hi: string, agentId: string): Promise<string> {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(lo + ":" + hi));
-  return "durian:" + Array.from(new Uint8Array(buf).slice(0, 8)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return agentId + ":" + Array.from(new Uint8Array(buf).slice(0, 8)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 async function runTool(deps: Deps, job: Job, names: Names, name: string, rawArgs: string): Promise<string> {
@@ -285,7 +288,7 @@ async function runTool(deps: Deps, job: Job, names: Names, name: string, rawArgs
       const { data, error } = await deps.admin.rpc("agent_search_messages", { p_a: job.asker, p_b: job.peer, p_query: query, p_limit: limit });
       if (error) return JSON.stringify({ error: "search_failed" });
       // deno-lint-ignore no-explicit-any
-      return JSON.stringify({ results: (data ?? []).map((r: any) => ({ at: stamp(r.created_at), from: r.author ? "沈剑心" : names[r.sender_id] ?? "?", text: r.body })) });
+      return JSON.stringify({ results: (data ?? []).map((r: any) => ({ at: stamp(r.created_at), from: r.author ? agentName(r.author) : names[r.sender_id] ?? "?", text: r.body })) });
     }
     if (name === "game_status") return await gameStatus(deps.admin, job.asker, job.peer, names, args);
     if (name === "game_leaderboard") return await gameRecord(deps.admin, job.asker, job.peer, names, args);
@@ -369,7 +372,7 @@ async function fail(deps: Deps, jobId: number, code: string) {
 export async function runJob(deps: Deps, jobId: number): Promise<void> {
   try {
     if (!deps.apiKey) throw new AgentError("agent_unconfigured");
-    const { data: job } = await deps.admin.from("agent_jobs").select("id,asker,peer,message_id,status").eq("id", jobId).maybeSingle();
+    const { data: job } = await deps.admin.from("agent_jobs").select("id,asker,peer,message_id,status,agent_id").eq("id", jobId).maybeSingle();
     if (!job) throw new AgentError("job_missing");
     const j = job as Job;
 
@@ -397,8 +400,9 @@ export async function runJob(deps: Deps, jobId: number): Promise<void> {
     const history = ((hist ?? []) as HistoryRow[]).filter((m) => m.id !== j.message_id).reverse();
     const hint = await gameHint(deps.admin, j.asker, j.peer, names).catch(() => "");
     const userText = buildUserInput({ askerName, peerName, now: new Date(), mems: (mems ?? []) as Memory[], history, names, question: q.body, gameHint: hint });
-    const instructions = systemInstructions();
-    const promptCacheKey = await cacheKey(pair.lo, pair.hi);
+    const agentId = j.agent_id ?? "durian";
+    const instructions = systemInstructions(agentId);
+    const promptCacheKey = await cacheKey(pair.lo, pair.hi, agentId);
 
     const total = deps.timeoutMs ?? TOTAL_TIMEOUT_MS;
     const ctl = new AbortController();
@@ -463,14 +467,14 @@ export async function runJob(deps: Deps, jobId: number): Promise<void> {
     if (!replyText) throw new AgentError("empty_reply");
 
     const { data: row, error: insErr } = await deps.admin.from("messages")
-      .insert({ sender_id: j.asker, receiver_id: j.peer, body: replyText, author: "durian" }).select("id").single();
+      .insert({ sender_id: j.asker, receiver_id: j.peer, body: replyText, author: agentId }).select("id").single();
     if (insErr || !row) throw new AgentError("reply_failed");
     await deps.admin.from("agent_jobs").update({ status: "done", reply_id: row.id, error: null, updated_at: new Date().toISOString() }).eq("id", jobId);
 
     // 推送给两个人（正在前台的设备由 pushToUser 跳过）；失败不影响任务
     const preview = Array.from(replyText.replace(/\s+/g, " ")).slice(0, 80).join("");
     await Promise.all([[j.asker, j.peer], [j.peer, j.asker]].map(([to, other]) =>
-      deps.push(to, { title: "沈剑心", body: preview, tag: "agent-" + jobId, peer: other }).catch(() => {})
+      deps.push(to, { title: agentName(agentId), body: preview, tag: "agent-" + jobId, peer: other }).catch(() => {})
     ));
   } catch (e) {
     const code = e instanceof AgentError ? e.code : "agent_error";

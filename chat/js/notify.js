@@ -1,5 +1,6 @@
 // 通知 + Web Push
 
+import { agentName } from './agent/info.js';
 import { VAPID_PUBLIC_KEY } from './config.js';
 import { previewOf } from './fx/table.js';
 import { S, avatarUrl, profileOf, sb } from './state.js';
@@ -137,7 +138,7 @@ export async function closeNotifications(tag) {
 export function notifyMessage(m, prefix) {
   var p = profileOf(m.sender_id);
   notify({
-    title: m.author ? '沈剑心' : p ? p.nickname : '新消息',
+    title: m.author ? agentName(m.author) : p ? p.nickname : '新消息',
     body: cut((prefix || '') + (m.author ? m.body : previewOf(m.body)), 80),
     tag: 'msg-' + m.sender_id,
     icon: p && avatarUrl(p.avatar_path),

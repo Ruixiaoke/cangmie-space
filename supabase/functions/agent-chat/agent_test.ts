@@ -90,6 +90,33 @@ function world(opts: { asker?: string; peer?: string; mems?: Mem[]; hist?: Recor
 const json = (o: unknown) => new Response(JSON.stringify(o), { status: 200, headers: { "Content-Type": "application/json" } });
 const noPush = () => Promise.resolve();
 
+Deno.test("each agent receives both speakers' history and replies under its own identity", async () => {
+  for (const [id, name] of [["durian", "沈剑心"], ["ye_ying", "叶英"]]) {
+    const w = world({ question: "@" + name + " 你们刚才说了什么？", hist: [
+      { id: 99, sender_id: ASKER, author: "ye_ying", body: "茶还温着。", created_at: "2026-11-18T01:00:00Z" },
+      { id: 98, sender_id: PEER, author: "durian", body: "我来尝尝。", created_at: "2026-11-18T00:59:00Z" },
+    ] });
+    w.state.job.agent_id = id;
+    const requests: Record<string, unknown>[] = [];
+    const titles: string[] = [];
+    await runJob({
+      admin: w.admin, apiKey: "test-key", model: "gpt-6-luna",
+      fetchFn: (_url, init) => {
+        requests.push(JSON.parse(String(init?.body)));
+        return Promise.resolve(json({ output: [{ type: "message", content: [{ type: "output_text", text: "茶还温着。" }] }] }));
+      },
+      push: (_user, payload) => { titles.push(payload.title); return Promise.resolve(); },
+    }, 7);
+    const request = requests[0];
+    if (request?.instructions !== systemInstructions(id)) throw new Error("wrong persona for " + name);
+    const history = JSON.stringify(request.input);
+    if (!history.includes("叶英：茶还温着。") || !history.includes("沈剑心：我来尝尝。")) throw new Error("missing agent history");
+    if (w.state.messages[0]?.author !== id || titles.some((title) => title !== name) || titles.length !== 2) {
+      throw new Error("wrong reply or push identity for " + name);
+    }
+  }
+});
+
 Deno.test("tool loop: search_chats -> remember -> final text with web citation; reply stored, job done", async () => {
   const w = world();
   const requests: Record<string, unknown>[] = [];

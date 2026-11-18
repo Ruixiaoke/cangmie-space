@@ -4,7 +4,7 @@ import { fetchLatest, nearBottom, scrollToBottom } from '../chat/view.js';
 import { errText } from '../errors.js';
 import { S, sb } from '../state.js';
 import { $, clear, h, toast } from '../utils.js';
-import { isAgentMsg, makeAgentAvatar, mentionedAgent } from './info.js';
+import { agentName, makeAgentAvatar, mentionedAgent } from './info.js';
 
 // ===== 任务状态 =====
 // c.job：当前会话里最近一个任务（agent_jobs 的一行；刚提问、还没拿到行时是 {local:true, status:'pending'}）
@@ -18,7 +18,7 @@ function startedAt(job) { var t = Date.parse(job.created_at || ''); return isNaN
 // 之后有没有沈剑心的回复（job.message_id 之后出现的沈剑心消息）
 function replied(c, job) {
   var mid = job.message_id == null ? -1 : job.message_id;
-  return c.msgs.some(function (m) { return m.id != null && m.id > mid && isAgentMsg(m); });
+  return c.msgs.some(function (m) { return m.id != null && m.id > mid && m.author === (job.agent_id || "durian"); });
 }
 function sawAnyAfter(c, job) {
   var mid = job.message_id == null ? -1 : job.message_id;
@@ -44,7 +44,7 @@ export function liveView(c) {
   return null;
 }
 function noteText(job) {
-  return job.error === 'agent_unconfigured' ? '沈剑心还没接通' : '沈剑心走神了，再问一次吧';
+  return agentName(job.agent_id) + (job.error === 'agent_unconfigured' ? '还没接通' : '走神了，再问一次吧');
 }
 
 export function renderLive() {
@@ -54,15 +54,16 @@ export function renderLive() {
   clearTimeout(timer); timer = 0;
   if (!v) { box.hidden = true; clear(box); box._v = null; return; }
   var stick = nearBottom();
-  var sig = v + '|' + (v === 'note' ? noteText(c.job) : '');
+  var name = agentName(c.job.agent_id);
+  var sig = v + '|' + name + '|' + (v === 'note' ? noteText(c.job) : '');
   if (box._v !== sig) {
     box._v = sig;
     clear(box);
     if (v === 'think') {
-      box.appendChild(h('div', { class: 'agent-think', role: 'status', 'aria-label': '沈剑心思考中' },
-        h('div', { class: 'av-slot' }, makeAgentAvatar(40)),
+      box.appendChild(h('div', { class: 'agent-think', role: 'status', 'aria-label': name + '思考中' },
+        h('div', { class: 'av-slot' }, makeAgentAvatar(40, c.job.agent_id)),
         h('div', { class: 'agent-think-body' },
-          h('span', { class: 'agent-name', text: '沈剑心' }),
+          h('span', { class: 'agent-name', text: name }),
           h('span', { class: 'agent-think-txt' }, '思考中', h('span', { class: 'dots', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'))))));
     } else {
       box.appendChild(h('div', { class: 'agent-note', role: 'status', text: noteText(c.job) }));
@@ -127,10 +128,11 @@ export function resetLive() {
 // ===== 提问 =====
 // 消息已经存好（有 id）之后调用：建任务 -> 叫醒 agent-chat 函数；两步都失败了用 toast 说原因
 export async function askAgent(row) {
-  if (!mentionedAgent(row.body) || !S.me || row.sender_id !== S.me.id) return;
+  var agent = mentionedAgent(row.body);
+  if (!agent || !S.me || row.sender_id !== S.me.id) return;
   var peer = row.receiver_id;
   var c = S.chat && S.chat.peer === peer ? S.chat : null;
-  if (c) setJob(c, { local: true, status: 'pending', message_id: row.id, localAt: Date.now() });
+  if (c) setJob(c, { local: true, status: 'pending', message_id: row.id, agent_id: agent.id, localAt: Date.now() });
   var r;
   try { r = await sb.rpc('agent_ask', { p_message: row.id }); } catch (e) { r = { error: e }; }
   if (r.error) {
@@ -145,6 +147,6 @@ export async function askAgent(row) {
   if (inv && inv.error) {
     // 没能叫醒函数：任务留在 pending，由 3 分钟超时兜底；先让提问的人看到失败提示
     if (S.chat && S.chat.peer === peer && S.chat.job && S.chat.job.id === job.id) setJob(S.chat, Object.assign({}, S.chat.job, { status: 'failed', error: 'invoke_failed' }));
-    toast('没能联系上沈剑心，再问一次吧');
+    toast('没能联系上' + agent.name + '，再问一次吧');
   }
 }

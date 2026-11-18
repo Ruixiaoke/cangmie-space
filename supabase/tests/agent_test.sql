@@ -65,7 +65,7 @@ do $$
 declare plain public.messages; ask public.messages; toDave public.messages;
 begin
   plain := public.send_message('a9000000-0000-0000-0000-00000000000b', '今天吃什么');
-  ask   := public.send_message('a9000000-0000-0000-0000-00000000000b', '@沈剑心 今天吃什么');
+  ask   := public.send_message('a9000000-0000-0000-0000-00000000000b', '＠叶英 今天吃什么？也请 @沈剑心 听听');
   toDave := public.send_message('a9000000-0000-0000-0000-00000000000d', '@沈剑心 你好');
   perform set_config('agent.plain', plain.id::text, false);
   perform set_config('agent.ask', ask.id::text, false);
@@ -108,7 +108,7 @@ do $$
 declare j public.agent_jobs;
 begin
   j := public.agent_ask(current_setting('agent.ask')::bigint);
-  if j.status <> 'pending' or j.asker <> 'a9000000-0000-0000-0000-00000000000a' or j.peer <> 'a9000000-0000-0000-0000-00000000000b' then
+  if j.agent_id <> 'ye_ying' or j.status <> 'pending' or j.asker <> 'a9000000-0000-0000-0000-00000000000a' or j.peer <> 'a9000000-0000-0000-0000-00000000000b' then
     raise exception 'job not created as expected: %', j; end if;
   perform set_config('agent.job', j.id::text, false);
 end $$;

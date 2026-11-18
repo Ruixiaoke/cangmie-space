@@ -13,20 +13,18 @@ import pathlib
 import sys
 
 root = pathlib.Path(__file__).resolve().parent.parent
-src = root / "agent" / "persona.md"
-dst = root / "supabase" / "functions" / "agent-chat" / "persona.gen.ts"
-
-text = src.read_text(encoding="utf-8")
-out = (
-    "// 自动生成，不要手改：来源 agent/persona.md，由 agent/gen-persona.py 生成\n"
-    "export const PERSONA: string = " + json.dumps(text, ensure_ascii=False) + ";\n"
-)
-
-if "--check" in sys.argv:
-    if not dst.exists() or dst.read_text(encoding="utf-8") != out:
-        print("::error::persona.gen.ts 和 agent/persona.md 不一致，请运行 python3 agent/gen-persona.py 并提交")
-        sys.exit(1)
-    print("persona.gen.ts is up to date")
-else:
-    dst.write_text(out, encoding="utf-8")
-    print("wrote", dst.relative_to(root))
+for name in ("persona", "ye-ying"):
+    src = root / "agent" / f"{name}.md"
+    dst = root / "supabase" / "functions" / "agent-chat" / f"{name}.gen.ts"
+    text = src.read_text(encoding="utf-8")
+    out = (
+        f"// 自动生成，不要手改：来源 agent/{name}.md，由 agent/gen-persona.py 生成\n"
+        "export const PERSONA: string = " + json.dumps(text, ensure_ascii=False) + ";\n"
+    )
+    if "--check" in sys.argv:
+        if not dst.exists() or dst.read_text(encoding="utf-8") != out:
+            sys.exit(f"::error::{dst.name} 和 {src.name} 不一致，请重新生成")
+        print(f"{dst.name} is up to date")
+    else:
+        dst.write_text(out, encoding="utf-8")
+        print("wrote", dst.relative_to(root))

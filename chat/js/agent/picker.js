@@ -36,7 +36,7 @@ function paint() {
   var pop = clear($('atPop'));
   st.list.forEach(function (a, i) {
     var b = h('button', { type: 'button', role: 'option', id: 'atOpt-' + a.id, class: i === st.idx ? 'on' : null, 'aria-selected': i === st.idx ? 'true' : 'false' },
-      makeAgentAvatar(32), h('span', { class: 'at-name', text: a.name }));
+      makeAgentAvatar(32, a.id), h('span', { class: 'at-name', text: a.name }));
     b.addEventListener('pointerdown', function (ev) { ev.preventDefault(); }); // 不抢输入框焦点
     b.addEventListener('click', function () { pick(a); });
     pop.appendChild(b);
