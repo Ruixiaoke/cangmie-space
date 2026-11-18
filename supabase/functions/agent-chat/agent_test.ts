@@ -414,3 +414,98 @@ Deno.test("tools: validation (title 1-20, content max 500, recall needs titles) 
   if (out[4].max !== PINNED_MAX || !String(out[4].hint).includes("pinned:false")) throw new Error("pinned_full must explain how to proceed");
   if (w.state.memories.find((m) => m.title === "常驻1")!.pinned !== false) throw new Error("unpin");
 });
+
+// ---- 群聊任务 ----
+
+const THIRD = "33333333-3333-3333-3333-333333333333";
+const GID = 9;
+
+function groupWorld(opts: { agents?: string[]; members?: string[]; agent_id?: string } = {}) {
+  const members = opts.members ?? [ASKER, PEER, THIRD];
+  const state = {
+    job: { id: 7, asker: ASKER, peer: null, group_id: GID, message_id: 100, status: "running", agent_id: opts.agent_id ?? "durian" } as Record<string, unknown>,
+    memories: [{ title: "群·约定", content: "周五聚餐", pinned: true, updated_at: "2026-11-10T00:00:00Z" }] as Mem[],
+    messages: [] as Record<string, unknown>[],
+    searches: [] as Record<string, unknown>[],
+    upserts: [] as Record<string, unknown>[],
+    tables: new Set<string>(),
+    msgFilters: [] as [string, unknown][][],
+  };
+  const handler = (q: Q) => {
+    state.tables.add(q.table + ":" + q.action);
+    if (q.table === "agent_jobs" && q.action === "select") return { data: state.job };
+    if (q.table === "agent_jobs" && q.action === "update") { Object.assign(state.job, q.payload); return {}; }
+    if (q.table === "groups") return { data: { id: GID, name: "周末小分队", agents: opts.agents ?? ["durian", "ye_ying"] } };
+    if (q.table === "group_members") return { data: members.map((user_id) => ({ user_id })) };
+    if (q.table === "profiles") return { data: [{ id: ASKER, nickname: "小红" }, { id: PEER, nickname: "小明" }, { id: THIRD, nickname: "小刚" }] };
+    if (q.table === "agent_group_memories" && q.action === "select") return { data: state.memories };
+    if (q.table === "agent_group_memories" && q.action === "upsert") { state.upserts.push(q.payload as Record<string, unknown>); return {}; }
+    if (q.table === "messages" && q.action === "select" && q.single) return { data: { sender_id: ASKER, body: "@沈剑心 周五去哪吃？" } };
+    if (q.table === "messages" && q.action === "select") {
+      state.msgFilters.push(q.filters);
+      return { data: [
+        { id: 100, sender_id: ASKER, author: null, body: "@沈剑心 周五去哪吃？", created_at: "2026-11-18T01:00:00Z" },
+        { id: 99, sender_id: THIRD, author: "system", body: "小刚 邀请 小明 加入了群聊", created_at: "2026-11-18T00:59:00Z" },
+        { id: 98, sender_id: THIRD, author: null, body: "我想吃火锅", created_at: "2026-11-18T00:58:00Z" },
+      ] };
+    }
+    if (q.table === "messages" && q.action === "insert") { state.messages.push(q.payload as Record<string, unknown>); return { data: { id: 300 } }; }
+    return {};
+  };
+  const rpc = (fn: string, args: Record<string, unknown>) => {
+    if (fn === "agent_search_group_messages") { state.searches.push(args); return { data: [{ id: 50, sender_id: THIRD, author: null, body: "火锅", created_at: "2026-11-14T02:30:00Z" }] }; }
+    return {};
+  };
+  return { state, ...fakeDb(handler, rpc) };
+}
+
+Deno.test("group job: group history without system lines, group memories, group search, reply row and pushes to every member", async () => {
+  const w = groupWorld();
+  const requests: Record<string, unknown>[] = [];
+  const outputs: string[] = [];
+  const pushes: [string, { title: string; body: string; tag: string; group?: number; peer?: string }][] = [];
+  const script = [
+    { id: "r1", output: [
+      { type: "function_call", call_id: "a", name: "search_chats", arguments: JSON.stringify({ query: "火锅" }) },
+      { type: "function_call", call_id: "b", name: "remember", arguments: JSON.stringify({ title: "聚餐", content: "想吃火锅" }) },
+      { type: "function_call", call_id: "c", name: "game_status", arguments: "{}" },
+    ] },
+    { id: "r2", output: [{ type: "message", content: [{ type: "output_text", text: "沈剑心：火锅吧。" }] }] },
+  ];
+  let i = 0;
+  await runJob({
+    admin: w.admin, apiKey: "k", model: "m",
+    fetchFn: ((_u: string, init: RequestInit) => {
+      const b = JSON.parse(String(init.body));
+      requests.push(b);
+      if (i > 0) for (const o of b.input) outputs.push(o.output);
+      return Promise.resolve(json(script[i++]));
+    }) as unknown as typeof fetch,
+    push: (to, p) => { pushes.push([to, p]); return Promise.resolve(); },
+  }, 7);
+  const text = (requests[0].input as { content: string }[])[0].content;
+  if (!text.includes("这是群聊「周末小分队」") || !text.includes("「小红」、「小明」、「小刚」") || !text.includes("「小红」在叫你")) throw new Error(text);
+  if (!text.includes("小刚：我想吃火锅") || text.includes("邀请 小明 加入了群聊")) throw new Error("history: " + text);
+  if (!text.includes("【群·约定】周五聚餐") || !text.includes("这个群共用")) throw new Error("group memory missing");
+  if (text.includes("进行中的小游戏")) throw new Error("no game hint in groups");
+  if (requests[0].instructions !== systemInstructions("durian")) throw new Error("instructions must stay static");
+  if (!/^durian:[0-9a-f]{16}$/.test(String(requests[0].prompt_cache_key))) throw new Error("cache key");
+  if (w.state.searches[0].p_group !== GID || w.state.searches[0].p_before !== 100 || "p_a" in w.state.searches[0]) throw new Error("search args");
+  if (w.state.upserts[0].group_id !== GID || w.state.upserts[0].agent_id !== "durian" || "user_lo" in w.state.upserts[0]) throw new Error("group memory upsert");
+  if (JSON.parse(outputs[2]).error !== "not_available_in_group") throw new Error("game tool: " + outputs[2]);
+  if (w.state.tables.has("agent_memories:select") || w.state.tables.has("friendships:select")) throw new Error("must not touch DM tables");
+  const row = w.state.messages[0];
+  if (row.group_id !== GID || row.sender_id !== ASKER || row.author !== "durian" || "receiver_id" in row || row.body !== "火锅吧。") throw new Error("reply row " + JSON.stringify(row));
+  if (w.state.job.status !== "done" || w.state.job.reply_id !== 300) throw new Error(JSON.stringify(w.state.job));
+  if (pushes.map((p) => p[0]).sort().join() !== [ASKER, PEER, THIRD].sort().join()) throw new Error("push targets");
+  if (pushes.some((p) => p[1].title !== "周末小分队" || p[1].body !== "沈剑心：火锅吧。" || p[1].group !== GID || p[1].tag !== "agent-7")) throw new Error(JSON.stringify(pushes));
+});
+
+Deno.test("group job: agent switched off or asker removed -> failed, no network", async () => {
+  for (const [opts, code] of [[{ agents: ["ye_ying"] }, "agent_not_enabled"], [{ members: [PEER, THIRD] }, "not_group_member"]] as [{ agents?: string[]; members?: string[] }, string][]) {
+    const w = groupWorld(opts);
+    let called = 0;
+    await runJob({ admin: w.admin, apiKey: "k", model: "m", push: noPush, fetchFn: (() => { called++; return Promise.resolve(json({})); }) as unknown as typeof fetch }, 7);
+    if (called || w.state.job.status !== "failed" || w.state.job.error !== code || w.state.messages.length) throw new Error(code + " " + JSON.stringify(w.state.job));
+  }
+});
