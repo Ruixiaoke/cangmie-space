@@ -7,6 +7,7 @@ on:
       - "supabase/migrations/**"
       - "supabase/functions/**"
       - "supabase/config.toml"
+      - "chat/js/miniapps/ddz-rules.js"
       - "agent/*.md"
       - "agent/gen-persona.py"
       - ".github/workflows/backend.yml"
@@ -101,3 +102,13 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
         run: supabase functions deploy agent-chat --remote="$SUPABASE_PROJECT_REF" --yes
+
+      # 斗地主：规则引擎 chat/js/miniapps/ddz-rules.js 是唯一真相来源，部署前重新生成 rules.gen.js
+      - name: Generate DDZ rules module
+        run: python3 supabase/functions/ddz/gen-rules.py
+
+      - name: Deploy ddz
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: supabase functions deploy ddz --remote="$SUPABASE_PROJECT_REF" --yes

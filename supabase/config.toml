@@ -429,3 +429,8 @@ enabled = true
 [functions.send-push]
 enabled = true
 verify_jwt = true
+
+# 斗地主牌局函数：必须带登录用户的 JWT
+[functions.ddz]
+enabled = true
+verify_jwt = true

@@ -125,6 +125,12 @@ jobs:
       - name: Test DDZ rules engine and bot
         run: deno test supabase/functions/ddz/rules_test.ts
 
+      - name: Type check ddz
+        run: deno check supabase/functions/ddz/index.ts
+
+      - name: Test DDZ table logic (mocked database, clock and rng)
+        run: deno test supabase/functions/ddz/game_test.ts
+
   backend:
     name: Backend checks
     runs-on: ubuntu-latest
