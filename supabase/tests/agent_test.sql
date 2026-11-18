@@ -114,6 +114,22 @@ begin
 end $$;
 -- 同一条消息再问
 call pg_temp.expect(format($$select public.agent_ask(%s)$$, current_setting('agent.ask')), 'agent_busy');
+-- 同一条消息同时点名两位助手，两位可以各自有一个正在进行的任务。
+begin;
+do $$
+declare j public.agent_jobs;
+begin
+  j := public.agent_ask(current_setting('agent.ask')::bigint, 'durian');
+  if j.agent_id <> 'durian' or j.status <> 'pending' then
+    raise exception 'second agent job missing';
+  end if;
+  if (select count(*) from public.agent_jobs where message_id = j.message_id and status = 'pending') <> 2 then
+    raise exception 'both agents should be pending';
+  end if;
+end $$;
+call pg_temp.expect(format($$select public.agent_ask(%s, 'durian')$$, current_setting('agent.ask')), 'agent_busy');
+call pg_temp.expect(format($$select public.agent_ask(%s, 'ye_ying')$$, current_setting('agent.toDave')), 'agent_not_mentioned');
+rollback;
 -- 同一对好友，另一条消息
 do $$
 declare m public.messages;
@@ -297,7 +313,7 @@ call pg_temp.expect($$insert into public.agent_memories (user_lo, user_hi, title
 -- 按标题 upsert：更新内容并刷新 updated_at，pinned 不指定时保持原值
 update public.agent_memories set updated_at = now() - interval '1 day' where title = '小明·口味';
 insert into public.agent_memories (user_lo, user_hi, title, content) values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000b', '小明·口味', '她不吃香菜，也不吃葱')
-  on conflict (user_lo, user_hi, title) do update set content = excluded.content;
+  on conflict (user_lo, user_hi, agent_id, title) do update set content = excluded.content;
 do $$ begin
   if (select count(*) from public.agent_memories where user_lo = 'a9000000-0000-0000-0000-00000000000a' and user_hi = 'a9000000-0000-0000-0000-00000000000b' and title = '小明·口味') <> 1 then raise exception 'upsert must not duplicate'; end if;
   if (select content from public.agent_memories where title = '小明·口味' and user_hi = 'a9000000-0000-0000-0000-00000000000b') <> '她不吃香菜，也不吃葱' then raise exception 'upsert must replace content'; end if;
@@ -326,7 +342,7 @@ begin
 end $$;
 call pg_temp.expect($$insert into public.agent_memories (user_lo, user_hi, title, content, pinned) values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000b', '常驻11', 'x', true)$$, 'pinned_full');
 call pg_temp.expect($$update public.agent_memories set pinned = true where title = '小明·口味' and user_hi = 'a9000000-0000-0000-0000-00000000000b'$$, 'pinned_full');
-call pg_temp.expect($$insert into public.agent_memories (user_lo, user_hi, title, content, pinned) values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000b', '常驻1', '改过', true) on conflict (user_lo, user_hi, title) do update set content = excluded.content, pinned = excluded.pinned$$, 'ok');
+call pg_temp.expect($$insert into public.agent_memories (user_lo, user_hi, title, content, pinned) values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000b', '常驻1', '改过', true) on conflict (user_lo, user_hi, agent_id, title) do update set content = excluded.content, pinned = excluded.pinned$$, 'ok');
 call pg_temp.expect($$update public.agent_memories set pinned = false where title = '常驻1'$$, 'ok');
 call pg_temp.expect($$insert into public.agent_memories (user_lo, user_hi, title, content, pinned) values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000d', '另一对常驻', 'x', true)$$, 'ok');
 -- 总条数上限 200（用同标题更新已有条目在满额时仍然可以）
@@ -338,7 +354,8 @@ begin
   end loop;
 end $$;
 call pg_temp.expect($$insert into public.agent_memories (user_lo, user_hi, title, content) values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000b', '第201条', 'x')$$, 'memory_full');
-call pg_temp.expect($$insert into public.agent_memories (user_lo, user_hi, title, content) values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000b', '记忆1', '满额时更新') on conflict (user_lo, user_hi, title) do update set content = excluded.content$$, 'ok');
+call pg_temp.expect($$insert into public.agent_memories (user_lo, user_hi, agent_id, title, content, pinned) values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000b', 'ye_ying', '小明·口味', '叶英的记忆', true)$$, 'ok');
+call pg_temp.expect($$insert into public.agent_memories (user_lo, user_hi, title, content) values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000b', '记忆1', '满额时更新') on conflict (user_lo, user_hi, agent_id, title) do update set content = excluded.content$$, 'ok');
 -- 另一对好友不受影响
 call pg_temp.expect($$insert into public.agent_memories (user_lo, user_hi, title, content) values ('a9000000-0000-0000-0000-00000000000a', 'a9000000-0000-0000-0000-00000000000d', '又一条', '另一对')$$, 'ok');
 

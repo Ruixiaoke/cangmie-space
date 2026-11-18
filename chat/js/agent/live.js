@@ -1,152 +1,158 @@
-// 沈剑心的任务状态：提问、实时同步、底部的「沈剑心 思考中…」行和失败提示
-
+// 每位助手分别跟踪最近的任务、实时状态和回复。
 import { fetchLatest, nearBottom, scrollToBottom } from '../chat/view.js';
 import { errText } from '../errors.js';
 import { S, sb } from '../state.js';
 import { $, clear, h, toast } from '../utils.js';
-import { agentName, makeAgentAvatar, mentionedAgent } from './info.js';
+import { AGENTS, agentName, makeAgentAvatar, mentionedAgents } from './info.js';
 
-// ===== 任务状态 =====
-// c.job：当前会话里最近一个任务（agent_jobs 的一行；刚提问、还没拿到行时是 {local:true, status:'pending'}）
-var STALE_MS = 3 * 60 * 1000;     // 超过 3 分钟还没结果：算失败（服务器那边也会在下次提问时清掉）
-var NOTE_MAX_MS = 30 * 60 * 1000; // 重新打开聊天时，失败提示只在 30 分钟内显示
-var timer = 0, doneTimer = 0;
+var STALE_MS = 3 * 60 * 1000;
+var NOTE_MAX_MS = 30 * 60 * 1000;
+var REPLY_WAIT_MS = 4000;
+var timer = 0;
 
-function otherOf(job) { return job.asker === S.me.id ? job.peer : job.asker; }
+function agentId(job) { return job.agent_id || 'durian'; }
 function active(job) { return job.status === 'pending' || job.status === 'running'; }
-function startedAt(job) { var t = Date.parse(job.created_at || ''); return isNaN(t) ? (job.localAt || Date.now()) : t; }
-// 之后有没有沈剑心的回复（job.message_id 之后出现的沈剑心消息）
+function startedAt(job) { return Date.parse(job.created_at || '') || job.localAt || Date.now(); }
 function replied(c, job) {
-  var mid = job.message_id == null ? -1 : job.message_id;
-  return c.msgs.some(function (m) { return m.id != null && m.id > mid && m.author === (job.agent_id || "durian"); });
+  if (job.reply_id != null) return c.ids.has(job.reply_id);
+  return c.msgs.some(function (m) {
+    return m.id != null && m.id > job.message_id && m.author === agentId(job);
+  });
 }
-function sawAnyAfter(c, job) {
-  var mid = job.message_id == null ? -1 : job.message_id;
-  return c.msgs.some(function (m) { return m.id != null && m.id > mid; });
-}
-// 当前该显示什么：'think' | 'note' | null
-export function liveView(c) {
-  var job = c && c.job;
-  if (!job) return null;
+
+function liveView(c, job) {
   var age = Date.now() - startedAt(job);
-  if (active(job)) {
-    if (replied(c, job)) return null;
-    return age > STALE_MS ? 'note' : 'think';
-  }
-  if (job.status === 'done') {
-    // 任务完成的通知可能比回复消息先到：等回复出现再收起（最多等几秒，见 setJob）
-    return job.reply_id != null && !c.ids.has(job.reply_id) && !replied(c, job) && c.doneWait ? 'think' : null;
-  }
+  if (active(job)) return replied(c, job) ? null : age > STALE_MS ? 'note' : 'think';
+  if (job.status === 'done') return job.reply_id != null && !replied(c, job) && job.waitUntil > Date.now() ? 'think' : null;
   if (job.status === 'failed') {
-    if (age > NOTE_MAX_MS || sawAnyAfter(c, job)) return null;
-    return 'note';
+    var movedOn = c.msgs.some(function (m) { return m.id > job.message_id && !m.author; });
+    return age > NOTE_MAX_MS || movedOn ? null : 'note';
   }
   return null;
 }
+
 function noteText(job) {
-  return agentName(job.agent_id) + (job.error === 'agent_unconfigured' ? '还没接通' : '走神了，再问一次吧');
+  return agentName(agentId(job)) + (job.error === 'agent_unconfigured' ? '还没接通' : '走神了，再问一次吧');
 }
 
 export function renderLive() {
   var c = S.chat, box = $('agentLive');
   if (!box) return;
-  var v = c ? liveView(c) : null;
   clearTimeout(timer); timer = 0;
-  if (!v) { box.hidden = true; clear(box); box._v = null; return; }
-  var stick = nearBottom();
-  var name = agentName(c.job.agent_id);
-  var sig = v + '|' + name + '|' + (v === 'note' ? noteText(c.job) : '');
+  var entries = c ? Object.values(c.agentJobs).map(function (job) {
+    return { job: job, view: liveView(c, job) };
+  }).filter(function (entry) { return entry.view; }) : [];
+  var sig = entries.map(function (entry) {
+    return agentId(entry.job) + '|' + entry.view + '|' + (entry.view === 'note' ? noteText(entry.job) : '');
+  }).join(';');
+  var stick = entries.length && nearBottom();
   if (box._v !== sig) {
     box._v = sig;
     clear(box);
-    if (v === 'think') {
+    entries.forEach(function (entry) {
+      var job = entry.job, name = agentName(agentId(job));
+      if (entry.view === 'note') {
+        box.appendChild(h('div', { class: 'agent-note', role: 'status', text: noteText(job) }));
+        return;
+      }
       box.appendChild(h('div', { class: 'agent-think', role: 'status', 'aria-label': name + '思考中' },
-        h('div', { class: 'av-slot' }, makeAgentAvatar(40, c.job.agent_id)),
+        h('div', { class: 'av-slot' }, makeAgentAvatar(40, agentId(job))),
         h('div', { class: 'agent-think-body' },
           h('span', { class: 'agent-name', text: name }),
           h('span', { class: 'agent-think-txt' }, '思考中', h('span', { class: 'dots', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'))))));
-    } else {
-      box.appendChild(h('div', { class: 'agent-note', role: 'status', text: noteText(c.job) }));
-    }
+    });
   }
-  box.hidden = false;
+  box.hidden = !entries.length;
   if (stick) scrollToBottom();
-  // 到了「走神」的时间点自动换成提示
-  if (v === 'think' && active(c.job)) {
-    var left = STALE_MS - (Date.now() - startedAt(c.job)) + 50;
-    timer = setTimeout(renderLive, Math.max(50, left));
+
+  var deadlines = entries.filter(function (entry) { return entry.view === 'think'; }).map(function (entry) {
+    return active(entry.job) ? startedAt(entry.job) + STALE_MS : entry.job.waitUntil;
+  });
+  if (deadlines.length) {
+    timer = setTimeout(async function () {
+      if (S.chat !== c) return;
+      var needsRefresh = Object.values(c.agentJobs).some(function (job) {
+        return job.waitUntil && job.waitUntil <= Date.now() && !replied(c, job);
+      });
+      if (needsRefresh) {
+        Object.values(c.agentJobs).forEach(function (job) {
+          if (job.waitUntil <= Date.now()) job.waitUntil = 0;
+        });
+        try { await fetchLatest(false); } catch (e) { /* Realtime can still deliver the reply. */ }
+      }
+      if (S.chat === c) renderLive();
+    }, Math.max(50, Math.min.apply(null, deadlines) - Date.now() + 25));
   }
 }
 
 function setJob(c, job) {
-  var old = c.job;
-  if (old && !old.local && job.id != null && old.id != null && job.id < old.id) return; // 过期的事件
-  c.job = job;
-  clearTimeout(doneTimer); c.doneWait = false;
-  if (job.status === 'done' && job.reply_id != null && !c.ids.has(job.reply_id) && !replied(c, job)) {
-    // 回复消息还没到：继续显示思考中；4 秒后还没到就主动拉一次
-    c.doneWait = true;
-    doneTimer = setTimeout(async function () {
-      if (S.chat !== c) return;
-      try { await fetchLatest(false); } catch (e) { /* 忽略 */ }
-      if (S.chat === c) { c.doneWait = false; renderLive(); }
-    }, 4000);
+  var key = agentId(job), old = c.agentJobs[key];
+  if (old && job.message_id < old.message_id && (old.local || job.local)) return;
+  if (old && !old.local && !job.local) {
+    if (job.id < old.id || (job.id === old.id && Date.parse(job.updated_at) < Date.parse(old.updated_at))) return;
+    if (job.id === old.id && !active(old) && active(job) && old.error !== 'invoke_failed') return;
   }
+  if (job.status === 'done' && job.reply_id != null && !replied(c, job)) {
+    job.waitUntil = old && old.id === job.id && old.status === 'done' ? old.waitUntil : Date.now() + REPLY_WAIT_MS;
+  }
+  c.agentJobs[key] = job;
   renderLive();
 }
 
-// 实时：agent_jobs 的变化
-export function onAgentJob(p) {
-  var job = p && p.new;
-  var c = S.chat;
+export function onAgentJob(event) {
+  var job = event && event.new, c = S.chat;
   if (!job || !job.id || !S.me || !c) return;
-  if (otherOf(job) !== c.peer) return;
-  setJob(c, job);
+  var peer = job.asker === S.me.id ? job.peer : job.asker;
+  if (c.peer === peer) setJob(c, job);
 }
-// 打开聊天 / 重连后：取这一对好友最近的任务
+
 export async function agentResync() {
-  var c = S.chat; if (!c || !S.me) return;
+  var c = S.chat;
+  if (!c || !S.me) return;
   var me = S.me.id, peer = c.peer;
-  var r;
-  try {
-    r = await sb.from('agent_jobs').select('*')
+  await Promise.allSettled(AGENTS.map(async function (agent) {
+    var r = await sb.from('agent_jobs').select('*').eq('agent_id', agent.id)
       .or('and(asker.eq.' + me + ',peer.eq.' + peer + '),and(asker.eq.' + peer + ',peer.eq.' + me + ')')
       .order('id', { ascending: false }).limit(1);
-  } catch (e) { return; }
-  if (S.chat !== c || r.error) return;
-  var job = (r.data || [])[0];
-  if (!job) return;
-  if (c.job && c.job.local) { if (job.id != null) setJob(c, job); return; }
-  setJob(c, job);
+    if (S.chat === c && !r.error && r.data && r.data[0]) setJob(c, r.data[0]);
+  }));
 }
+
 export function resetLive() {
-  clearTimeout(timer); clearTimeout(doneTimer); timer = 0; doneTimer = 0;
+  clearTimeout(timer); timer = 0;
   var box = $('agentLive');
   if (box) { box.hidden = true; clear(box); box._v = null; }
 }
 
-// ===== 提问 =====
-// 消息已经存好（有 id）之后调用：建任务 -> 叫醒 agent-chat 函数；两步都失败了用 toast 说原因
-export async function askAgent(row) {
-  var agent = mentionedAgent(row.body);
-  if (!agent || !S.me || row.sender_id !== S.me.id) return;
-  var peer = row.receiver_id;
-  var c = S.chat && S.chat.peer === peer ? S.chat : null;
-  if (c) setJob(c, { local: true, status: 'pending', message_id: row.id, agent_id: agent.id, localAt: Date.now() });
+async function askOne(row, agent, c) {
+  var pending = { local: true, status: 'pending', message_id: row.id, agent_id: agent.id, localAt: Date.now() };
+  if (c) setJob(c, pending);
   var r;
-  try { r = await sb.rpc('agent_ask', { p_message: row.id }); } catch (e) { r = { error: e }; }
-  if (r.error) {
-    if (c && c.job && c.job.local && S.chat === c) { c.job = null; renderLive(); }
-    toast(errText(r.error));
+  try { r = await sb.rpc('agent_ask', { p_message: row.id, p_agent_id: agent.id }); } catch (e) { r = { error: e }; }
+  if (r.error || !r.data) {
+    if (S.chat === c && c && c.agentJobs[agent.id] === pending) {
+      delete c.agentJobs[agent.id];
+      renderLive();
+      void agentResync();
+    }
+    toast(agent.name + '：' + errText(r.error));
     return;
   }
   var job = r.data;
-  if (S.chat && S.chat.peer === peer && job) setJob(S.chat, job);
+  if (S.chat && S.chat.peer === row.receiver_id) setJob(S.chat, job);
   var inv;
   try { inv = await sb.functions.invoke('agent-chat', { body: { job: job.id } }); } catch (e) { inv = { error: e }; }
   if (inv && inv.error) {
-    // 没能叫醒函数：任务留在 pending，由 3 分钟超时兜底；先让提问的人看到失败提示
-    if (S.chat && S.chat.peer === peer && S.chat.job && S.chat.job.id === job.id) setJob(S.chat, Object.assign({}, S.chat.job, { status: 'failed', error: 'invoke_failed' }));
+    var current = S.chat && S.chat.peer === row.receiver_id && S.chat.agentJobs[agent.id];
+    if (current && current.id === job.id && current.status === 'pending') {
+      setJob(S.chat, Object.assign({}, current, { status: 'failed', error: 'invoke_failed' }));
+    }
     toast('没能联系上' + agent.name + '，再问一次吧');
   }
+}
+
+export async function askAgent(row) {
+  if (!S.me || row.sender_id !== S.me.id) return;
+  var c = S.chat && S.chat.peer === row.receiver_id ? S.chat : null;
+  await Promise.all(mentionedAgents(row.body).map(function (agent) { return askOne(row, agent, c); }));
 }

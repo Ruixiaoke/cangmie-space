@@ -281,12 +281,13 @@ async function runTool(deps: Deps, job: Job, names: Names, name: string, rawArgs
     return JSON.stringify({ error: "invalid_arguments" });
   }
   const { lo, hi } = pairOf(job.asker, job.peer);
+  const agentId = job.agent_id ?? "durian";
   try {
     if (name === "search_chats") {
       const query = typeof args.query === "string" ? args.query.trim() : "";
       if (!query) return JSON.stringify({ error: "empty_query" });
       const limit = Number.isInteger(args.limit) ? Math.max(1, Math.min(SEARCH_MAX_LIMIT, args.limit as number)) : SEARCH_DEFAULT_LIMIT;
-      const { data, error } = await deps.admin.rpc("agent_search_messages", { p_a: job.asker, p_b: job.peer, p_query: query, p_limit: limit });
+      const { data, error } = await deps.admin.rpc("agent_search_messages", { p_a: job.asker, p_b: job.peer, p_query: query, p_limit: limit, p_before: job.message_id });
       if (error) return JSON.stringify({ error: "search_failed" });
       // deno-lint-ignore no-explicit-any
       return JSON.stringify({ results: (data ?? []).map((r: any) => ({ at: stamp(r.created_at), from: r.author ? agentName(r.author) : names[r.sender_id] ?? "?", text: r.body })) });
@@ -300,9 +301,9 @@ async function runTool(deps: Deps, job: Job, names: Names, name: string, rawArgs
       if (!content) return JSON.stringify({ error: "empty_content" });
       if (Array.from(content).length > MEMORY_CONTENT_MAX) return JSON.stringify({ error: "too_long", max: MEMORY_CONTENT_MAX });
       // 按 (这对好友, 标题) upsert：已有就整条替换；pinned 不传就不动原值
-      const row: Record<string, unknown> = { user_lo: lo, user_hi: hi, title, content, updated_at: new Date().toISOString() };
+      const row: Record<string, unknown> = { user_lo: lo, user_hi: hi, agent_id: agentId, title, content, updated_at: new Date().toISOString() };
       if (typeof args.pinned === "boolean") row.pinned = args.pinned;
-      const { error } = await deps.admin.from("agent_memories").upsert(row, { onConflict: "user_lo,user_hi,title" });
+      const { error } = await deps.admin.from("agent_memories").upsert(row, { onConflict: "user_lo,user_hi,agent_id,title" });
       if (error) {
         const msg = String(error.message ?? "");
         if (msg.includes("pinned_full")) return JSON.stringify({ error: "pinned_full", max: PINNED_MAX, hint: "常驻已满。先用 remember 把某条改成 pinned:false，或 forget 掉不需要的，再重试" });
@@ -313,14 +314,14 @@ async function runTool(deps: Deps, job: Job, names: Names, name: string, rawArgs
     if (name === "forget") {
       const title = typeof args.title === "string" ? args.title.trim() : "";
       if (!title) return JSON.stringify({ error: "bad_title" });
-      const { data, error } = await deps.admin.from("agent_memories").delete().eq("user_lo", lo).eq("user_hi", hi).eq("title", title).select("id");
+      const { data, error } = await deps.admin.from("agent_memories").delete().eq("user_lo", lo).eq("user_hi", hi).eq("agent_id", agentId).eq("title", title).select("id");
       if (error) return JSON.stringify({ error: "forget_failed" });
       return JSON.stringify({ deleted: (data ?? []).length });
     }
     if (name === "recall") {
       const titles = Array.isArray(args.titles) ? [...new Set(args.titles.filter((t): t is string => typeof t === "string").map((t) => t.trim()).filter(Boolean))].slice(0, RECALL_MAX) : [];
       if (titles.length === 0) return JSON.stringify({ error: "no_titles" });
-      const { data, error } = await deps.admin.from("agent_memories").select("title,content,pinned").eq("user_lo", lo).eq("user_hi", hi).in("title", titles);
+      const { data, error } = await deps.admin.from("agent_memories").select("title,content,pinned").eq("user_lo", lo).eq("user_hi", hi).eq("agent_id", agentId).in("title", titles);
       if (error) return JSON.stringify({ error: "recall_failed" });
       // deno-lint-ignore no-explicit-any
       const found = (data ?? []) as any[];
@@ -398,11 +399,12 @@ export async function runJob(deps: Deps, jobId: number): Promise<void> {
     const askerName = names[j.asker] ?? "好友", peerName = names[j.peer] ?? "好友";
 
     const pair = pairOf(j.asker, j.peer);
-    const { data: mems } = await deps.admin.from("agent_memories").select("title,content,pinned,updated_at").eq("user_lo", pair.lo).eq("user_hi", pair.hi).order("updated_at", { ascending: false }).limit(200);
+    const agentId = j.agent_id ?? "durian";
+    const { data: mems } = await deps.admin.from("agent_memories").select("title,content,pinned,updated_at").eq("user_lo", pair.lo).eq("user_hi", pair.hi).eq("agent_id", agentId).order("updated_at", { ascending: false }).limit(200);
 
     const { data: hist } = await deps.admin.from("messages").select("id,sender_id,author,body,created_at")
       .or(`and(sender_id.eq.${j.asker},receiver_id.eq.${j.peer}),and(sender_id.eq.${j.peer},receiver_id.eq.${j.asker})`)
-      .order("id", { ascending: false }).limit(HISTORY_LIMIT);
+      .lt("id", j.message_id).order("id", { ascending: false }).limit(HISTORY_LIMIT);
 
     const { data: q } = await deps.admin.from("messages").select("sender_id,body").eq("id", j.message_id).maybeSingle();
     if (!q || q.sender_id !== j.asker) throw new AgentError("job_missing");
@@ -411,7 +413,6 @@ export async function runJob(deps: Deps, jobId: number): Promise<void> {
     const history = ((hist ?? []) as HistoryRow[]).filter((m) => m.id !== j.message_id).reverse();
     const hint = await gameHint(deps.admin, j.asker, j.peer, names).catch(() => "");
     const userText = buildUserInput({ askerName, peerName, now: new Date(), mems: (mems ?? []) as Memory[], history, names, question: q.body, gameHint: hint });
-    const agentId = j.agent_id ?? "durian";
     const instructions = systemInstructions(agentId);
     const promptCacheKey = await cacheKey(pair.lo, pair.hi, agentId);
 

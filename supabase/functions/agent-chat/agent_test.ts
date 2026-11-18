@@ -20,7 +20,7 @@ function fakeDb(handler: (q: Q) => { data?: unknown; error?: unknown }, rpc: (fn
     for (const m of ["select", "insert", "update", "delete", "upsert"]) {
       b[m] = (payload?: unknown) => { if (m !== "select" || q.action === "select") { q.action = m; if (m !== "select") q.payload = payload; } return b; };
     }
-    for (const m of ["eq", "in", "or", "order", "limit", "not"]) b[m] = (...a: unknown[]) => { if (m === "eq" || m === "in") q.filters.push([String(a[0]), a[1]]); return b; };
+    for (const m of ["eq", "in", "or", "order", "limit", "not", "lt"]) b[m] = (...a: unknown[]) => { if (m === "eq" || m === "in" || m === "lt") q.filters.push([String(a[0]), a[1]]); return b; };
     b.maybeSingle = () => { q.single = true; return Promise.resolve(run()); };
     b.single = () => { q.single = true; return Promise.resolve(run()); };
     // deno-lint-ignore no-explicit-any
@@ -111,6 +111,9 @@ Deno.test("each agent receives both speakers' history and replies under its own 
     }, 7);
     const request = requests[0];
     if (request?.instructions !== systemInstructions(id)) throw new Error("wrong persona for " + name);
+    if (request.previous_response_id || !String(request.prompt_cache_key).startsWith(id + ":")) throw new Error("shared model state");
+    if (!w.state.memFilters.some((f) => new Map(f).get("agent_id") === id)) throw new Error("shared agent memory");
+    if (!w.log.some((q) => q.table === "messages" && new Map(q.filters).get("id") === 100 && !q.single)) throw new Error("history is not bounded to the prompt");
     const history = JSON.stringify(request.input);
     if (!history.includes("叶英：茶还温着。") || !history.includes("沈剑心：我来尝尝。")) throw new Error("missing agent history");
     if (w.state.messages[0]?.author !== id || w.state.messages[0]?.body !== "茶还温着。" || titles.some((title) => title !== name) || titles.length !== 2) {
@@ -157,7 +160,7 @@ Deno.test("tool loop: search_chats -> remember -> final text with web citation; 
   if (!r2.input[1].output.includes('"deleted":1')) throw new Error("forget output " + r2.input[1].output);
 
   // 工具副作用：只搜这一对；记忆写入/删除
-  if (w.state.searches[0].p_a !== ASKER || w.state.searches[0].p_b !== PEER || w.state.searches[0].p_limit !== 5) throw new Error("search args");
+  if (w.state.searches[0].p_a !== ASKER || w.state.searches[0].p_b !== PEER || w.state.searches[0].p_limit !== 5 || w.state.searches[0].p_before !== 100) throw new Error("search args");
   if (w.state.memories.map((m) => m.title + "=" + m.content).join() !== "周末计划=他们周末去爬山") throw new Error("memories: " + JSON.stringify(w.state.memories));
 
   // 回复

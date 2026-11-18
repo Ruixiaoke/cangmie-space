@@ -16,9 +16,12 @@ export function agentById(id) {
 // 消息是不是 agent 写的（author 只可能由服务器写入）
 export function isAgentMsg(m) { return !!(m && m.author && agentById(m.author)); }
 export function agentName(author) { var a = agentById(author); return a ? a.name : '沈剑心'; }
-export function mentionedAgent(body) {
-  var match = /[@＠](沈剑心|榴莲|叶英)/.exec(String(body || ''));
-  return match ? agentById(match[1] === '叶英' ? 'ye_ying' : 'durian') : null;
+export function mentionedAgents(body) {
+  var ids = new Set();
+  for (var match of String(body || '').matchAll(/[@＠](沈剑心|榴莲|叶英)/g)) {
+    ids.add(match[1] === '叶英' ? 'ye_ying' : 'durian');
+  }
+  return Array.from(ids, agentById);
 }
 
 // 头像：优先用 agent/ 目录里的图（部署时带内容哈希，换图后自动刷新）；加载失败就换成画出来的备用头像

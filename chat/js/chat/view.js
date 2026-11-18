@@ -43,7 +43,7 @@ export async function openChat(peerId, fromHistory) {
   }
   if (S.chat && S.chat.peer === peerId) return;
   S.chat = { peer: peerId, msgs: [], ids: new Set(), nodes: new Map(), hasMore: false, loadingOlder: false, loaded: false,
-    bstate: {}, bshow: {}, btstate: {}, btshow: {}, finfo: {}, bev: [], fxApplied: new Set(), job: null, doneWait: false };
+    bstate: {}, bshow: {}, btstate: {}, btshow: {}, finfo: {}, bev: [], fxApplied: new Set(), agentJobs: {} };
   if (!fromHistory) { try { history.pushState({ chat: peerId }, ''); } catch (e) { /* 忽略 */ } }
   $('chat').hidden = false;
   closePanels();
