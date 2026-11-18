@@ -358,7 +358,7 @@ Deno.test("full games: 2000 seeded bot games terminate with sane results", () =>
     if (s.redeals) redealGames++;
   }
   console.log(`landlord wins ${landlordWins}/2000, spring ${springs}, bomb games ${bombGames}, redeal games ${redealGames}`);
-  assert(landlordWins > 300 && landlordWins < 1700, "winrate sanity");
+  assert(landlordWins >= 700 && landlordWins <= 1400, `landlord win rate out of band: ${landlordWins}/2000`);
 });
 
 Deno.test("botAction is deterministic and does not mutate state", () => {

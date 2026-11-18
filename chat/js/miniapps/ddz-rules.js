@@ -467,7 +467,7 @@ function handStrength(hand) {
 
 function bidFor(hand, cur) {
   const st = handStrength(hand);
-  const want = st >= 9.5 ? 3 : st >= 7 ? 2 : st >= 4.5 ? 1 : 0;
+  const want = st >= 11 ? 3 : st >= 8 ? 2 : st >= 5 ? 1 : 0;
   return want > cur ? want : 0;
 }
 
@@ -577,7 +577,8 @@ function leadPlay(state, seat, hand) {
     }
     let best = pool[0], bk = 1e9;
     for (const o of pool) {
-      const k = o.rank - 1.2 * (o.cards.length - 1);
+      // 农民更看重一手多出牌（尽快跑牌），地主更看重出小牌；自博弈把地主胜率压到 55~60%
+      const k = o.rank - (seat === state.landlord ? 0.4 : 3) * (o.cards.length - 1);
       if (k < bk) { bk = k; best = o; }
     }
     return best.cards;
@@ -611,14 +612,15 @@ function followPlay(state, seat, hand) {
     const c = normal[0];
     const info = classify(c);
     // 不用 2 / 王去压很小的单张或对子，除非对手快跑完了
-    if (info.rank >= 12 && pinfo.rank < 8 && (pinfo.type === 'single' || pinfo.type === 'pair') && oppMin > 4) return null;
+    // （农民压地主不受此限：地主牌多时压住他才有机会抢出牌权）
+    if (seat === L && info.rank >= 12 && pinfo.rank < 8 && (pinfo.type === 'single' || pinfo.type === 'pair') && oppMin > 4) return null;
     return c;
   }
   if (bombs.length) {
     const b = bombs[0];
     const drop = new Set(b);
     const rest = hand.filter(x => !drop.has(x));
-    if (oppMin <= 4 || classify(rest)) return b;
+    if (oppMin <= 4 || classify(rest) || (seat !== L && state.hands[L].length <= 8)) return b;
   }
   return null;
 }
