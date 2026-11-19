@@ -23,7 +23,7 @@ import { PERSONA as YE_YING_PERSONA } from "./ye-ying.gen.ts";
 import { PERSONA as XIE_YUNLIU_PERSONA } from "./xie-yunliu.gen.ts";
 import { PERSONA as LI_WANGSHENG_PERSONA } from "./li-wangsheng.gen.ts";
 import { PERSONA as TANG_WUYING_PERSONA } from "./tang-wuying.gen.ts";
-import { BOARD_GAMES, ddzRecord, gameHint, gameRecord, gameStatus } from "./games.ts";
+import { BOARD_GAMES, ddzRecord, gameHint, gameRecord, gameStatus, groupGameHint, mjRecord, mjStatus } from "./games.ts";
 import { JX3_CELEBS, JX3_KINDS, jx3Info } from "./jx3.ts";
 
 // ---- 调参：全部数字集中在这里 ----
@@ -112,7 +112,7 @@ export function systemInstructions(id = "durian"): string {
 - 记忆由你自己做主，没有人会叫你记，也没人能手动加。你觉得以后用得上的事就主动用 remember 记下：喜好、计划、日期、正在发生的事、对方希望的称呼、他们在意的东西。情况变了就更新那一条，过时或记错的用 forget 删掉。闲聊和一次性的小事不要记。
 - 哪些记忆常驻（pinned）也由你定：称呼、过敏、禁忌这类每次都该知道的才常驻，最多 10 条，满了先取消或删掉一条再加。
 - 记忆标题用「人名·类别」或简短主题，20 字内，例如「小明·口味」「纪念日」「周末计划」。新建标题前先看记忆里有没有相近的，有就沿用，并把合并后的完整最新内容一起写进去（同标题会整条替换）。
-- 用户消息里如果写了「进行中的小游戏」，说明这两个人正在玩小游戏。聊到小游戏、或有人想要建议时，你可以用 game_status 看他们的井字棋、弹弓大战、台球（9球和8球）的当前局面，用 game_leaderboard 看这两个人的胜负战绩（含彼此的交手）。斗地主（私聊和群聊都能玩）只能用 game_leaderboard 带 game=ddz 看积分战绩：私聊里是两个人一起打的和各自的总计，群聊里是本群成员在本群的积分排名；群聊里其他小游戏的工具都不可用。这两个工具只是看，你不能替任何人落子、出杆、认输、出牌或开局。
+- 用户消息里如果写了「进行中的小游戏」，说明这两个人正在玩小游戏。聊到小游戏、或有人想要建议时，你可以用 game_status 看他们的井字棋、弹弓大战、台球（9球和8球）的当前局面，用 game_leaderboard 看这两个人的胜负战绩（含彼此的交手）。斗地主（私聊和群聊都能玩）只能用 game_leaderboard 带 game=ddz 看积分战绩：私聊里是两个人一起打的和各自的总计，群聊里是本群成员在本群的积分排名。麻将（私聊和群聊都能玩）：game_status 带 game=mahjong 看公开的局面（轮到谁、牌河、亮出来的吃碰杠、各家张数、牌墙剩余、最近的动作、结果），game_leaderboard 带 game=mahjong 看积分战绩；任何人的手牌都是秘密，包括提问人自己的，你看不到也不要猜，更不要透露。群聊里其他小游戏的工具都不可用。这两个工具只是看，你不能替任何人落子、出杆、认输、出牌或开局。
 - 有人问剑三（剑网三）里的事：今天或明天的日常、大战打哪、某个服开没开、维护到几点、最新公告、楚天社这些活动的时间，用 jx3_info 查，不要凭记忆编，也不要先去网上搜。查不到就直说，并提一句数据来自第三方、可能有延迟。服务器名不清楚就先问。骚话只在气氛合适、有人想要时来一句。
 - 给游戏建议要具体、正确：基于返回的局面说话。井字棋直接用返回的必胜点和必堵点；台球说清打哪个球、进哪个袋、大概多大力，也可以建议防守，但你看不到精确物理，台球的建议要说成「建议」「大概」。
 - 聊天的两个人都能看到你的回复。有人在对局中向你要建议时，公开、公平地说，不偏袒；可以善意地调侃一句。
@@ -175,11 +175,11 @@ const TOOLS = [
   {
     type: "function",
     name: "game_status",
-    description: "只读：看这两个人的小游戏。不带参数 = 列出每种游戏最近的几局（进行中的在前）。带 game（ttt 井字棋 / sling 弹弓大战 / pool 台球，含9球和8球）= 看那一局的详细局面（不给 id 就是进行中的最新一局），井字棋会给出必胜点和必堵点，台球会给出球的坐标、合法目标球和粗略的进袋建议。你不能用它做任何操作。",
+    description: "只读：看这两个人的小游戏。不带参数 = 列出每种游戏最近的几局（进行中的在前）。带 game（ttt 井字棋 / sling 弹弓大战 / pool 台球，含9球和8球 / mahjong 麻将）= 看那一局的详细局面（不给 id 就是进行中的最新一局），井字棋会给出必胜点和必堵点，台球会给出球的坐标、合法目标球和粗略的进袋建议。game=mahjong 麻将（私聊和群聊都可用）只给公开信息，没有任何手牌。你不能用它做任何操作。",
     parameters: {
       type: "object",
       properties: {
-        game: { type: "string", enum: ["ttt", "sling", "pool"], description: "要看哪种游戏" },
+        game: { type: "string", enum: ["ttt", "sling", "pool", "mahjong"], description: "要看哪种游戏" },
         id: { type: "integer", description: "对局编号（列表里有）；不给就是最新进行中的一局" },
       },
       additionalProperties: false,
@@ -188,10 +188,10 @@ const TOOLS = [
   {
     type: "function",
     name: "game_leaderboard",
-    description: "只读：战绩。ttt / sling / pool / pool8：这两个人各自的总胜负和两人之间的交手，只在私聊里可用。ddz 斗地主（按积分）：私聊里是这两个人一起打的积分和各自在所有牌局的总计，群聊里是本群成员在本群的积分排名。不含别的好友。",
+    description: "只读：战绩。ttt / sling / pool / pool8：这两个人各自的总胜负和两人之间的交手，只在私聊里可用。ddz 斗地主、mahjong 麻将（都按积分）：私聊里是这两个人一起打的积分和各自在所有牌局的总计，群聊里是本群成员在本群的积分排名。不含别的好友。",
     parameters: {
       type: "object",
-      properties: { game: { type: "string", enum: BOARD_GAMES, description: "ttt 井字棋 / sling 弹弓大战 / pool 9球 / pool8 8球 / ddz 斗地主" } },
+      properties: { game: { type: "string", enum: BOARD_GAMES, description: "ttt 井字棋 / sling 弹弓大战 / pool 9球 / pool8 8球 / ddz 斗地主 / mahjong 麻将" } },
       required: ["game"],
       additionalProperties: false,
     },
@@ -342,7 +342,10 @@ async function runTool(deps: Deps, job: Job, names: Names, name: string, rawArgs
       return JSON.stringify({ results: (data ?? []).map((r: any) => ({ at: stamp(r.created_at), from: r.author ? agentName(r.author) : names[r.sender_id] ?? "?", text: r.body })) });
     }
     if (name === "jx3_info") return await jx3Info(deps.fetchFn, args, Date.now(), deps.admin);
-    if (name === "game_leaderboard" && args.game === "ddz") return await ddzRecord(deps.admin, job.asker, gid != null ? { group: gid } : { peer: job.peer }, names);
+    const chatWhere = gid != null ? { group: gid } : { peer: job.peer };
+    if (name === "game_leaderboard" && args.game === "ddz") return await ddzRecord(deps.admin, job.asker, chatWhere, names);
+    if (name === "game_leaderboard" && args.game === "mahjong") return await mjRecord(deps.admin, job.asker, chatWhere, names);
+    if (name === "game_status" && args.game === "mahjong") return await mjStatus(deps.admin, chatWhere, job.asker, names, args); // 私聊和群聊都能看，只给公开状态
     if ((name === "game_status" || name === "game_leaderboard") && (gid != null || job.peer == null)) return JSON.stringify({ error: "not_available_in_group" });
     if (name === "game_status") return await gameStatus(deps.admin, job.asker, job.peer as string, names, args);
     if (name === "game_leaderboard") return await gameRecord(deps.admin, job.asker, job.peer as string, names, args);
@@ -471,6 +474,7 @@ export async function runJob(deps: Deps, jobId: number): Promise<void> {
         .eq("group_id", gid).lt("id", j.message_id).order("id", { ascending: false }).limit(HISTORY_LIMIT * 2);
       // 系统提示行（「A 邀请 B 加入了群聊」）不进聊天记录
       history = ((hist ?? []) as HistoryRow[]).filter((m) => m.id !== j.message_id && m.author !== "system").slice(0, HISTORY_LIMIT).reverse();
+      hint = await groupGameHint(deps.admin, gid, j.asker, names).catch(() => "");
     } else {
       const peer = j.peer as string;
       const { data: fr } = await deps.admin.from("friendships").select("id").eq("status", "accepted")

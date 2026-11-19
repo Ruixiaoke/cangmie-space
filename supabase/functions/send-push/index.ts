@@ -21,6 +21,7 @@ function pushText(s: string): string {
   if (/^\[井字棋\]#\d+$/.test(s)) return "邀请你下一局井字棋";
   if (/^\[弹弓大战\]#\d+$/.test(s)) return "邀请你玩弹弓大战";
   if (/^\[斗地主\]#\d+$/.test(s)) return "开了一桌斗地主，来玩";
+  if (/^\[麻将\]#\d+$/.test(s)) return "开了一桌麻将，来玩";
   if (/^\[[89]球台球\]#\d+$/.test(s)) return "邀请你打一局" + s.slice(1, 5);
   return stripStickerId(s);
 }

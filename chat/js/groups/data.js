@@ -4,6 +4,7 @@ import { AGENTS, agentName } from '../agent/info.js';
 import { closeChat } from '../chat/view.js';
 import { fxParse } from '../fx/table.js';
 import { ddzOf } from '../miniapps/ddz-token.js';
+import { mjOf } from '../miniapps/mahjong-token.js';
 import { S, nameOf, profileOf } from '../state.js';
 import { cut, toast } from '../utils.js';
 import { renderChats } from '../views/chats.js';
@@ -22,8 +23,8 @@ export function enabledAgents(g) {
   var on = (g && g.agents) || [];
   return AGENTS.filter(function (a) { return on.indexOf(a.id) >= 0; });
 }
-// 群聊里特效表情只显示它的名字，斗地主卡片显示「斗地主」，其余小游戏邀请当普通文字
-function bodyPreview(body) { if (ddzOf(body) != null) return '斗地主'; var p = fxParse(body); return p ? p.tok : String(body || '').replace(/\s+/g, ' '); }
+// 群聊里特效表情只显示它的名字，斗地主、麻将卡片显示游戏名，其余小游戏邀请当普通文字
+function bodyPreview(body) { if (ddzOf(body) != null) return '斗地主'; if (mjOf(body) != null) return '麻将'; var p = fxParse(body); return p ? p.tok : String(body || '').replace(/\s+/g, ' '); }
 // 消息列表里群的预览：「昵称：内容」；助手的回复带助手名；系统提示原样
 export function groupPreview(g) {
   if (g.last_id == null) return '';

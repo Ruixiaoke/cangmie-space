@@ -9,6 +9,7 @@ import { previewOf } from './fx/table.js';
 import { onPoolGame, poolResync } from './miniapps/pool.js';
 import { onSlingGame, slResync } from './miniapps/sling.js';
 import { onDdzGame, onDdzHand, onDdzScore, ddzResync } from './miniapps/ddz.js';
+import { onMjGame, onMjHand, onMjScore, mjResync } from './miniapps/mahjong.js';
 import { onTttGame, tttResync } from './miniapps/ttt.js';
 import { notify, notifyGroupMessage, notifyMessage } from './notify.js';
 import { applyGroupLast, dropGroup, groupLine, groupOf } from './groups/data.js';
@@ -213,6 +214,13 @@ export function startRealtime() {
   ['dm_lo', 'dm_hi'].forEach(function (col) { // 私聊的累计积分：按好友对（有序的 dm_lo / dm_hi）
     ch.on('postgres_changes', { event: '*', schema: 'public', table: 'ddz_scores', filter: col + '=eq.' + me }, onDdzScore);
   });
+  // 麻将（群聊和私聊，和斗地主一样）：mj_games 按 id 过滤（私聊桌的 group_id 是空的）；mj_hands 只有我自己的手牌（含现在能做的事）
+  ch.on('postgres_changes', { event: '*', schema: 'public', table: 'mj_games', filter: 'id=gt.0' }, onMjGame);
+  ch.on('postgres_changes', { event: '*', schema: 'public', table: 'mj_hands', filter: 'user_id=eq.' + me }, onMjHand);
+  ch.on('postgres_changes', { event: '*', schema: 'public', table: 'mj_scores', filter: 'group_id=gt.0' }, onMjScore);
+  ['dm_lo', 'dm_hi'].forEach(function (col) {
+    ch.on('postgres_changes', { event: '*', schema: 'public', table: 'mj_scores', filter: col + '=eq.' + me }, onMjScore);
+  });
   ['player_x', 'player_o'].forEach(function (col) {
     ch.on('postgres_changes', { event: '*', schema: 'public', table: 'ttt_games', filter: col + '=eq.' + me }, onTttGame);
   });
@@ -244,6 +252,6 @@ export async function refreshAll() {
   if (S.chat) {
     await fetchLatest(false); markReadIfNeeded(); agentResync();
     if (S.chat && S.chat.gid == null) { tttResync(); slResync(); poolResync(); } // 双人小游戏只在私聊里
-    if (S.chat) ddzResync(); // 斗地主私聊和群聊里都有
+    if (S.chat) { ddzResync(); mjResync(); } // 斗地主、麻将私聊和群聊里都有
   }
 }
