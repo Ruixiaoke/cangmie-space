@@ -102,7 +102,7 @@ description: 聊天应用的整套外观皮肤（纯阳 chunyang 这类：换场
 
 做纹样时注意：
 
-- 用 `mask` 的地方加 `@supports not` 兜底，不支持时直接不画，不能出现色块。
+- 用 `mask` 的地方加 `@supports not ((mask-image:none) or (-webkit-mask-image:none))` 兜底，不支持时直接不画，不能出现色块。条件里别写 `url(x.png)` 这种假文件名：CI 的「Chat images exist」会把它当成真图片引用而报错。
 - 纹样别压在可点的控件上（纯阳一开始在登录卡片右上角也放了祥云，深色下叠到了「登录 / 注册」上，后来去掉了）。`.panel>*` 要 `position:relative;z-index:1`，纹样才在内容下面。
 - 深色模式里吉祥物头像有浅色底（`--mascot-bg`），这是默认就有的，保持。
 

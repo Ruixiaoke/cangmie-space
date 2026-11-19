@@ -162,6 +162,6 @@
 }
 
 /* 遮罩不支持时不画祥云（不会出现色块） */
-@supports not ((mask:url(x.png)) or (-webkit-mask:url(x.png))){
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
   [data-skin="chunyang"] .panel::after,[data-skin="chunyang"] #auth .sub::after{display:none}
 }
