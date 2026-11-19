@@ -119,6 +119,9 @@ jobs:
       - name: Test agent-chat (mocked OpenAI and database)
         run: deno test supabase/functions/agent-chat/agent_test.ts
 
+      - name: Test the JX3 game-data tool (mocked fetch)
+        run: deno test supabase/functions/agent-chat/jx3_test.ts
+
       - name: DDZ rules module is in sync with chat/js/miniapps/ddz-rules.js
         run: python3 supabase/functions/ddz/gen-rules.py --check
 
