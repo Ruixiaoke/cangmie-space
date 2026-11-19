@@ -81,7 +81,7 @@ declare t public.ddz_games; t2 public.ddz_games; n int; m public.messages;
 begin
   t := public.ddz_open(current_setting('ddz.g')::bigint);
   perform set_config('ddz.t', t.id::text, false);
-  if t.status <> 'waiting' or t.seats <> array['d9000000-0000-0000-0000-00000000000b', null, null]::uuid[] or t.bots <> array[false,false,false] then
+  if t.status <> 'waiting' or t.seats <> array['d9000000-0000-0000-0000-00000000000b', null, null, null]::uuid[] or t.bots <> array[false,false,false,false] then
     raise exception 'bad new table: %', row_to_json(t);
   end if;
   select * into m from public.messages where id = t.message_id;
@@ -105,7 +105,7 @@ call pg_temp.expect($$insert into public.ddz_games (group_id, created_by) values
 -- ===== 入座 / 换座 / 座位被占 / 非成员 =====
 call pg_temp.as_user('d9000000-0000-0000-0000-00000000000c');
 call pg_temp.expect($$select public.ddz_sit(current_setting('ddz.t')::bigint, 0)$$, 'seat_taken');
-call pg_temp.expect($$select public.ddz_sit(current_setting('ddz.t')::bigint, 3)$$, 'invalid_seat');
+call pg_temp.expect($$select public.ddz_sit(current_setting('ddz.t')::bigint, 4)$$, 'invalid_seat');
 call pg_temp.expect($$select public.ddz_sit(current_setting('ddz.t')::bigint, -1)$$, 'invalid_seat');
 call pg_temp.expect($$select public.ddz_sit(999999, 1)$$, 'table_not_found');
 do $$
@@ -135,7 +135,7 @@ do $$
 declare t public.ddz_games;
 begin
   t := public.ddz_set_bot(current_setting('ddz.t')::bigint, 1, true);
-  if t.bots <> array[false, true, false] then raise exception 'bot not added: %', row_to_json(t); end if;
+  if t.bots <> array[false, true, false, false] then raise exception 'bot not added: %', row_to_json(t); end if;
 end $$;
 call pg_temp.expect($$select public.ddz_set_bot(current_setting('ddz.t')::bigint, 1, true)$$, 'seat_taken');
 call pg_temp.expect($$select public.ddz_sit(current_setting('ddz.t')::bigint, 1)$$, 'seat_taken'); -- 机器人占着，不能坐
@@ -144,7 +144,7 @@ do $$
 declare t public.ddz_games;
 begin
   t := public.ddz_set_bot(current_setting('ddz.t')::bigint, 1, false); -- carol 移除 bob 加的机器人
-  if t.bots <> array[false, false, false] then raise exception 'bot not removed'; end if;
+  if t.bots <> array[false, false, false, false] then raise exception 'bot not removed'; end if;
   t := public.ddz_set_bot(current_setting('ddz.t')::bigint, 1, true);
 end $$;
 
@@ -195,7 +195,7 @@ begin
   if (select status from public.ddz_games where id = current_setting('ddz.t')::bigint) <> 'waiting' then raise exception 'stale commit changed the table'; end if;
   if exists (select 1 from public.ddz_state where game_id = current_setting('ddz.t')::bigint) then raise exception 'stale commit wrote state'; end if;
   ok := public.ddz_commit(current_setting('ddz.t')::bigint, v,
-    '{"status":"bidding","pub":{"x":1},"auto":[false,false,false],"round":1,"deadline":"2030-01-01T00:00:00Z"}',
+    '{"status":"bidding","pub":{"x":1},"auto":[false,false,false,false],"round":1,"deadline":"2030-01-01T00:00:00Z"}',
     '{"secret":"all hands"}',
     '[{"seat":0,"user_id":"d9000000-0000-0000-0000-00000000000b","round":1,"cards":[1,2,3]},{"seat":2,"user_id":"d9000000-0000-0000-0000-00000000000c","round":1,"cards":[7,8,9]}]',
     '[]', null, null);
@@ -318,7 +318,7 @@ do $$
 declare t public.ddz_games;
 begin
   select * into t from public.ddz_games where id = current_setting('ddz.t3')::bigint;
-  if t.seats[3] is not null or t.status <> 'waiting' or t.bots <> array[false,false,false] then raise exception 'waiting seat should be freed: %', row_to_json(t); end if;
+  if t.seats[3] is not null or t.status <> 'waiting' or t.bots <> array[false,false,false,false] then raise exception 'waiting seat should be freed: %', row_to_json(t); end if;
   if t.seats[1] <> 'd9000000-0000-0000-0000-00000000000d' then raise exception 'dave keeps his seat'; end if;
 end $$;
 
@@ -333,7 +333,7 @@ declare v int; ok boolean;
 begin
   select version into v from public.ddz_games where id = current_setting('ddz.t3')::bigint;
   ok := public.ddz_commit(current_setting('ddz.t3')::bigint, v,
-    '{"status":"playing","pub":{},"auto":[false,false,false],"round":1,"deadline":"2030-01-01T00:00:00Z"}', '{"s":1}',
+    '{"status":"playing","pub":{},"auto":[false,false,false,false],"round":1,"deadline":"2030-01-01T00:00:00Z"}', '{"s":1}',
     '[{"seat":0,"user_id":"d9000000-0000-0000-0000-00000000000d","round":1,"cards":[1]},{"seat":1,"user_id":"d9000000-0000-0000-0000-00000000000b","round":1,"cards":[2]}]', '[]', null, null);
   if not ok then raise exception 'commit t3'; end if;
 end $$;
