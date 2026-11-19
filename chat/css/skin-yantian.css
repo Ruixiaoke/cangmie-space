@@ -1,0 +1,165 @@
+/* 皮肤：衍天宗（观星台、夜紫、金、星蓝）。<html data-skin="yantian"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动）。结构同纯阳：先覆盖设计变量，再加组件细节。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="yantian"]{
+  --t1:#1f1a33; --t2:#4a4468; --t3:#655f84;
+  --pink:#4a3a7a; --on-pink:#fff; --pink-text:#3d2e6a; --red-text:#b0373a; --ok:#2b6c58; --badge:#9a7420;
+  --hair:rgba(60,48,110,.14); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(60,48,110,.14); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(247,245,253,.62); --g-card:rgba(247,245,253,.64); --g-chip:rgba(255,255,255,.6); --g-solid:rgb(247,245,253);
+  --field-bg:rgba(255,255,255,.52);
+  --sh-1:0 1px 2px rgba(28,20,56,.08),0 4px 14px rgba(28,20,56,.07);
+  --sh-2:0 2px 4px rgba(28,20,56,.08),0 12px 32px rgba(28,20,56,.13);
+  --sh-0:0 1px 1px rgba(28,20,56,.10);
+  --page:#e4e0f0; --stage-bg:rgba(236,232,248,.82);
+  --toast-bg:rgba(28,22,52,.92); --toast-fg:#f4f6f8;
+  --mascot-bg-av:#f3f1fa;
+  --bub-peer:rgba(252,253,254,.82); --bub-own:rgba(214,208,242,.9); --bub-fx:rgba(214,228,250,.92); --bub-fail:rgba(250,214,214,.9);
+  --chat-bub-peer:#f0eef8; --chat-bub-bd:rgba(60,48,110,.1);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(60,48,110,.12); --bub-sheen:rgba(255,255,255,.6);
+  --yt-sil:#b8a4d8; --yt-ink:#3d2e6a; --yt-btn-a:#6050a0; --yt-btn-b:#43336f; --yt-orn:rgba(74,58,122,.2);
+  --yt-ring:rgba(74,58,122,.26); --yt-seal:#9a7420;
+  --yt-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M13 6C17 1 22 11 27 6' fill='none' stroke='%23b0393a' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='7' cy='6' r='5.2' fill='%23b8923a'/%3E%3Crect x='4.6' y='3.6' width='4.8' height='4.8' fill='%23f3f1fa'/%3E%3Ccircle cx='7' cy='6' r='4.4' fill='none' stroke='%238a6a1e' stroke-width='.5'/%3E%3Crect x='27' y='4.4' width='94' height='3.2' rx='1.4' fill='%23c9b57a'/%3E%3Crect x='52' y='4.2' width='1.4' height='3.6' fill='%238a7440'/%3E%3Crect x='84' y='4.2' width='1.4' height='3.6' fill='%238a7440'/%3E%3Cpath d='M30 6H48' stroke='%23f4ebc8' stroke-width='.6'/%3E%3Cpath d='M124 1.6h7M124 6h2.8M128.2 6h2.8M124 10.4h7' stroke='%23b8923a' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  --yt-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/yantian/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(242,240,250,.06) 0,rgba(242,240,250,.18) 45%,rgba(242,240,250,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#f3f1fa 0,#e6e2f2 50%,#d6d0e8 100%);
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="yantian"][data-theme="dark"]{
+  --t1:#ece8fa; --t2:#bdb6dc; --t3:#968fb8;
+  --pink:#b4a2ee; --on-pink:#1a1238; --pink-text:#c8baf4; --red-text:#ff9da8; --ok:#8fd6bd; --badge:#c9a24a;
+  --hair:rgba(210,200,250,.12); --rim:rgba(210,200,250,.16);
+  --hi:rgba(222,214,252,.22); --lo:rgba(0,0,0,.4); --side:rgba(210,200,250,.07);
+  --g-bar:rgba(16,12,34,.62); --g-card:rgba(24,18,50,.58); --g-chip:rgba(210,200,250,.1); --g-solid:#1c1634;
+  --field-bg:rgba(4,8,12,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0a0818; --stage-bg:rgba(14,10,30,.84);
+  --toast-bg:rgba(44,36,84,.96); --toast-fg:#f4f6f8;
+  --mascot-bg:#ece8fa; --mascot-bg-av:#ece8fa;
+  --bub-peer:rgba(38,32,70,.84); --bub-own:rgba(80,62,146,.86); --bub-fx:rgba(48,74,128,.86); --bub-fail:rgba(120,44,60,.88);
+  --chat-bub-peer:rgba(42,36,76,.88); --chat-bub-bd:rgba(210,200,250,.14);
+  --bub-bd:rgba(210,200,250,.16); --bub-hi:rgba(222,214,252,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(222,214,252,.12);
+  --yt-sil:#8478b0; --yt-ink:#c8baf4; --yt-btn-a:#a898e8; --yt-btn-b:#7e6cc4; --yt-orn:rgba(200,186,244,.2);
+  --yt-ring:rgba(180,162,238,.3); --yt-seal:#c9a24a;
+  --yt-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M13 6C17 1 22 11 27 6' fill='none' stroke='%23e0707a' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='7' cy='6' r='5.2' fill='%23e0c070'/%3E%3Crect x='4.6' y='3.6' width='4.8' height='4.8' fill='%23120e26'/%3E%3Ccircle cx='7' cy='6' r='4.4' fill='none' stroke='%23fff0b8' stroke-width='.5'/%3E%3Crect x='27' y='4.4' width='94' height='3.2' rx='1.4' fill='%23b8a878'/%3E%3Crect x='52' y='4.2' width='1.4' height='3.6' fill='%23e8dcae'/%3E%3Crect x='84' y='4.2' width='1.4' height='3.6' fill='%23e8dcae'/%3E%3Cpath d='M30 6H48' stroke='%23f4ecc8' stroke-width='.6'/%3E%3Cpath d='M124 1.6h7M124 6h2.8M128.2 6h2.8M124 10.4h7' stroke='%23e0c070' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/yantian/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(6,4,16,.05) 0,rgba(6,4,16,.22) 45%,rgba(6,4,16,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(180,170,250,.22),rgba(180,170,250,0) 70%),
+    linear-gradient(180deg,#120e26 0,#0d0a1c 60%,#080614 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="yantian"]:not([data-theme="light"]){
+  --t1:#ece8fa; --t2:#bdb6dc; --t3:#968fb8;
+  --pink:#b4a2ee; --on-pink:#1a1238; --pink-text:#c8baf4; --red-text:#ff9da8; --ok:#8fd6bd; --badge:#c9a24a;
+  --hair:rgba(210,200,250,.12); --rim:rgba(210,200,250,.16);
+  --hi:rgba(222,214,252,.22); --lo:rgba(0,0,0,.4); --side:rgba(210,200,250,.07);
+  --g-bar:rgba(16,12,34,.62); --g-card:rgba(24,18,50,.58); --g-chip:rgba(210,200,250,.1); --g-solid:#1c1634;
+  --field-bg:rgba(4,8,12,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0a0818; --stage-bg:rgba(14,10,30,.84);
+  --toast-bg:rgba(44,36,84,.96); --toast-fg:#f4f6f8;
+  --mascot-bg:#ece8fa; --mascot-bg-av:#ece8fa;
+  --bub-peer:rgba(38,32,70,.84); --bub-own:rgba(80,62,146,.86); --bub-fx:rgba(48,74,128,.86); --bub-fail:rgba(120,44,60,.88);
+  --chat-bub-peer:rgba(42,36,76,.88); --chat-bub-bd:rgba(210,200,250,.14);
+  --bub-bd:rgba(210,200,250,.16); --bub-hi:rgba(222,214,252,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(222,214,252,.12);
+  --yt-sil:#8478b0; --yt-ink:#c8baf4; --yt-btn-a:#a898e8; --yt-btn-b:#7e6cc4; --yt-orn:rgba(200,186,244,.2);
+  --yt-ring:rgba(180,162,238,.3); --yt-seal:#c9a24a;
+  --yt-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M13 6C17 1 22 11 27 6' fill='none' stroke='%23e0707a' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='7' cy='6' r='5.2' fill='%23e0c070'/%3E%3Crect x='4.6' y='3.6' width='4.8' height='4.8' fill='%23120e26'/%3E%3Ccircle cx='7' cy='6' r='4.4' fill='none' stroke='%23fff0b8' stroke-width='.5'/%3E%3Crect x='27' y='4.4' width='94' height='3.2' rx='1.4' fill='%23b8a878'/%3E%3Crect x='52' y='4.2' width='1.4' height='3.6' fill='%23e8dcae'/%3E%3Crect x='84' y='4.2' width='1.4' height='3.6' fill='%23e8dcae'/%3E%3Cpath d='M30 6H48' stroke='%23f4ecc8' stroke-width='.6'/%3E%3Cpath d='M124 1.6h7M124 6h2.8M128.2 6h2.8M124 10.4h7' stroke='%23e0c070' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/yantian/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(6,4,16,.05) 0,rgba(6,4,16,.22) 45%,rgba(6,4,16,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(180,170,250,.22),rgba(180,170,250,0) 70%),
+    linear-gradient(180deg,#120e26 0,#0d0a1c 60%,#080614 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="yantian"] ::selection{background:rgba(74,58,122,.28)}
+[data-skin="yantian"][data-theme="dark"] ::selection{background:rgba(180,162,238,.34)}
+[data-skin="yantian"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题 */
+[data-skin="yantian"] .top h2,[data-skin="yantian"] #auth h1,[data-skin="yantian"] .me-head .name,
+[data-skin="yantian"] .panel h3,[data-skin="yantian"] .section-title,[data-skin="yantian"] #chat .who b{
+  font-family:var(--yt-serif);letter-spacing:.06em;
+}
+[data-skin="yantian"] .top h2,[data-skin="yantian"] #auth h1{font-weight:700}
+[data-skin="yantian"] .panel h3,[data-skin="yantian"] .section-title{color:var(--yt-ink)}
+
+/* 顶栏：页名前一枚徽记，下沿一道渐隐的线 */
+[data-skin="yantian"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="yantian"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--yt-sil) 18%,var(--yt-sil) 82%,transparent);opacity:.7;
+}
+[data-skin="yantian"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="yantian"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/yantian/emblem.png) center/contain no-repeat;
+}
+
+/* 面板右上角的纹样（遮罩取形，颜色跟主题走） */
+[data-skin="yantian"] .panel{position:relative;overflow:hidden}
+[data-skin="yantian"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--yt-orn);
+  -webkit-mask:url(../skins/yantian/ornament.png) center/contain no-repeat;mask:url(../skins/yantian/ornament.png) center/contain no-repeat;
+}
+[data-skin="yantian"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮 */
+[data-skin="yantian"] .btn:not(.ghost):not(.danger){
+  background-color:var(--yt-btn-b);
+  background-image:linear-gradient(180deg,var(--yt-btn-a),var(--yt-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.14);
+}
+@media (hover:hover){ [data-skin="yantian"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--yt-btn-a) 88%,#fff),var(--yt-btn-b))} }
+[data-skin="yantian"] .seg button.on{background-image:linear-gradient(180deg,var(--yt-btn-a),var(--yt-btn-b));color:var(--on-pink)}
+[data-skin="yantian"] .field:focus{box-shadow:inset 0 1px 3px rgba(0,0,0,.14),0 0 0 3px var(--yt-ring)}
+[data-skin="yantian"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--yt-btn-a),var(--yt-btn-b))}
+
+/* 底部标签栏：选中的一格 */
+[data-skin="yantian"] #tabbar button.on{
+  color:var(--yt-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="yantian"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标 */
+[data-skin="yantian"] .badge{background:var(--yt-seal);border-radius:6px}
+
+/* 时间分隔线：一枚铜钱系着竹签（签尾一组爻），代替默认的饼干棒 */
+[data-skin="yantian"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--yt-line) center/contain no-repeat;
+}
+
+[data-skin="yantian"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：副标题下一道纹样 */
+[data-skin="yantian"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="yantian"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--yt-orn);
+  -webkit-mask:url(../skins/yantian/ornament.png) center/contain no-repeat;mask:url(../skins/yantian/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="yantian"] .panel::after,[data-skin="yantian"] #auth .sub::after{display:none}
+}

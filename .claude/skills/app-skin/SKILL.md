@@ -11,7 +11,7 @@ description: 聊天应用的整套外观皮肤（纯阳 chunyang 这类：换场
 - **动效皮肤**（`沙子`）：只改气泡的动画，代码在 `chat/js/skins/sand.js`。
 - **整套外观皮肤**（`纯阳`）：在 `<html data-skin="<id>">` 上生效，换掉整套界面的样子。本 skill 讲的是这一种。
 
-几个皮肤是单选的（同一时间只有一个）。范例就是纯阳：`chat/css/skin-chunyang.css`，新皮肤从它复制起步。
+几个皮肤是单选的（同一时间只有一个）。现有的整套外观皮肤：纯阳（第一个，范例 `chat/css/skin-chunyang.css`）和剑网三其余 20 个门派（`skin-shaolin.css` 到 `skin-wuxiang.css`），新皮肤从任意一个复制起步。
 
 代码是唯一的真相来源，下面用来定位。动手前把 `chat/css/tokens.css`、`chat/css/skin-chunyang.css`、`chat/js/skins/index.js` 读一遍。
 
@@ -26,7 +26,8 @@ description: 聊天应用的整套外观皮肤（纯阳 chunyang 这类：换场
 | `chat/index.html` 开头的 `theme-init` 脚本 | 首屏之前就设好 `data-skin` 和浏览器顶栏颜色，避免先闪一下默认样式。里面的 `C` 表：皮肤 id → [白天顶栏色, 晚上顶栏色] |
 | `chat/js/theme.js` 的 `SKIN_COLOR` | 同一组顶栏颜色（切换皮肤或外观之后用）。和 `C` 表写同样的值 |
 | `chat/js/mascot.js` 的 `SKIN_MASCOT` | 可选：皮肤 id → 固定用哪个吉祥物（`CHARS` 的下标；纯阳是 1）。不写就照常随机 |
-| `chat/js/views/me.js` | 皮肤选择器，读 `SKINS` 自动生成，不用改 |
+| `chat/js/views/me.js` | 皮肤选择器（色块网格），读 `SKINS` 自动生成，不用改 |
+| `chat/css/skins.css` | 所有整套外观皮肤共用的修正（`:root[data-skin]` 前缀）：登录页和「我的」页压在场景上的文字加柔光、登录页返回链接加玻璃底、页名前徽记加细描边、皮肤选择器网格。某个问题在所有皮肤上都有，就改这里，不要每个皮肤各改一遍 |
 | `.claude/skills/app-skin/tools/` | 截图脚本 `shots.mjs`、假数据 `fake-sb.js`、预览页生成 `build-preview.py` |
 
 ## 规则
@@ -89,7 +90,7 @@ description: 聊天应用的整套外观皮肤（纯阳 chunyang 这类：换场
 | 挂点 | 纯阳做了什么 |
 |---|---|
 | `.top h2` `#auth h1` `.me-head .name` `.panel h3` `.section-title` `#chat .who b` | 宋体加字距 |
-| `.view>.top h2::before` | 页名前的徽记（`taiji.png`） |
+| `.view>.top h2::before` | 页名前的徽记（纯阳是 `taiji.png`，门派皮肤是 `emblem.png`） |
 | `.top::after` | 顶栏下沿一道渐隐的银线 |
 | `.panel::after` | 面板右上角的纹样，用 `mask` 取形、`background` 上色，颜色跟着主题变 |
 | `.btn:not(.ghost):not(.danger)` `.seg button.on` `.toggle[aria-checked="true"]` | 主按钮渐变 |
@@ -108,19 +109,19 @@ description: 聊天应用的整套外观皮肤（纯阳 chunyang 这类：换场
 
 ### 4. 素材（交给 Codex，按 `gpt-assets` skill）
 
-放在 `chat/skins/<id>/`，纯阳的规格可以照抄：
+放在 `chat/skins/<id>/`。新皮肤的文件名统一用 `scene-day.jpg`、`scene-night.jpg`、`ornament.png`、`emblem.png`（纯阳是早期的 `cloud.png`、`taiji.png`，不用改）。规格：
 
 | 文件 | 规格 |
 |---|---|
 | `scene-day.jpg` / `scene-night.jpg` | 1024×1536 竖图，每张 ≤ 220KB。一对，构图和视角相同。**下半部分 55% 要平静、低对比**（玻璃面板压在上面），没有人物和文字 |
-| 纹样（纯阳的 `cloud.png`） | 768×128 透明 PNG，纯白线条、无填充、无阴影（只当 `mask` 用，只看 alpha），四角 alpha 为 0，≤ 40KB |
-| 徽记（纯阳的 `taiji.png`） | 256×256 透明 PNG，主体约 80%，四角 alpha 为 0，≤ 60KB；要在 22px 下认得出 |
+| `ornament.png`（纹样） | 768×128 透明 PNG，纯白线条、无填充、无阴影（只当 `mask` 用，只看 alpha），四角 alpha 为 0，≤ 40KB |
+| `emblem.png`（徽记） | 256×256 透明 PNG，主体约 80%，四角 alpha 为 0，≤ 60KB；要在 22px 下认得出。主体别用纯白（七秀的白色短剑在浅色顶栏上消失过，后来靠 `skins.css` 的描边才显出来） |
 
 提示里写清：这是哪个门派 / 主题、配色、风格（纯阳是「水墨加水粉、清雅、不卡通」），参考 `chat/sling/bg-day.jpg`、`bg-night.jpg` 的柔和程度，但不要照抄它们的暖色。生成后自己看每一张（`gpt-assets` 第 4 节），纹样要放在深色底上看线条是否干净。
 
 ### 5. 注册
 
-1. `chat/js/skins/index.js` 的 `SKINS` 加一项：`{ id: '<id>', name: '<名>', look: true, hint: '<一句话说明，最后写「只影响你自己看到的样子。」>' }`。
+1. `chat/js/skins/index.js` 的 `SKINS` 加一项：`{ id: '<id>', name: '<名>', look: true, sw: ['<主色>', '<底色>'], hint: '<一句话说明，最后写「只影响你自己看到的样子。」>' }`。`sw` 是皮肤选择器里的色块。
 2. `chat/index.html`：`<link rel="stylesheet" href="css/skin-<id>.css">` 放在 `skin-chunyang.css` 旁边；`theme-init` 脚本里的 `C` 表加 `<id>:['<白天顶栏色>','<晚上顶栏色>']`（顶栏色取场景最上面的颜色）。
 3. `chat/js/theme.js` 的 `SKIN_COLOR` 加同样的两个颜色。
 4. 要固定吉祥物的话，`chat/js/mascot.js` 的 `SKIN_MASCOT` 加 `<id>: <CHARS 下标>`。
@@ -138,8 +139,8 @@ P=<scratchpad>/pwskin && mkdir -p $P && cp .claude/skills/app-skin/tools/{shots.
 `shots.mjs` 用本机的 Chrome（`/Applications/Google Chrome.app/...`），起一个本地静态服务（端口 8079）读工作树，把页面里的 `supabase.js` 换成 `fake-sb.js`，在 `localStorage` 写好 `chat.skin`。截 13 个页面：登录、消息、好友、我的、皮肤设置、私聊、长按菜单、表情、+ 面板、排行榜、小程序大厅、群聊、群资料。
 
 ```bash
-# 新皮肤：白天 + 晚上
-WT=<工作树> OUT=<scratchpad>/shots/<id> SKIN=<id> node shots.mjs
+# 新皮肤：白天 + 晚上（几个截图同时跑时，每个用不同的 PORT，默认 8079）
+PORT=8079 WT=<工作树> OUT=<scratchpad>/shots/<id> SKIN=<id> node shots.mjs
 # 默认外观的对比图（预览页的「和默认外观对比」用）
 WT=<工作树> OUT=<scratchpad>/shots/<id> SKIN=default SCHEMES=light ONLY=02-chats,06-dm,04-me node shots.mjs
 ```
@@ -154,7 +155,13 @@ WT=<工作树> OUT=<scratchpad>/shots/<id> SKIN=default SCHEMES=light ONLY=02-ch
 python3 .claude/skills/app-skin/tools/build-preview.py <scratchpad>/shots/<id> <id> <名> <scratchpad>/preview/<id>-skin.html "<一句话说明>"
 ```
 
-用 Artifact 工具发布这个 html（首次发布带 `icon: "palette"` 和一句 `description`），把链接给用户。用户要改就改完重新截图、用同一个文件路径重新发布（链接不变）。
+用 Artifact 工具发布这个 html（首次发布带 `icon: "palette"` 和一句 `description`），把链接给用户。
+
+一次做了很多个皮肤时，改用多皮肤预览页（点名字切换，每个皮肤 4 个页面的白天和晚上）：先用 `ONLY=01-auth,02-chats,04-me,06-dm` 截图，再
+
+```bash
+python3 .claude/skills/app-skin/tools/build-gallery.py <截图目录> <输出.html> "<标题>" shaolin:少林 tiance:天策 …
+```用户要改就改完重新截图、用同一个文件路径重新发布（链接不变）。
 
 ### 7. 检查和 PR
 
@@ -163,6 +170,16 @@ python3 .claude/skills/app-skin/tools/build-preview.py <scratchpad>/shots/<id> <
 3. CI 的「Chat images exist」会检查 CSS 里引用的图片是否存在：`url(../skins/<id>/...)` 的文件都要提交。
 4. 默认皮肤和沙子皮肤各截一张私聊，确认没被新皮肤影响（所有规则都带 `[data-skin]` 前缀就不会）。
 5. PR 说明写：皮肤名、改了哪些、没改哪些（聊天页底色等）、素材由 GPT 生成（Codex imagegen）的文件列表、预览页链接、没测到的部分（真机、各种安卓自带字体下宋体的样子）。
+
+## 批量做很多个皮肤
+
+做剑网三 20 个门派时的做法，再批量做（比如节日、颜色主题）照这个来：
+
+1. 主会话先写一张设定表（每个皮肤一行：场景、配色、徽记、纹样、标题字体、时间线画什么），子代理和生图都照它做。
+2. 主会话**先把所有皮肤一次注册好**（SKINS、`index.html` 的 link 和 `C` 表、`SKIN_COLOR`），再开子代理。子代理只新建自己的 `skin-<id>.css`，不碰任何共用文件，几个子代理就不会互相覆盖。
+3. 生图按 4 到 5 个皮肤一组交给 Codex；写 CSS 的子代理同时开，先写样式，等自己那组的图片到了再截图（截图用不同的 `PORT`）。
+4. 子代理报告：配色、时间线、说明文案、自查发现的问题。主会话验收：每组的图片拼成一张看（场景、纹样放在深色底上、徽记放在 22px 和 96px 上）；所有皮肤的时间线从私聊截图里裁出来拼一张看；所有皮肤的消息页和「我的」页拼一张总览看。
+5. 好几个皮肤都有的问题，在 `skins.css` 里统一修。
 
 ## 排查
 
@@ -173,4 +190,6 @@ python3 .claude/skills/app-skin/tools/build-preview.py <scratchpad>/shots/<id> <
 | 刷新时先闪一下默认样式 | `theme-init` 的 `C` 表没加这个皮肤 |
 | 浏览器顶栏颜色不对 | `C` 表或 `SKIN_COLOR` 的颜色没写 / 两边不一致 |
 | 输入框聚焦时还是粉色光圈 | 没覆盖 `.field:focus`（默认写死了粉色） |
+| 徽记在顶栏上只剩一部分 | 徽记里有纯白的部分；`skins.css` 已经给所有徽记加了细描边，还不够就让生图重画，主体用实色 |
+| 登录页或「我的」页的字压在场景上看不清 | `skins.css` 里的柔光规则没覆盖到那个元素，把它加进去 |
 | 纹样变成一块色块 | 图片不是透明底，或者浏览器不支持 `mask` 而又没有 `@supports` 兜底 |

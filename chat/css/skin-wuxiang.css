@@ -1,0 +1,165 @@
+/* 皮肤：无相楼（泉州永宁湾：胭脂朱、青灰、金）。<html data-skin="wuxiang"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动）。结构同 skin-chunyang.css：先覆盖设计变量，再加组件细节。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="wuxiang"]{
+  --t1:#2c2024; --t2:#5a4850; --t3:#725f67;
+  --pink:#a8384b; --on-pink:#fff; --pink-text:#8a2a3c; --red-text:#b03040; --ok:#3f6f68; --badge:#a8384b;
+  --hair:rgba(110,40,56,.15); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(110,40,56,.15); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(252,246,246,.62); --g-card:rgba(253,249,248,.64); --g-chip:rgba(255,255,255,.6); --g-solid:#f8f0f0;
+  --field-bg:rgba(255,255,255,.52);
+  --sh-1:0 1px 2px rgba(50,18,26,0.08),0 4px 14px rgba(50,18,26,0.07);
+  --sh-2:0 2px 6px rgba(50,18,26,0.08),0 14px 36px rgba(50,18,26,0.13);
+  --sh-0:0 1px 1px rgba(50,18,26,0.1);
+  --page:#ece0e0; --stage-bg:rgba(244,234,234,.82);
+  --toast-bg:rgba(40,22,28,.92); --toast-fg:#fbf0f0;
+  --mascot-bg-av:#faf1f1;
+  --bub-peer:rgba(255,252,251,.84); --bub-own:rgba(244,210,216,.9); --bub-fx:rgba(236,228,238,.92); --bub-fail:rgba(250,214,206,.9);
+  --chat-bub-peer:#f4eeee; --chat-bub-bd:rgba(44,32,36,.08);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(110,40,56,.12); --bub-sheen:rgba(255,255,255,.6);
+  --wx-silver:#c4a468; --wx-ink:#8a2a3c; --wx-btn-a:#c04a5e; --wx-btn-b:#a8384b; --wx-orn:rgba(168,56,75,.22);
+  --wx-ring:rgba(168,56,75,.26); --wx-seal:#8f2a3a;
+  --wx-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='4' y='1' width='124' height='2.4' rx='1.2' fill='%237a5a3a'/%3E%3Crect x='63' y='0' width='6' height='5.2' rx='1.2' fill='%23a8384b'/%3E%3Ccircle cx='66' cy='2.6' r='.9' fill='%23c8a04a'/%3E%3Cpath d='M8 3.4V10M26 3.4V9M46 3.4V10.4M66 5.2V11M86 3.4V10.4M106 3.4V9M124 3.4V10' stroke='%236d8794' stroke-width='.7'/%3E%3Ccircle cx='8' cy='10.4' r='1' fill='%23c8a04a'/%3E%3Ccircle cx='46' cy='10.6' r='1' fill='%23c8a04a'/%3E%3Ccircle cx='66' cy='11' r='1' fill='%23c8a04a'/%3E%3Ccircle cx='86' cy='10.6' r='1' fill='%23c8a04a'/%3E%3Ccircle cx='124' cy='10.4' r='1' fill='%23c8a04a'/%3E%3Ccircle cx='26' cy='9.4' r='.8' fill='%23a8384b'/%3E%3Ccircle cx='106' cy='9.4' r='.8' fill='%23a8384b'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/wuxiang/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(250,242,242,0.06) 0,rgba(250,242,242,0.18) 45%,rgba(250,242,242,0.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#f8f0f0 0,#eee2e2 50%,#e2d3d4 100%);
+  --wx-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="wuxiang"][data-theme="dark"]{
+  --t1:#f2e8ea; --t2:#c8b6bb; --t3:#a08e94;
+  --pink:#e48a9a; --on-pink:#2a0c14; --pink-text:#f0a8b4; --red-text:#ff9aa4; --ok:#8fd0c4; --badge:#c8485c;
+  --hair:rgba(250,214,222,.12); --rim:rgba(250,214,222,.16);
+  --hi:rgba(255,226,232,.22); --lo:rgba(0,0,0,.42); --side:rgba(250,214,222,.07);
+  --g-bar:rgba(26,14,18,.64); --g-card:rgba(36,20,26,.6); --g-chip:rgba(250,214,222,.1); --g-solid:#24141a;
+  --field-bg:rgba(12,4,6,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,0.45),0 4px 14px rgba(0,0,0,0.28);
+  --sh-2:0 2px 6px rgba(0,0,0,0.45),0 14px 36px rgba(0,0,0,0.42);
+  --sh-0:0 1px 1px rgba(0,0,0,0.4);
+  --page:#120a0d; --stage-bg:rgba(20,10,14,.86);
+  --toast-bg:rgba(64,34,44,.96); --toast-fg:#fbf0f0;
+  --mascot-bg:#f2e8ea; --mascot-bg-av:#f2e8ea;
+  --bub-peer:rgba(54,36,42,.84); --bub-own:rgba(130,48,66,.86); --bub-fx:rgba(66,58,84,.86); --bub-fail:rgba(124,44,40,.88);
+  --chat-bub-peer:rgba(56,38,44,.88); --chat-bub-bd:rgba(250,214,222,.14);
+  --bub-bd:rgba(250,214,222,.16); --bub-hi:rgba(255,226,232,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(255,226,232,.12);
+  --wx-silver:#9a7d4c; --wx-ink:#f0a8b4; --wx-btn-a:#d86e82; --wx-btn-b:#b04a5e; --wx-orn:rgba(228,190,120,.24);
+  --wx-ring:rgba(228,138,154,.3); --wx-seal:#c8485c;
+  --wx-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='4' y='1' width='124' height='2.4' rx='1.2' fill='%23c8a06a'/%3E%3Crect x='63' y='0' width='6' height='5.2' rx='1.2' fill='%23d86e82'/%3E%3Ccircle cx='66' cy='2.6' r='.9' fill='%23e0bb66'/%3E%3Cpath d='M8 3.4V10M26 3.4V9M46 3.4V10.4M66 5.2V11M86 3.4V10.4M106 3.4V9M124 3.4V10' stroke='%238fa8b4' stroke-width='.7'/%3E%3Ccircle cx='8' cy='10.4' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='46' cy='10.6' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='66' cy='11' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='86' cy='10.6' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='124' cy='10.4' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='26' cy='9.4' r='.8' fill='%23e48a9a'/%3E%3Ccircle cx='106' cy='9.4' r='.8' fill='%23e48a9a'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/wuxiang/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(12,6,8,0.05) 0,rgba(12,6,8,0.22) 45%,rgba(12,6,8,0.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(250,190,170,.18),rgba(250,190,170,0) 70%),
+    linear-gradient(180deg,#1c1014 0,#160c10 60%,#0e0709 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="wuxiang"]:not([data-theme="light"]){
+  --t1:#f2e8ea; --t2:#c8b6bb; --t3:#a08e94;
+  --pink:#e48a9a; --on-pink:#2a0c14; --pink-text:#f0a8b4; --red-text:#ff9aa4; --ok:#8fd0c4; --badge:#c8485c;
+  --hair:rgba(250,214,222,.12); --rim:rgba(250,214,222,.16);
+  --hi:rgba(255,226,232,.22); --lo:rgba(0,0,0,.42); --side:rgba(250,214,222,.07);
+  --g-bar:rgba(26,14,18,.64); --g-card:rgba(36,20,26,.6); --g-chip:rgba(250,214,222,.1); --g-solid:#24141a;
+  --field-bg:rgba(12,4,6,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,0.45),0 4px 14px rgba(0,0,0,0.28);
+  --sh-2:0 2px 6px rgba(0,0,0,0.45),0 14px 36px rgba(0,0,0,0.42);
+  --sh-0:0 1px 1px rgba(0,0,0,0.4);
+  --page:#120a0d; --stage-bg:rgba(20,10,14,.86);
+  --toast-bg:rgba(64,34,44,.96); --toast-fg:#fbf0f0;
+  --mascot-bg:#f2e8ea; --mascot-bg-av:#f2e8ea;
+  --bub-peer:rgba(54,36,42,.84); --bub-own:rgba(130,48,66,.86); --bub-fx:rgba(66,58,84,.86); --bub-fail:rgba(124,44,40,.88);
+  --chat-bub-peer:rgba(56,38,44,.88); --chat-bub-bd:rgba(250,214,222,.14);
+  --bub-bd:rgba(250,214,222,.16); --bub-hi:rgba(255,226,232,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(255,226,232,.12);
+  --wx-silver:#9a7d4c; --wx-ink:#f0a8b4; --wx-btn-a:#d86e82; --wx-btn-b:#b04a5e; --wx-orn:rgba(228,190,120,.24);
+  --wx-ring:rgba(228,138,154,.3); --wx-seal:#c8485c;
+  --wx-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='4' y='1' width='124' height='2.4' rx='1.2' fill='%23c8a06a'/%3E%3Crect x='63' y='0' width='6' height='5.2' rx='1.2' fill='%23d86e82'/%3E%3Ccircle cx='66' cy='2.6' r='.9' fill='%23e0bb66'/%3E%3Cpath d='M8 3.4V10M26 3.4V9M46 3.4V10.4M66 5.2V11M86 3.4V10.4M106 3.4V9M124 3.4V10' stroke='%238fa8b4' stroke-width='.7'/%3E%3Ccircle cx='8' cy='10.4' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='46' cy='10.6' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='66' cy='11' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='86' cy='10.6' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='124' cy='10.4' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='26' cy='9.4' r='.8' fill='%23e48a9a'/%3E%3Ccircle cx='106' cy='9.4' r='.8' fill='%23e48a9a'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/wuxiang/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(12,6,8,0.05) 0,rgba(12,6,8,0.22) 45%,rgba(12,6,8,0.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(250,190,170,.18),rgba(250,190,170,0) 70%),
+    linear-gradient(180deg,#1c1014 0,#160c10 60%,#0e0709 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="wuxiang"] ::selection{background:rgba(168,56,75,.28)}
+:root[data-skin="wuxiang"][data-theme="dark"] ::selection{background:rgba(228,138,154,.35)}
+[data-skin="wuxiang"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题 */
+[data-skin="wuxiang"] .top h2,[data-skin="wuxiang"] #auth h1,[data-skin="wuxiang"] .me-head .name,
+[data-skin="wuxiang"] .panel h3,[data-skin="wuxiang"] .section-title,[data-skin="wuxiang"] #chat .who b{
+  font-family:var(--wx-serif);letter-spacing:.06em;
+}
+[data-skin="wuxiang"] .top h2,[data-skin="wuxiang"] #auth h1{font-weight:700}
+[data-skin="wuxiang"] .panel h3,[data-skin="wuxiang"] .section-title{color:var(--wx-ink)}
+
+/* 顶栏：页名前一枚徽记，下沿一道渐隐的细线 */
+[data-skin="wuxiang"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="wuxiang"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--wx-silver) 18%,var(--wx-silver) 82%,transparent);opacity:.75;
+}
+[data-skin="wuxiang"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="wuxiang"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/wuxiang/emblem.png) center/contain no-repeat;
+}
+
+/* 面板右上角的纹样（遮罩取形，颜色跟主题走） */
+[data-skin="wuxiang"] .panel{position:relative;overflow:hidden}
+[data-skin="wuxiang"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--wx-orn);
+  -webkit-mask:url(../skins/wuxiang/ornament.png) center/contain no-repeat;mask:url(../skins/wuxiang/ornament.png) center/contain no-repeat;
+}
+[data-skin="wuxiang"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮 */
+[data-skin="wuxiang"] .btn:not(.ghost):not(.danger){
+  background-color:var(--wx-btn-b);
+  background-image:linear-gradient(180deg,var(--wx-btn-a),var(--wx-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(50,18,26,.18),0 4px 10px rgba(50,18,26,.14);
+}
+@media (hover:hover){ [data-skin="wuxiang"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--wx-btn-a) 88%,#fff),var(--wx-btn-b))} }
+[data-skin="wuxiang"] .seg button.on{background-image:linear-gradient(180deg,var(--wx-btn-a),var(--wx-btn-b));color:var(--on-pink)}
+[data-skin="wuxiang"] .field:focus{box-shadow:inset 0 1px 3px rgba(50,18,26,.14),0 0 0 3px var(--wx-ring)}
+[data-skin="wuxiang"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--wx-btn-a),var(--wx-btn-b))}
+
+/* 底部标签栏选中格 */
+[data-skin="wuxiang"] #tabbar button.on{
+  color:var(--wx-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="wuxiang"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标：印章，方一点 */
+[data-skin="wuxiang"] .badge{background:var(--wx-seal);border-radius:6px}
+
+/* 时间分隔线：门派兵器的剪影（内联 SVG，白天晚上各一份） */
+[data-skin="wuxiang"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--wx-blade) center/contain no-repeat;
+}
+
+[data-skin="wuxiang"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：吉祥物下方一道纹样 */
+[data-skin="wuxiang"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="wuxiang"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--wx-orn);
+  -webkit-mask:url(../skins/wuxiang/ornament.png) center/contain no-repeat;mask:url(../skins/wuxiang/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="wuxiang"] .panel::after,[data-skin="wuxiang"] #auth .sub::after{display:none}
+}

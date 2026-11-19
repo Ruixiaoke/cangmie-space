@@ -1,0 +1,161 @@
+/* 皮肤：七秀（qixiu）。<html data-skin="qixiu"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动）。结构同纯阳：先覆盖设计变量，再加组件细节（宋体标题、页眉徽记、面板角纹样、主按钮、兵器形时间线、角标）。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="qixiu"]{
+  --t1:#3a2230; --t2:#664656; --t3:#82667a;
+  --pink:#c4567a; --on-pink:#fff; --pink-text:#a23a5f; --red-text:#b02b4f; --ok:#2f7a66; --badge:#d04570;
+  --hair:rgba(140,60,90,.15); --rim:rgba(255,252,253,.74);
+  --hi:rgba(255,252,253,.95); --lo:rgba(140,60,90,.14); --side:rgba(255,248,251,.42);
+  --g-bar:rgba(255,246,249,.64); --g-card:rgba(255,249,251,.66); --g-chip:rgba(255,252,253,.62); --g-solid:#fbf1f4;
+  --field-bg:rgba(255,252,253,.54);
+  --sh-1:0 1px 2px rgba(84,30,52,.08),0 4px 14px rgba(84,30,52,.07);
+  --sh-2:0 2px 4px rgba(84,30,52,.08),0 12px 32px rgba(84,30,52,.13);
+  --sh-0:0 1px 1px rgba(84,30,52,.10);
+  --page:#f0dfe5; --stage-bg:rgba(248,232,238,.84);
+  --toast-bg:rgba(54,28,42,.92); --toast-fg:#fcf0f4;
+  --mascot-bg-av:#fbf1f4;
+  --bub-peer:rgba(255,251,252,.84); --bub-own:rgba(246,208,222,.92); --bub-fx:rgba(236,224,240,.92); --bub-fail:rgba(250,208,212,.9);
+  --chat-bub-peer:#f8eff2; --chat-bub-bd:rgba(58,34,48,.09);
+  --bub-bd:rgba(255,252,253,.82); --bub-hi:rgba(255,252,253,.95); --bub-lo:rgba(140,60,90,.12); --bub-sheen:rgba(255,252,253,.6);
+  --qx-silver:#7fb8a8; --qx-ink:#8e2f50; --qx-btn-a:#d36d90; --qx-btn-b:#aa3f64; --qx-orn:rgba(196,86,122,.2);
+  --qx-ring:rgba(196,86,122,.26); --qx-seal:#d04570;
+  --qx-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 8.6c3-5.6 6-5.6 9-2.6s6 2.6 9-.6' fill='none' stroke='%23d0507a' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M2 3.4c3 5 6 5 9 2.4s6-2.2 9 .8' fill='none' stroke='%23e888a8' stroke-width='1' stroke-linecap='round' opacity='.85'/%3E%3Ccircle cx='23' cy='6' r='2' fill='%23b08a4e'/%3E%3Crect x='25' y='5.1' width='14' height='1.8' rx='.9' fill='%234a7f72'/%3E%3Crect x='39' y='2' width='2.8' height='8' rx='1.1' fill='%23b08a4e'/%3E%3Cpath d='M42 4.6h70l18 1.4-18 1.4H42z' fill='%23b5c0c8'/%3E%3Cpath d='M42 6h86' stroke='%23ffffff' stroke-width='.55'/%3E%3C/svg%3E");
+  --qx-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/qixiu/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(252,238,243,.06) 0,rgba(252,238,243,.18) 45%,rgba(252,238,243,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,248,250,.95),rgba(255,248,250,0) 60%),linear-gradient(180deg,#faedf1 0,#f0dfe5 50%,#e4cdd6 100%);
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="qixiu"][data-theme="dark"]{
+  --t1:#fbeef3; --t2:#dcbfcc; --t3:#b0929f;
+  --pink:#f0a0bc; --on-pink:#3a0f20; --pink-text:#f6b4cb; --red-text:#ff9db8; --ok:#9ae0c6; --badge:#d84f78;
+  --hair:rgba(250,208,224,.13); --rim:rgba(250,208,224,.17);
+  --hi:rgba(255,222,234,.2); --lo:rgba(0,0,0,.44); --side:rgba(250,208,224,.07);
+  --g-bar:rgba(36,20,32,.64); --g-card:rgba(46,26,42,.6); --g-chip:rgba(250,208,224,.1); --g-solid:#2c1a28;
+  --field-bg:rgba(18,8,16,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#1a0f19; --stage-bg:rgba(28,16,26,.86);
+  --toast-bg:rgba(88,44,66,.96); --toast-fg:#fcf0f4;
+  --mascot-bg:#fbeef3; --mascot-bg-av:#fbeef3;
+  --bub-peer:rgba(70,44,62,.84); --bub-own:rgba(150,60,100,.88); --bub-fx:rgba(86,66,104,.86); --bub-fail:rgba(124,40,60,.88);
+  --chat-bub-peer:rgba(74,46,66,.88); --chat-bub-bd:rgba(250,208,224,.15);
+  --bub-bd:rgba(250,208,224,.17); --bub-hi:rgba(255,222,234,.2); --bub-lo:rgba(0,0,0,.34); --bub-sheen:rgba(255,222,234,.12);
+  --qx-silver:#6fae9c; --qx-ink:#f6b4cb; --qx-btn-a:#f4b0c8; --qx-btn-b:#d4709a; --qx-orn:rgba(246,180,203,.2);
+  --qx-ring:rgba(240,160,188,.34); --qx-seal:#d84f78;
+  --qx-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 8.6c3-5.6 6-5.6 9-2.6s6 2.6 9-.6' fill='none' stroke='%23f06a96' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M2 3.4c3 5 6 5 9 2.4s6-2.2 9 .8' fill='none' stroke='%23f4a8c4' stroke-width='1' stroke-linecap='round' opacity='.85'/%3E%3Ccircle cx='23' cy='6' r='2' fill='%23d8b070'/%3E%3Crect x='25' y='5.1' width='14' height='1.8' rx='.9' fill='%237fc8b2'/%3E%3Crect x='39' y='2' width='2.8' height='8' rx='1.1' fill='%23d8b070'/%3E%3Cpath d='M42 4.6h70l18 1.4-18 1.4H42z' fill='%23c8d2da'/%3E%3Cpath d='M42 6h86' stroke='%23ffffff' stroke-width='.55'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/qixiu/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(14,6,12,.05) 0,rgba(14,6,12,.22) 45%,rgba(14,6,12,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(255,200,150,.2),rgba(255,200,150,0) 70%),linear-gradient(180deg,#25142a 0,#1a0f1c 60%,#110912 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="qixiu"]:not([data-theme="light"]){
+  --t1:#fbeef3; --t2:#dcbfcc; --t3:#b0929f;
+  --pink:#f0a0bc; --on-pink:#3a0f20; --pink-text:#f6b4cb; --red-text:#ff9db8; --ok:#9ae0c6; --badge:#d84f78;
+  --hair:rgba(250,208,224,.13); --rim:rgba(250,208,224,.17);
+  --hi:rgba(255,222,234,.2); --lo:rgba(0,0,0,.44); --side:rgba(250,208,224,.07);
+  --g-bar:rgba(36,20,32,.64); --g-card:rgba(46,26,42,.6); --g-chip:rgba(250,208,224,.1); --g-solid:#2c1a28;
+  --field-bg:rgba(18,8,16,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#1a0f19; --stage-bg:rgba(28,16,26,.86);
+  --toast-bg:rgba(88,44,66,.96); --toast-fg:#fcf0f4;
+  --mascot-bg:#fbeef3; --mascot-bg-av:#fbeef3;
+  --bub-peer:rgba(70,44,62,.84); --bub-own:rgba(150,60,100,.88); --bub-fx:rgba(86,66,104,.86); --bub-fail:rgba(124,40,60,.88);
+  --chat-bub-peer:rgba(74,46,66,.88); --chat-bub-bd:rgba(250,208,224,.15);
+  --bub-bd:rgba(250,208,224,.17); --bub-hi:rgba(255,222,234,.2); --bub-lo:rgba(0,0,0,.34); --bub-sheen:rgba(255,222,234,.12);
+  --qx-silver:#6fae9c; --qx-ink:#f6b4cb; --qx-btn-a:#f4b0c8; --qx-btn-b:#d4709a; --qx-orn:rgba(246,180,203,.2);
+  --qx-ring:rgba(240,160,188,.34); --qx-seal:#d84f78;
+  --qx-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 8.6c3-5.6 6-5.6 9-2.6s6 2.6 9-.6' fill='none' stroke='%23f06a96' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M2 3.4c3 5 6 5 9 2.4s6-2.2 9 .8' fill='none' stroke='%23f4a8c4' stroke-width='1' stroke-linecap='round' opacity='.85'/%3E%3Ccircle cx='23' cy='6' r='2' fill='%23d8b070'/%3E%3Crect x='25' y='5.1' width='14' height='1.8' rx='.9' fill='%237fc8b2'/%3E%3Crect x='39' y='2' width='2.8' height='8' rx='1.1' fill='%23d8b070'/%3E%3Cpath d='M42 4.6h70l18 1.4-18 1.4H42z' fill='%23c8d2da'/%3E%3Cpath d='M42 6h86' stroke='%23ffffff' stroke-width='.55'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/qixiu/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(14,6,12,.05) 0,rgba(14,6,12,.22) 45%,rgba(14,6,12,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(255,200,150,.2),rgba(255,200,150,0) 70%),linear-gradient(180deg,#25142a 0,#1a0f1c 60%,#110912 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="qixiu"] ::selection{background:rgba(196,86,122,.28)}
+[data-skin="qixiu"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题 */
+[data-skin="qixiu"] .top h2,[data-skin="qixiu"] #auth h1,[data-skin="qixiu"] .me-head .name,
+[data-skin="qixiu"] .panel h3,[data-skin="qixiu"] .section-title,[data-skin="qixiu"] #chat .who b{
+  font-family:var(--qx-serif);letter-spacing:.06em;
+}
+[data-skin="qixiu"] .top h2,[data-skin="qixiu"] #auth h1{font-weight:700}
+[data-skin="qixiu"] .panel h3,[data-skin="qixiu"] .section-title{color:var(--qx-ink)}
+
+/* 顶栏：页名前的徽记，下沿一道渐隐的线 */
+[data-skin="qixiu"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="qixiu"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--qx-silver) 18%,var(--qx-silver) 82%,transparent);opacity:.75;
+}
+[data-skin="qixiu"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="qixiu"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/qixiu/emblem.png) center/contain no-repeat;
+}
+
+/* 面板：右上角纹样（遮罩取形，颜色跟主题走） */
+[data-skin="qixiu"] .panel{position:relative;overflow:hidden}
+[data-skin="qixiu"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--qx-orn);
+  -webkit-mask:url(../skins/qixiu/ornament.png) center/contain no-repeat;mask:url(../skins/qixiu/ornament.png) center/contain no-repeat;
+}
+[data-skin="qixiu"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮 */
+[data-skin="qixiu"] .btn:not(.ghost):not(.danger){
+  background-color:var(--qx-btn-b);
+  background-image:linear-gradient(180deg,var(--qx-btn-a),var(--qx-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.16),0 4px 10px rgba(0,0,0,.12);
+}
+@media (hover:hover){ [data-skin="qixiu"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--qx-btn-a) 88%,#fff),var(--qx-btn-b))} }
+[data-skin="qixiu"] .seg button.on{background-image:linear-gradient(180deg,var(--qx-btn-a),var(--qx-btn-b));color:var(--on-pink)}
+[data-skin="qixiu"] .field:focus{box-shadow:inset 0 1px 3px rgba(0,0,0,.12),0 0 0 3px var(--qx-ring)}
+[data-skin="qixiu"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--qx-btn-a),var(--qx-btn-b))}
+
+/* 底部标签栏 */
+[data-skin="qixiu"] #tabbar button.on{
+  color:var(--qx-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="qixiu"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标 */
+[data-skin="qixiu"] .badge{background:var(--qx-seal);border-radius:6px}
+
+/* 时间分隔线：门派兵器（内联 SVG，白天晚上各一份） */
+[data-skin="qixiu"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--qx-weapon) center/contain no-repeat;
+}
+
+[data-skin="qixiu"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：副标题下一道纹样 */
+[data-skin="qixiu"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="qixiu"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--qx-orn);
+  -webkit-mask:url(../skins/qixiu/ornament.png) center/contain no-repeat;mask:url(../skins/qixiu/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="qixiu"] .panel::after,[data-skin="qixiu"] #auth .sub::after{display:none}
+}

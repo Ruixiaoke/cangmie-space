@@ -1,0 +1,164 @@
+/* 皮肤：藏剑（藏剑金、西湖绿、朱砂，山庄屋檐与湖上灯影）。<html data-skin="cangjian"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动，那是聊天壁纸）。结构同纯阳：先覆盖设计变量，再加组件细节。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="cangjian"]{
+  --t1:#2c2410; --t2:#5a4a26; --t3:#74623a;
+  --pink:#b8860b; --on-pink:#fff; --pink-text:#80590a; --red-text:#b0372a; --ok:#2c7050; --badge:#c0392b;
+  --hair:rgba(110,84,20,.14); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(110,84,20,.14); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(253,249,238,.62); --g-card:rgba(253,249,238,.64); --g-chip:rgba(255,255,255,.6); --g-solid:#f8f3e4;
+  --field-bg:rgba(255,255,255,.52);
+  --sh-1:0 1px 2px rgba(44,32,6,.08),0 4px 14px rgba(44,32,6,.07);
+  --sh-2:0 2px 4px rgba(44,32,6,.08),0 12px 32px rgba(44,32,6,.13);
+  --sh-0:0 1px 1px rgba(44,32,6,.10);
+  --page:#ebe4cf; --stage-bg:rgba(246,240,222,.82);
+  --toast-bg:rgba(44,34,12,.92); --toast-fg:#faf4e2;
+  --mascot-bg-av:#f8f3e4;
+  --bub-peer:rgba(255,252,244,.82); --bub-own:rgba(240,222,166,.9); --bub-fx:rgba(226,236,214,.92); --bub-fail:rgba(250,214,206,.9);
+  --chat-bub-peer:#f5f0e2; --chat-bub-bd:rgba(44,36,16,.08);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(110,84,20,.12); --bub-sheen:rgba(255,255,255,.6);
+  --cj-silver:#cdb572; --cj-ink:#7a5608; --cj-btn-a:#c99a1f; --cj-btn-b:#9a6d06; --cj-orn:rgba(184,134,11,.24);
+  --cj-ring:rgba(184,134,11,.28); --cj-seal:#c0392b;
+  --cj-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c2-3 5-3.4 7-1.6M2 6c2 3 5 3.4 7 1.6' fill='none' stroke='%23c0392b' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='10.5' cy='6' r='2' fill='%23c99a1f'/%3E%3Crect x='12' y='4.8' width='15' height='2.4' rx='1.1' fill='%237a5a2a'/%3E%3Cpath d='M15 4.6v2.8M19 4.6v2.8M23 4.6v2.8' stroke='%23c99a1f' stroke-width='.7'/%3E%3Cpath d='M27 .8h4l.8 5.2-.8 5.2h-4z' fill='%23c99a1f'/%3E%3Cpath d='M31.8 2.6H126l4 1.2v4.4l-4 1.2H31.8z' fill='%23aab4b8'/%3E%3Cpath d='M33 4.2H126' stroke='%23f2f6f7' stroke-width='.7'/%3E%3Cpath d='M33 7.4H124' stroke='%237e8a90' stroke-width='.7'/%3E%3C/svg%3E");
+  --cj-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/cangjian/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(252,247,232,.06) 0,rgba(252,247,232,.18) 45%,rgba(236,228,204,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,250,230,.95),rgba(255,250,230,0) 60%),
+    linear-gradient(180deg,#f8f3e4 0,#efe7d0 55%,#e4dabc 100%);
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="cangjian"][data-theme="dark"]{
+  --t1:#f4ecd6; --t2:#cbbf9e; --t3:#a39777;
+  --pink:#e3bc52; --on-pink:#2a1d05; --pink-text:#ecce7a; --red-text:#ff9d8f; --ok:#8fd6b0; --badge:#d0523f;
+  --hair:rgba(240,220,150,.12); --rim:rgba(240,220,150,.16);
+  --hi:rgba(240,220,150,.22); --lo:rgba(0,0,0,.4); --side:rgba(240,220,150,.07);
+  --g-bar:rgba(28,26,16,.62); --g-card:rgba(28,26,16,.58); --g-chip:rgba(240,220,150,.1); --g-solid:#221f13;
+  --field-bg:rgba(4,8,6,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0d0c07; --stage-bg:rgba(20,18,10,.84);
+  --toast-bg:rgba(56,48,26,.96); --toast-fg:#faf2dc;
+  --mascot-bg:#f4ecd6; --mascot-bg-av:#f4ecd6;
+  --bub-peer:rgba(52,46,28,.84); --bub-own:rgba(110,86,28,.86); --bub-fx:rgba(56,70,48,.86); --bub-fail:rgba(124,50,42,.88);
+  --chat-bub-peer:rgba(56,50,32,.88); --chat-bub-bd:rgba(240,220,150,.14);
+  --bub-bd:rgba(240,220,150,.16); --bub-hi:rgba(240,220,150,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(240,220,150,.12);
+  --cj-silver:#8d7c4a; --cj-ink:#ecce7a; --cj-btn-a:#d9ad3c; --cj-btn-b:#b08a22; --cj-orn:rgba(236,206,122,.22);
+  --cj-ring:rgba(227,188,82,.3); --cj-seal:#d0523f;
+  --cj-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c2-3 5-3.4 7-1.6M2 6c2 3 5 3.4 7 1.6' fill='none' stroke='%23d0523f' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='10.5' cy='6' r='2' fill='%23e3bc52'/%3E%3Crect x='12' y='4.8' width='15' height='2.4' rx='1.1' fill='%23a8845a'/%3E%3Cpath d='M15 4.6v2.8M19 4.6v2.8M23 4.6v2.8' stroke='%23e3bc52' stroke-width='.7'/%3E%3Cpath d='M27 .8h4l.8 5.2-.8 5.2h-4z' fill='%23e3bc52'/%3E%3Cpath d='M31.8 2.6H126l4 1.2v4.4l-4 1.2H31.8z' fill='%238a949a'/%3E%3Cpath d='M33 4.2H126' stroke='%23d8e2e6' stroke-width='.7'/%3E%3Cpath d='M33 7.4H124' stroke='%235f6a70' stroke-width='.7'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/cangjian/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(10,12,10,.05) 0,rgba(10,12,10,.22) 45%,rgba(10,12,10,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(240,200,110,.2),rgba(240,200,110,0) 70%),
+    linear-gradient(180deg,#17160d 0,#100f09 55%,#0a0906 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="cangjian"]:not([data-theme="light"]){
+  --t1:#f4ecd6; --t2:#cbbf9e; --t3:#a39777;
+  --pink:#e3bc52; --on-pink:#2a1d05; --pink-text:#ecce7a; --red-text:#ff9d8f; --ok:#8fd6b0; --badge:#d0523f;
+  --hair:rgba(240,220,150,.12); --rim:rgba(240,220,150,.16);
+  --hi:rgba(240,220,150,.22); --lo:rgba(0,0,0,.4); --side:rgba(240,220,150,.07);
+  --g-bar:rgba(28,26,16,.62); --g-card:rgba(28,26,16,.58); --g-chip:rgba(240,220,150,.1); --g-solid:#221f13;
+  --field-bg:rgba(4,8,6,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0d0c07; --stage-bg:rgba(20,18,10,.84);
+  --toast-bg:rgba(56,48,26,.96); --toast-fg:#faf2dc;
+  --mascot-bg:#f4ecd6; --mascot-bg-av:#f4ecd6;
+  --bub-peer:rgba(52,46,28,.84); --bub-own:rgba(110,86,28,.86); --bub-fx:rgba(56,70,48,.86); --bub-fail:rgba(124,50,42,.88);
+  --chat-bub-peer:rgba(56,50,32,.88); --chat-bub-bd:rgba(240,220,150,.14);
+  --bub-bd:rgba(240,220,150,.16); --bub-hi:rgba(240,220,150,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(240,220,150,.12);
+  --cj-silver:#8d7c4a; --cj-ink:#ecce7a; --cj-btn-a:#d9ad3c; --cj-btn-b:#b08a22; --cj-orn:rgba(236,206,122,.22);
+  --cj-ring:rgba(227,188,82,.3); --cj-seal:#d0523f;
+  --cj-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c2-3 5-3.4 7-1.6M2 6c2 3 5 3.4 7 1.6' fill='none' stroke='%23d0523f' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='10.5' cy='6' r='2' fill='%23e3bc52'/%3E%3Crect x='12' y='4.8' width='15' height='2.4' rx='1.1' fill='%23a8845a'/%3E%3Cpath d='M15 4.6v2.8M19 4.6v2.8M23 4.6v2.8' stroke='%23e3bc52' stroke-width='.7'/%3E%3Cpath d='M27 .8h4l.8 5.2-.8 5.2h-4z' fill='%23e3bc52'/%3E%3Cpath d='M31.8 2.6H126l4 1.2v4.4l-4 1.2H31.8z' fill='%238a949a'/%3E%3Cpath d='M33 4.2H126' stroke='%23d8e2e6' stroke-width='.7'/%3E%3Cpath d='M33 7.4H124' stroke='%235f6a70' stroke-width='.7'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/cangjian/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(10,12,10,.05) 0,rgba(10,12,10,.22) 45%,rgba(10,12,10,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(240,200,110,.2),rgba(240,200,110,0) 70%),
+    linear-gradient(180deg,#17160d 0,#100f09 55%,#0a0906 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="cangjian"] ::selection{background:color-mix(in srgb,var(--pink) 30%,transparent)}
+[data-skin="cangjian"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题：像山庄的匾额 */
+[data-skin="cangjian"] .top h2,[data-skin="cangjian"] #auth h1,[data-skin="cangjian"] .me-head .name,
+[data-skin="cangjian"] .panel h3,[data-skin="cangjian"] .section-title,[data-skin="cangjian"] #chat .who b{
+  font-family:var(--cj-serif);letter-spacing:.06em;
+}
+[data-skin="cangjian"] .top h2,[data-skin="cangjian"] #auth h1{font-weight:700}
+[data-skin="cangjian"] .panel h3,[data-skin="cangjian"] .section-title{color:var(--cj-ink)}
+
+/* 顶栏：页名前一枚徽记，下沿一道渐隐的细线 */
+[data-skin="cangjian"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="cangjian"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--cj-silver) 18%,var(--cj-silver) 82%,transparent);opacity:.7;
+}
+[data-skin="cangjian"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="cangjian"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/cangjian/emblem.png) center/contain no-repeat;
+}
+
+/* 面板和卡片：右上角一抹纹样（遮罩取形，颜色跟主题走） */
+[data-skin="cangjian"] .panel{position:relative;overflow:hidden}
+[data-skin="cangjian"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--cj-orn);
+  -webkit-mask:url(../skins/cangjian/ornament.png) center/contain no-repeat;mask:url(../skins/cangjian/ornament.png) center/contain no-repeat;
+}
+[data-skin="cangjian"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮：门派主色渐变，上缘一道亮边 */
+[data-skin="cangjian"] .btn:not(.ghost):not(.danger){
+  background-color:var(--cj-btn-b);
+  background-image:linear-gradient(180deg,var(--cj-btn-a),var(--cj-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.14);
+}
+@media (hover:hover){ [data-skin="cangjian"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--cj-btn-a) 88%,#fff),var(--cj-btn-b))} }
+[data-skin="cangjian"] .seg button.on{background-image:linear-gradient(180deg,var(--cj-btn-a),var(--cj-btn-b));color:var(--on-pink)}
+[data-skin="cangjian"] .field:focus{box-shadow:inset 0 1px 3px rgba(0,0,0,.14),0 0 0 3px var(--cj-ring)}
+[data-skin="cangjian"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--cj-btn-a),var(--cj-btn-b))}
+
+/* 底部标签栏：选中的一格浅浅染上主色，上沿一小段主色线 */
+[data-skin="cangjian"] #tabbar button.on{
+  color:var(--cj-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="cangjian"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标：印章色，方一点 */
+[data-skin="cangjian"] .badge{background:var(--cj-seal);border-radius:6px}
+
+/* 时间分隔线：内联 SVG 画的门派兵器，代替默认的饼干棒 */
+[data-skin="cangjian"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--cj-weapon) center/contain no-repeat;
+}
+
+[data-skin="cangjian"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：副标题下方一道纹样 */
+[data-skin="cangjian"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="cangjian"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--cj-orn);
+  -webkit-mask:url(../skins/cangjian/ornament.png) center/contain no-repeat;mask:url(../skins/cangjian/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="cangjian"] .panel::after,[data-skin="cangjian"] #auth .sub::after{display:none}
+}

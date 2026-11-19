@@ -1,0 +1,160 @@
+/* 皮肤：五毒（wudu）。<html data-skin="wudu"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动）。结构同纯阳：先覆盖设计变量，再加组件细节（黑体标题加字距、页眉徽记、面板角纹样、主按钮、兵器形时间线、角标）。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="wudu"]{
+  --t1:#1d2236; --t2:#434c6e; --t3:#5f6990;
+  --pink:#3c4f9a; --on-pink:#fff; --pink-text:#2f3f84; --red-text:#b0304f; --ok:#2f6a58; --badge:#8a3fa0;
+  --hair:rgba(48,60,120,.15); --rim:rgba(252,253,255,.74);
+  --hi:rgba(252,253,255,.95); --lo:rgba(48,60,120,.15); --side:rgba(246,248,255,.42);
+  --g-bar:rgba(244,246,254,.64); --g-card:rgba(247,249,255,.66); --g-chip:rgba(252,253,255,.62); --g-solid:#eff1fa;
+  --field-bg:rgba(252,253,255,.54);
+  --sh-1:0 1px 2px rgba(24,32,72,.08),0 4px 14px rgba(24,32,72,.07);
+  --sh-2:0 2px 4px rgba(24,32,72,.08),0 12px 32px rgba(24,32,72,.13);
+  --sh-0:0 1px 1px rgba(24,32,72,.10);
+  --page:#dde1f0; --stage-bg:rgba(228,232,246,.84);
+  --toast-bg:rgba(26,32,64,.92); --toast-fg:#eef0fc;
+  --mascot-bg-av:#eff1fa;
+  --bub-peer:rgba(250,251,255,.84); --bub-own:rgba(204,212,244,.92); --bub-fx:rgba(224,214,244,.92); --bub-fail:rgba(250,212,220,.9);
+  --chat-bub-peer:#eef0f8; --chat-bub-bd:rgba(29,34,54,.09);
+  --bub-bd:rgba(252,253,255,.82); --bub-hi:rgba(252,253,255,.95); --bub-lo:rgba(48,60,120,.13); --bub-sheen:rgba(252,253,255,.6);
+  --wd-silver:#a9b3c8; --wd-ink:#2a3a80; --wd-btn-a:#5266b0; --wd-btn-b:#2f3f84; --wd-orn:rgba(60,79,154,.2);
+  --wd-ring:rgba(60,79,154,.26); --wd-seal:#8a3fa0;
+  --wd-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 3.6c2 0 3.4 1 3.6 3' fill='none' stroke='%238a3fa0' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='2.6' cy='9.4' r='1.6' fill='%23a9b3c8'/%3E%3Cpath d='M5.6 6.4v1.4' stroke='%238a3fa0' stroke-width='1'/%3E%3Crect x='8' y='4' width='118' height='4' rx='2' fill='%23f0e8d2' stroke='%233c4f9a' stroke-width='.8'/%3E%3Crect x='10' y='3.6' width='3.4' height='4.8' rx='.8' fill='%23a9b3c8'/%3E%3Crect x='119.6' y='3.6' width='3.4' height='4.8' rx='.8' fill='%23a9b3c8'/%3E%3Crect x='25' y='3.8' width='2.2' height='4.4' rx='.6' fill='%238a3fa0'/%3E%3Ccircle cx='40' cy='6' r='1.1' fill='%233c4f9a'/%3E%3Ccircle cx='52' cy='6' r='1.1' fill='%233c4f9a'/%3E%3Ccircle cx='64' cy='6' r='1.1' fill='%233c4f9a'/%3E%3Ccircle cx='76' cy='6' r='1.1' fill='%233c4f9a'/%3E%3Ccircle cx='88' cy='6' r='1.1' fill='%233c4f9a'/%3E%3Ccircle cx='100' cy='6' r='1.1' fill='%233c4f9a'/%3E%3Cpath d='M14 4.7h104' stroke='%23ffffff' stroke-width='.5' opacity='.7'/%3E%3C/svg%3E");
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/wudu/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(232,236,250,.06) 0,rgba(232,236,250,.18) 45%,rgba(232,236,250,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(250,251,255,.95),rgba(250,251,255,0) 60%),linear-gradient(180deg,#eaedf8 0,#dde1f0 50%,#cdd3e6 100%);
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="wudu"][data-theme="dark"]{
+  --t1:#eaedfa; --t2:#bcc4e2; --t3:#8f98ba;
+  --pink:#9fb0ec; --on-pink:#0f1633; --pink-text:#b4c2f4; --red-text:#ff9db8; --ok:#9ae0c6; --badge:#a456bc;
+  --hair:rgba(196,208,248,.13); --rim:rgba(196,208,248,.17);
+  --hi:rgba(210,220,252,.2); --lo:rgba(0,0,0,.44); --side:rgba(196,208,248,.07);
+  --g-bar:rgba(16,20,44,.64); --g-card:rgba(22,28,58,.6); --g-chip:rgba(196,208,248,.1); --g-solid:#171d3c;
+  --field-bg:rgba(6,8,22,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0a0d1c; --stage-bg:rgba(12,16,34,.86);
+  --toast-bg:rgba(44,54,100,.96); --toast-fg:#eef0fc;
+  --mascot-bg:#eaedfa; --mascot-bg-av:#eaedfa;
+  --bub-peer:rgba(36,44,82,.84); --bub-own:rgba(60,76,150,.88); --bub-fx:rgba(70,56,112,.86); --bub-fail:rgba(120,40,70,.88);
+  --chat-bub-peer:rgba(40,48,88,.88); --chat-bub-bd:rgba(196,208,248,.15);
+  --bub-bd:rgba(196,208,248,.17); --bub-hi:rgba(210,220,252,.2); --bub-lo:rgba(0,0,0,.34); --bub-sheen:rgba(210,220,252,.12);
+  --wd-silver:#7480a8; --wd-ink:#b4c2f4; --wd-btn-a:#8296e0; --wd-btn-b:#5a70c4; --wd-orn:rgba(180,194,244,.2);
+  --wd-ring:rgba(159,176,236,.34); --wd-seal:#a456bc;
+  --wd-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 3.6c2 0 3.4 1 3.6 3' fill='none' stroke='%23c27ad8' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='2.6' cy='9.4' r='1.6' fill='%23b4bed4'/%3E%3Cpath d='M5.6 6.4v1.4' stroke='%23c27ad8' stroke-width='1'/%3E%3Crect x='8' y='4' width='118' height='4' rx='2' fill='%23e8e0ca' stroke='%239fb0ec' stroke-width='.8'/%3E%3Crect x='10' y='3.6' width='3.4' height='4.8' rx='.8' fill='%23b4bed4'/%3E%3Crect x='119.6' y='3.6' width='3.4' height='4.8' rx='.8' fill='%23b4bed4'/%3E%3Crect x='25' y='3.8' width='2.2' height='4.4' rx='.6' fill='%23c27ad8'/%3E%3Ccircle cx='40' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='52' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='64' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='76' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='88' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='100' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Cpath d='M14 4.7h104' stroke='%23ffffff' stroke-width='.5' opacity='.7'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/wudu/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(6,8,20,.05) 0,rgba(6,8,20,.22) 45%,rgba(6,8,20,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(160,180,250,.2),rgba(160,180,250,0) 70%),linear-gradient(180deg,#111733 0,#0c1126 60%,#080b18 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="wudu"]:not([data-theme="light"]){
+  --t1:#eaedfa; --t2:#bcc4e2; --t3:#8f98ba;
+  --pink:#9fb0ec; --on-pink:#0f1633; --pink-text:#b4c2f4; --red-text:#ff9db8; --ok:#9ae0c6; --badge:#a456bc;
+  --hair:rgba(196,208,248,.13); --rim:rgba(196,208,248,.17);
+  --hi:rgba(210,220,252,.2); --lo:rgba(0,0,0,.44); --side:rgba(196,208,248,.07);
+  --g-bar:rgba(16,20,44,.64); --g-card:rgba(22,28,58,.6); --g-chip:rgba(196,208,248,.1); --g-solid:#171d3c;
+  --field-bg:rgba(6,8,22,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0a0d1c; --stage-bg:rgba(12,16,34,.86);
+  --toast-bg:rgba(44,54,100,.96); --toast-fg:#eef0fc;
+  --mascot-bg:#eaedfa; --mascot-bg-av:#eaedfa;
+  --bub-peer:rgba(36,44,82,.84); --bub-own:rgba(60,76,150,.88); --bub-fx:rgba(70,56,112,.86); --bub-fail:rgba(120,40,70,.88);
+  --chat-bub-peer:rgba(40,48,88,.88); --chat-bub-bd:rgba(196,208,248,.15);
+  --bub-bd:rgba(196,208,248,.17); --bub-hi:rgba(210,220,252,.2); --bub-lo:rgba(0,0,0,.34); --bub-sheen:rgba(210,220,252,.12);
+  --wd-silver:#7480a8; --wd-ink:#b4c2f4; --wd-btn-a:#8296e0; --wd-btn-b:#5a70c4; --wd-orn:rgba(180,194,244,.2);
+  --wd-ring:rgba(159,176,236,.34); --wd-seal:#a456bc;
+  --wd-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 3.6c2 0 3.4 1 3.6 3' fill='none' stroke='%23c27ad8' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='2.6' cy='9.4' r='1.6' fill='%23b4bed4'/%3E%3Cpath d='M5.6 6.4v1.4' stroke='%23c27ad8' stroke-width='1'/%3E%3Crect x='8' y='4' width='118' height='4' rx='2' fill='%23e8e0ca' stroke='%239fb0ec' stroke-width='.8'/%3E%3Crect x='10' y='3.6' width='3.4' height='4.8' rx='.8' fill='%23b4bed4'/%3E%3Crect x='119.6' y='3.6' width='3.4' height='4.8' rx='.8' fill='%23b4bed4'/%3E%3Crect x='25' y='3.8' width='2.2' height='4.4' rx='.6' fill='%23c27ad8'/%3E%3Ccircle cx='40' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='52' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='64' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='76' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='88' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='100' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Cpath d='M14 4.7h104' stroke='%23ffffff' stroke-width='.5' opacity='.7'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/wudu/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(6,8,20,.05) 0,rgba(6,8,20,.22) 45%,rgba(6,8,20,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(160,180,250,.2),rgba(160,180,250,0) 70%),linear-gradient(180deg,#111733 0,#0c1126 60%,#080b18 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="wudu"] ::selection{background:rgba(60,79,154,.28)}
+[data-skin="wudu"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题 */
+[data-skin="wudu"] .top h2,[data-skin="wudu"] #auth h1,[data-skin="wudu"] .me-head .name,
+[data-skin="wudu"] .panel h3,[data-skin="wudu"] .section-title,[data-skin="wudu"] #chat .who b{
+  letter-spacing:.05em;
+}
+[data-skin="wudu"] .top h2,[data-skin="wudu"] #auth h1{font-weight:700}
+[data-skin="wudu"] .panel h3,[data-skin="wudu"] .section-title{color:var(--wd-ink)}
+
+/* 顶栏：页名前的徽记，下沿一道渐隐的线 */
+[data-skin="wudu"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="wudu"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--wd-silver) 18%,var(--wd-silver) 82%,transparent);opacity:.75;
+}
+[data-skin="wudu"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="wudu"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/wudu/emblem.png) center/contain no-repeat;
+}
+
+/* 面板：右上角纹样（遮罩取形，颜色跟主题走） */
+[data-skin="wudu"] .panel{position:relative;overflow:hidden}
+[data-skin="wudu"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--wd-orn);
+  -webkit-mask:url(../skins/wudu/ornament.png) center/contain no-repeat;mask:url(../skins/wudu/ornament.png) center/contain no-repeat;
+}
+[data-skin="wudu"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮 */
+[data-skin="wudu"] .btn:not(.ghost):not(.danger){
+  background-color:var(--wd-btn-b);
+  background-image:linear-gradient(180deg,var(--wd-btn-a),var(--wd-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.16),0 4px 10px rgba(0,0,0,.12);
+}
+@media (hover:hover){ [data-skin="wudu"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--wd-btn-a) 88%,#fff),var(--wd-btn-b))} }
+[data-skin="wudu"] .seg button.on{background-image:linear-gradient(180deg,var(--wd-btn-a),var(--wd-btn-b));color:var(--on-pink)}
+[data-skin="wudu"] .field:focus{box-shadow:inset 0 1px 3px rgba(0,0,0,.12),0 0 0 3px var(--wd-ring)}
+[data-skin="wudu"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--wd-btn-a),var(--wd-btn-b))}
+
+/* 底部标签栏 */
+[data-skin="wudu"] #tabbar button.on{
+  color:var(--wd-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="wudu"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标 */
+[data-skin="wudu"] .badge{background:var(--wd-seal);border-radius:6px}
+
+/* 时间分隔线：门派兵器（内联 SVG，白天晚上各一份） */
+[data-skin="wudu"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--wd-weapon) center/contain no-repeat;
+}
+
+[data-skin="wudu"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：副标题下一道纹样 */
+[data-skin="wudu"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="wudu"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--wd-orn);
+  -webkit-mask:url(../skins/wudu/ornament.png) center/contain no-repeat;mask:url(../skins/wudu/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="wudu"] .panel::after,[data-skin="wudu"] #auth .sub::after{display:none}
+}

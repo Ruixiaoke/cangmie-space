@@ -1,0 +1,165 @@
+/* 皮肤：药宗（北地雪山药谷：青绿、雪白、赭色）。<html data-skin="yaozong"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动）。结构同 skin-chunyang.css：先覆盖设计变量，再加组件细节。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="yaozong"]{
+  --t1:#1f2e27; --t2:#46584e; --t3:#5d7066;
+  --pink:#3f7a5c; --on-pink:#fff; --pink-text:#2d6247; --red-text:#a8402f; --ok:#2b6c4a; --badge:#a8552f;
+  --hair:rgba(40,84,62,.14); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(40,84,62,.14); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(244,250,246,.62); --g-card:rgba(247,251,248,.64); --g-chip:rgba(255,255,255,.6); --g-solid:#f0f6f2;
+  --field-bg:rgba(255,255,255,.52);
+  --sh-1:0 1px 2px rgba(18,38,28,0.08),0 4px 14px rgba(18,38,28,0.07);
+  --sh-2:0 2px 6px rgba(18,38,28,0.08),0 14px 36px rgba(18,38,28,0.13);
+  --sh-0:0 1px 1px rgba(18,38,28,0.1);
+  --page:#dfebe4; --stage-bg:rgba(232,243,237,.82);
+  --toast-bg:rgba(22,40,32,.92); --toast-fg:#eef7f1;
+  --mascot-bg-av:#eef6f1;
+  --bub-peer:rgba(250,254,251,.82); --bub-own:rgba(200,230,214,.9); --bub-fx:rgba(222,236,226,.92); --bub-fail:rgba(250,214,208,.9);
+  --chat-bub-peer:#eef4f0; --chat-bub-bd:rgba(31,46,39,.08);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(40,84,62,.12); --bub-sheen:rgba(255,255,255,.6);
+  --yz-silver:#9db8a9; --yz-ink:#2d5a43; --yz-btn-a:#54906f; --yz-btn-b:#356a4e; --yz-orn:rgba(63,122,92,.22);
+  --yz-ring:rgba(63,122,92,.26); --yz-seal:#a8552f;
+  --yz-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 8.5c2-.2 3.6-1.4 4-3.2-2.2.1-3.7 1.2-4 3.2zM5 9c1.8.8 3.8.4 5-1.2-2-.4-4 0-5 1.2z' fill='%235a9a6a'/%3E%3Cpath d='M6 6.4h6' stroke='%235a9a6a' stroke-width='1' stroke-linecap='round'/%3E%3Crect x='12' y='5' width='100' height='2.2' rx='1.1' fill='%23a07a4e'/%3E%3Cpath d='M20 5.4v1.4M36 5.4v1.4M62 5.4v1.4M88 5.4v1.4' stroke='%237d5c36' stroke-width='.6'/%3E%3Crect x='110' y='3.9' width='7' height='4.4' rx='1' fill='%238a8f8c'/%3E%3Cpath d='M118 1.2h4.4c2 0 6 .6 7.6 2.2l-1 6.2c-2.2 1.2-5.6 1.6-7.4 1.4l-3.6-.6z' fill='%237f8d95'/%3E%3Cpath d='M120 3.2l8 .9' stroke='%23dbe5ea' stroke-width='.7' stroke-linecap='round'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/yaozong/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(240,248,243,0.06) 0,rgba(240,248,243,0.18) 45%,rgba(240,248,243,0.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#eef6f1 0,#e1ece5 50%,#d3e2d9 100%);
+  --yz-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="yaozong"][data-theme="dark"]{
+  --t1:#e6f0ea; --t2:#b3c6ba; --t3:#8ca395;
+  --pink:#8fcdab; --on-pink:#0f2218; --pink-text:#a9dcc0; --red-text:#ff9d8a; --ok:#8fd6b0; --badge:#c26a3e;
+  --hair:rgba(200,240,220,.12); --rim:rgba(200,240,220,.16);
+  --hi:rgba(210,248,228,.22); --lo:rgba(0,0,0,.4); --side:rgba(200,240,220,.07);
+  --g-bar:rgba(12,26,20,.62); --g-card:rgba(18,36,28,.58); --g-chip:rgba(200,240,220,.1); --g-solid:#14281f;
+  --field-bg:rgba(4,14,9,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,0.45),0 4px 14px rgba(0,0,0,0.28);
+  --sh-2:0 2px 6px rgba(0,0,0,0.45),0 14px 36px rgba(0,0,0,0.42);
+  --sh-0:0 1px 1px rgba(0,0,0,0.4);
+  --page:#0a120e; --stage-bg:rgba(12,24,18,.84);
+  --toast-bg:rgba(36,64,52,.96); --toast-fg:#eef7f1;
+  --mascot-bg:#e6f0ea; --mascot-bg-av:#e6f0ea;
+  --bub-peer:rgba(32,54,44,.84); --bub-own:rgba(48,104,76,.86); --bub-fx:rgba(48,70,86,.86); --bub-fail:rgba(120,48,44,.88);
+  --chat-bub-peer:rgba(34,56,46,.88); --chat-bub-bd:rgba(200,240,220,.14);
+  --bub-bd:rgba(200,240,220,.16); --bub-hi:rgba(210,248,228,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(210,248,228,.12);
+  --yz-silver:#6f8f7d; --yz-ink:#a9dcc0; --yz-btn-a:#7fbf9d; --yz-btn-b:#5a9a78; --yz-orn:rgba(169,220,192,.2);
+  --yz-ring:rgba(143,205,171,.3); --yz-seal:#c26a3e;
+  --yz-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 8.5c2-.2 3.6-1.4 4-3.2-2.2.1-3.7 1.2-4 3.2zM5 9c1.8.8 3.8.4 5-1.2-2-.4-4 0-5 1.2z' fill='%237fc79a'/%3E%3Cpath d='M6 6.4h6' stroke='%237fc79a' stroke-width='1' stroke-linecap='round'/%3E%3Crect x='12' y='5' width='100' height='2.2' rx='1.1' fill='%23c8a06a'/%3E%3Cpath d='M20 5.4v1.4M36 5.4v1.4M62 5.4v1.4M88 5.4v1.4' stroke='%238f6c40' stroke-width='.6'/%3E%3Crect x='110' y='3.9' width='7' height='4.4' rx='1' fill='%239aa3a0'/%3E%3Cpath d='M118 1.2h4.4c2 0 6 .6 7.6 2.2l-1 6.2c-2.2 1.2-5.6 1.6-7.4 1.4l-3.6-.6z' fill='%239fb0b8'/%3E%3Cpath d='M120 3.2l8 .9' stroke='%23e8f0f4' stroke-width='.7' stroke-linecap='round'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/yaozong/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(6,14,10,0.05) 0,rgba(6,14,10,0.22) 45%,rgba(6,14,10,0.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(170,240,200,.2),rgba(170,240,200,0) 70%),
+    linear-gradient(180deg,#10201a 0,#0d1a14 60%,#09120d 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="yaozong"]:not([data-theme="light"]){
+  --t1:#e6f0ea; --t2:#b3c6ba; --t3:#8ca395;
+  --pink:#8fcdab; --on-pink:#0f2218; --pink-text:#a9dcc0; --red-text:#ff9d8a; --ok:#8fd6b0; --badge:#c26a3e;
+  --hair:rgba(200,240,220,.12); --rim:rgba(200,240,220,.16);
+  --hi:rgba(210,248,228,.22); --lo:rgba(0,0,0,.4); --side:rgba(200,240,220,.07);
+  --g-bar:rgba(12,26,20,.62); --g-card:rgba(18,36,28,.58); --g-chip:rgba(200,240,220,.1); --g-solid:#14281f;
+  --field-bg:rgba(4,14,9,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,0.45),0 4px 14px rgba(0,0,0,0.28);
+  --sh-2:0 2px 6px rgba(0,0,0,0.45),0 14px 36px rgba(0,0,0,0.42);
+  --sh-0:0 1px 1px rgba(0,0,0,0.4);
+  --page:#0a120e; --stage-bg:rgba(12,24,18,.84);
+  --toast-bg:rgba(36,64,52,.96); --toast-fg:#eef7f1;
+  --mascot-bg:#e6f0ea; --mascot-bg-av:#e6f0ea;
+  --bub-peer:rgba(32,54,44,.84); --bub-own:rgba(48,104,76,.86); --bub-fx:rgba(48,70,86,.86); --bub-fail:rgba(120,48,44,.88);
+  --chat-bub-peer:rgba(34,56,46,.88); --chat-bub-bd:rgba(200,240,220,.14);
+  --bub-bd:rgba(200,240,220,.16); --bub-hi:rgba(210,248,228,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(210,248,228,.12);
+  --yz-silver:#6f8f7d; --yz-ink:#a9dcc0; --yz-btn-a:#7fbf9d; --yz-btn-b:#5a9a78; --yz-orn:rgba(169,220,192,.2);
+  --yz-ring:rgba(143,205,171,.3); --yz-seal:#c26a3e;
+  --yz-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 8.5c2-.2 3.6-1.4 4-3.2-2.2.1-3.7 1.2-4 3.2zM5 9c1.8.8 3.8.4 5-1.2-2-.4-4 0-5 1.2z' fill='%237fc79a'/%3E%3Cpath d='M6 6.4h6' stroke='%237fc79a' stroke-width='1' stroke-linecap='round'/%3E%3Crect x='12' y='5' width='100' height='2.2' rx='1.1' fill='%23c8a06a'/%3E%3Cpath d='M20 5.4v1.4M36 5.4v1.4M62 5.4v1.4M88 5.4v1.4' stroke='%238f6c40' stroke-width='.6'/%3E%3Crect x='110' y='3.9' width='7' height='4.4' rx='1' fill='%239aa3a0'/%3E%3Cpath d='M118 1.2h4.4c2 0 6 .6 7.6 2.2l-1 6.2c-2.2 1.2-5.6 1.6-7.4 1.4l-3.6-.6z' fill='%239fb0b8'/%3E%3Cpath d='M120 3.2l8 .9' stroke='%23e8f0f4' stroke-width='.7' stroke-linecap='round'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/yaozong/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(6,14,10,0.05) 0,rgba(6,14,10,0.22) 45%,rgba(6,14,10,0.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(170,240,200,.2),rgba(170,240,200,0) 70%),
+    linear-gradient(180deg,#10201a 0,#0d1a14 60%,#09120d 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="yaozong"] ::selection{background:rgba(63,122,92,.3)}
+:root[data-skin="yaozong"][data-theme="dark"] ::selection{background:rgba(143,205,171,.35)}
+[data-skin="yaozong"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题 */
+[data-skin="yaozong"] .top h2,[data-skin="yaozong"] #auth h1,[data-skin="yaozong"] .me-head .name,
+[data-skin="yaozong"] .panel h3,[data-skin="yaozong"] .section-title,[data-skin="yaozong"] #chat .who b{
+  font-family:var(--yz-serif);letter-spacing:.06em;
+}
+[data-skin="yaozong"] .top h2,[data-skin="yaozong"] #auth h1{font-weight:700}
+[data-skin="yaozong"] .panel h3,[data-skin="yaozong"] .section-title{color:var(--yz-ink)}
+
+/* 顶栏：页名前一枚徽记，下沿一道渐隐的细线 */
+[data-skin="yaozong"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="yaozong"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--yz-silver) 18%,var(--yz-silver) 82%,transparent);opacity:.75;
+}
+[data-skin="yaozong"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="yaozong"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/yaozong/emblem.png) center/contain no-repeat;
+}
+
+/* 面板右上角的纹样（遮罩取形，颜色跟主题走） */
+[data-skin="yaozong"] .panel{position:relative;overflow:hidden}
+[data-skin="yaozong"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--yz-orn);
+  -webkit-mask:url(../skins/yaozong/ornament.png) center/contain no-repeat;mask:url(../skins/yaozong/ornament.png) center/contain no-repeat;
+}
+[data-skin="yaozong"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮 */
+[data-skin="yaozong"] .btn:not(.ghost):not(.danger){
+  background-color:var(--yz-btn-b);
+  background-image:linear-gradient(180deg,var(--yz-btn-a),var(--yz-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(18,38,28,.18),0 4px 10px rgba(18,38,28,.14);
+}
+@media (hover:hover){ [data-skin="yaozong"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--yz-btn-a) 88%,#fff),var(--yz-btn-b))} }
+[data-skin="yaozong"] .seg button.on{background-image:linear-gradient(180deg,var(--yz-btn-a),var(--yz-btn-b));color:var(--on-pink)}
+[data-skin="yaozong"] .field:focus{box-shadow:inset 0 1px 3px rgba(18,38,28,.14),0 0 0 3px var(--yz-ring)}
+[data-skin="yaozong"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--yz-btn-a),var(--yz-btn-b))}
+
+/* 底部标签栏选中格 */
+[data-skin="yaozong"] #tabbar button.on{
+  color:var(--yz-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="yaozong"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标：印章，方一点 */
+[data-skin="yaozong"] .badge{background:var(--yz-seal);border-radius:6px}
+
+/* 时间分隔线：门派兵器的剪影（内联 SVG，白天晚上各一份） */
+[data-skin="yaozong"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--yz-blade) center/contain no-repeat;
+}
+
+[data-skin="yaozong"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：吉祥物下方一道纹样 */
+[data-skin="yaozong"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="yaozong"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--yz-orn);
+  -webkit-mask:url(../skins/yaozong/ornament.png) center/contain no-repeat;mask:url(../skins/yaozong/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="yaozong"] .panel::after,[data-skin="yaozong"] #auth .sub::after{display:none}
+}
