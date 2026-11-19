@@ -30,7 +30,7 @@ end $$;
 
 -- 名单和 @ 识别
 do $$ begin
-  if public.agent_ids() <> array['durian', 'ye_ying', 'xie_yunliu', 'li_wangsheng'] then raise exception 'agent_ids: %', public.agent_ids(); end if;
+  if public.agent_ids() <> array['durian', 'ye_ying', 'xie_yunliu', 'li_wangsheng', 'tang_wuying'] then raise exception 'agent_ids: %', public.agent_ids(); end if;
   if not public.agent_mentioned('xie_yunliu', '@谢云流 喝酒吗') or not public.agent_mentioned('xie_yunliu', '你好＠谢云流')
      or not public.agent_mentioned('li_wangsheng', '@李忘生 早') or not public.agent_mentioned('durian', '@榴莲 在吗')
      or not public.agent_mentioned('ye_ying', '@叶英') then raise exception 'mention not recognised'; end if;
