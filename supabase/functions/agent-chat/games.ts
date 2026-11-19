@@ -6,6 +6,8 @@
 //   井字棋 chat/js/miniapps/ttt.js；弹弓 chat/js/miniapps/sling-sim.js（slLayout 摆堡垒）；台球 chat/js/miniapps/pool-sim.js
 //   （PW / PH / BR / POCKETS / poolRack / poolRack8 / poolTargets8 / poolGroupOf）。改了那边的规则或尺寸，这里要跟着改。
 // 新增一个小游戏时，也要在这里加：gameHint 一行、game_status 的详情、game_leaderboard 的游戏名（见 .claude/skills/chat-miniapp/SKILL.md）。
+// 麻将（mahjong）：私聊和群聊都能看。game_status 只给公开状态（轮到谁、牌河、亮出来的组、各家张数、牌墙剩余、最近动作、结果），
+//   绝不包含任何手牌，连提问人自己的也不给：榴莲的回复聊天里所有人都看得到。数据只读 mj_games.pub（本来就是公开的）和 mj_scores。
 // 斗地主（ddz）只有战绩：ddzRecord 读 ddz_scores。私聊 = 这两个人一起打的 + 各自所有牌局的总计；群聊 = 本群成员在本群的积分。
 
 // deno-lint-ignore no-explicit-any
@@ -16,7 +18,7 @@ type Row = Record<string, any>;
 
 export const STATUS_MAX_CHARS = 2500; // game_status 详情的字数上限，超了先去掉预计算的建议
 export const LIST_PER_KIND = 2;
-export const BOARD_GAMES = ["ttt", "sling", "pool", "pool8", "ddz"];
+export const BOARD_GAMES = ["ttt", "sling", "pool", "pool8", "ddz", "mahjong"];
 
 type Kind = "ttt" | "sling" | "pool";
 const KINDS: Kind[] = ["ttt", "sling", "pool"];
@@ -55,7 +57,18 @@ export async function gameHint(admin: Db, asker: string, peer: string, names: Na
       parts.push(`${name}（${score}${turn(g)}）`.replace("，）", "）").replace("（）", ""));
     } catch { /* 忽略 */ }
   }
+  try {
+    const mj = await mjHint(admin, { peer }, asker, names);
+    if (mj) parts.push(mj);
+  } catch { /* 忽略 */ }
   return parts.length ? "进行中的小游戏：" + parts.join("、") : "";
+}
+// 群聊里的一行：目前群里只有麻将能看
+export async function groupGameHint(admin: Db, gid: number, asker: string, names: Names): Promise<string> {
+  try {
+    const mj = await mjHint(admin, { group: gid }, asker, names);
+    return mj ? "进行中的小游戏：" + mj : "";
+  } catch { return ""; }
 }
 
 // ---------- 通用 ----------
@@ -401,6 +414,7 @@ export async function gameRecord(admin: Db, asker: string, peer: string, names: 
   const game = args.game;
   if (typeof game !== "string" || !BOARD_GAMES.includes(game)) return JSON.stringify({ error: "bad_game", allowed: BOARD_GAMES });
   if (game === "ddz") return await ddzRecord(admin, asker, { peer }, names);
+  if (game === "mahjong") return await mjRecord(admin, asker, { peer }, names);
   const { data, error } = await admin.rpc("agent_game_record", { p_a: asker, p_b: peer, p_game: game });
   if (error) return JSON.stringify({ error: "record_failed" });
   const r = (Array.isArray(data) ? data[0] : data) as Row | null;
@@ -451,5 +465,147 @@ export async function ddzRecord(admin: Db, asker: string, where: { peer?: string
     together: played ? { [who(asker)]: ddzLine(inPair(asker)), [who(peer)]: ddzLine(inPair(peer)) } : "这两个人还没在私聊里一起打过斗地主",
     overall: { [who(asker)]: ddzLine(ddzSum((mine.data ?? []) as Row[])), [who(peer)]: ddzLine(ddzSum((theirs.data ?? []) as Row[])) },
     note: DDZ_NOTE + "；together 是两人在这个私聊里一起打的（可能还有机器人），overall 是各自在所有群和私聊里的总计",
+  });
+}
+
+
+// ---------- 麻将（只读，只给公开状态）----------
+const MJ_NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "九"], MJ_SUIT = ["万", "条", "筒"], MJ_HON = ["东", "南", "西", "北", "中", "发", "白"];
+export const mjTile = (t: number): string => (t < 27 ? MJ_NUM[t % 9] + MJ_SUIT[Math.floor(t / 9)] : MJ_HON[t - 27] ?? "?");
+const MJ_WIND = ["东", "南", "西", "北"];
+const MJ_COLS = "id,group_id,dm_lo,dm_hi,status,seats,bots,auto,round,pub";
+type MjWhere = { peer?: string | null; group?: number | null };
+
+// 这个群 / 这对好友的牌桌（只按调用者所在的聊天过滤，查别的桌子只会得到空结果）
+function mjQuery(admin: Db, asker: string, where: MjWhere, cols: string) {
+  const q = admin.from("mj_games").select(cols);
+  if (where.group != null) return q.eq("group_id", where.group);
+  const peer = where.peer as string;
+  const lo = asker < peer ? asker : peer, hi = asker < peer ? peer : asker;
+  return q.or(`and(dm_lo.eq.${lo},dm_hi.eq.${hi})`);
+}
+function mjSeatName(g: Row, i: number, asker: string, names: Names): string {
+  const u = g.seats?.[i] as string | null;
+  if (u) return (names[u] ?? "?") + (u === asker ? "(提问人)" : "");
+  let n = 0;
+  for (let k = 0; k <= i; k++) if (g.bots?.[k]) n++;
+  return "机器人" + n;
+}
+export async function mjHint(admin: Db, where: MjWhere, asker: string, names: Names): Promise<string> {
+  const { data } = await mjQuery(admin, asker, where, MJ_COLS).eq("status", "playing").order("id", { ascending: false }).limit(1);
+  const g = ((data ?? []) as Row[])[0];
+  if (!g) return "";
+  const p = (g.pub ?? {}) as Row;
+  const who = p.phase === "discard" && Number.isInteger(p.turn) ? "轮到" + mjSeatName(g, p.turn, asker, names).replace("(提问人)", "") : "大家在表态";
+  const me = Array.isArray(g.seats) ? g.seats.indexOf(asker) : -1;
+  return `麻将（${me >= 0 && p.phase === "discard" && p.turn === me ? "轮到你" : who}）`;
+}
+
+const mjMeld = (m: Row): string => {
+  const k = m.kind as string;
+  if (k === "angang") return "暗杠";
+  const t = (m.tiles as number[] | undefined) ?? [];
+  return (k === "chi" ? "吃" : k === "peng" ? "碰" : "杠") + t.map(mjTile).join("");
+};
+const mjAction = (a: Row, g: Row, asker: string, names: Names): string => {
+  const k = a.kind as string;
+  const who = mjSeatName(g, a.seat as number, asker, names);
+  const t = typeof a.tile === "number" ? mjTile(a.tile) : "";
+  const verb: Record<string, string> = { discard: "打出", peng: "碰", chi: "吃", gang: "明杠", angang: "暗杠", bugang: "补杠", hu: "点炮胡", zimo: "自摸", draw: "流局" };
+  return `${who} ${verb[k] ?? k}${t}`;
+};
+
+export async function mjStatus(admin: Db, where: MjWhere, asker: string, names: Names, args: Row): Promise<string> {
+  const hasId = args.id !== undefined && args.id !== null;
+  if (hasId && (!Number.isSafeInteger(args.id) || (args.id as number) <= 0)) return JSON.stringify({ error: "bad_id" });
+  let q = mjQuery(admin, asker, where, MJ_COLS);
+  if (hasId) q = q.eq("id", args.id);
+  else q = q.order("id", { ascending: false }).limit(8);
+  const { data, error } = await q;
+  if (error) return JSON.stringify({ error: "status_failed" });
+  let rows = (data ?? []) as Row[];
+  if (hasId) rows = rows.filter((r) => r.id === args.id);
+  else rows = [...rows.filter((r) => r.status === "playing"), ...rows.filter((r) => r.status === "over"), ...rows.filter((r) => r.status === "waiting")];
+  const g = rows[0];
+  if (!g) return JSON.stringify({ error: hasId ? "game_not_found" : "no_game" });
+  const p = (g.pub ?? {}) as Row;
+  const out: Row = { game: "mahjong", id: g.id, status: g.status, round: p.round ?? g.round };
+  out.seats = [0, 1, 2, 3].map((i) => {
+    const s: Row = { seat: i, player: mjSeatName(g, i, asker, names) };
+    if (g.status === "waiting") return s;
+    if (Array.isArray(p.handCounts)) s.wind = MJ_WIND[(i - (p.dealer ?? 0) + 4) % 4] + (p.dealer === i ? "(庄)" : "");
+    if (Array.isArray(p.handCounts)) s.hand_count = p.handCounts[i];
+    const melds = ((p.melds?.[i] ?? []) as Row[]).map(mjMeld);
+    if (melds.length) s.melds = melds.join(" ");
+    const ds = ((p.discards?.[i] ?? []) as number[]).map(mjTile).join("");
+    if (ds) s.discards = ds;
+    if (g.auto?.[i] && g.seats?.[i]) s.auto = "托管中";
+    return s;
+  });
+  if (g.status === "waiting") { out.note = "还在等人入座，没有开始"; return JSON.stringify(out); }
+  if (g.status === "playing") {
+    out.dealer_wind_round = MJ_WIND[Math.floor((p.quan ?? 0) / 4) % 4] + "风圈";
+    out.wall_left = p.wallLeft;
+    if (p.phase === "claim") out.waiting = "有人可以吃碰杠胡，正在表态";
+    else out.turn = mjSeatName(g, p.turn, asker, names);
+    if (p.claim) out.pending_tile = `${mjTile(p.claim.tile)}（${mjSeatName(g, p.claim.from, asker, names)}${p.claim.kind === "qianggang" ? " 补杠" : " 打出"}）`;
+    out.deadline = g.deadline ?? undefined;
+  }
+  if (Array.isArray(p.recent) && p.recent.length) out.recent = (p.recent as Row[]).slice(-6).map((a) => mjAction(a, g, asker, names));
+  if (g.status === "over" && p.result) {
+    const r = p.result as Row;
+    out.result = r.type === "draw" ? "流局" : {
+      winner: mjSeatName(g, r.winner, asker, names), how: r.type === "zimo" ? "自摸" : r.type === "qianggang" ? "抢杠胡" : "点炮", from: r.from != null ? mjSeatName(g, r.from, asker, names) : undefined,
+      shape: r.shape, fan: r.fan, items: (r.items as Row[]).map((i) => `${i.name}${i.fan}`).join(" "),
+      score_changes: (r.scores as number[]).map((d, i) => `${mjSeatName(g, i, asker, names)} ${d > 0 ? "+" : ""}${d}`),
+    };
+  }
+  try {
+    const q2 = where.group != null ? admin.from("mj_scores").select("user_id,total,wins,games").eq("group_id", where.group) : (() => {
+      const peer = where.peer as string, lo = asker < peer ? asker : peer, hi = asker < peer ? peer : asker;
+      return admin.from("mj_scores").select("user_id,total,wins,games").eq("dm_lo", lo).eq("dm_hi", hi);
+    })();
+    const { data: sc } = await q2.limit(60);
+    const rows2 = ((sc ?? []) as Row[]).filter((x) => names[x.user_id as string] !== undefined);
+    if (rows2.length) out.totals = rows2.map((x) => `${names[x.user_id as string]}${x.user_id === asker ? "(提问人)" : ""} ${mjLine(mjSum([x]))}`);
+  } catch { /* 忽略 */ }
+  out.note = "麻将（推倒胡）：只能看到公开信息，手牌是秘密，你不知道也不要猜任何人的手牌；不能替人操作";
+  return JSON.stringify(out);
+}
+
+// 麻将战绩（只读，service role 查 mj_scores）：私聊 = 这一对好友一起打的 + 各自所有牌局的总计；群聊 = 本群成员在本群的积分
+const mjSum = ddzSum;
+const mjLine = ddzLine;
+const MJ_NOTE = "麻将按积分算：自摸三家各付番数，点炮的人一家付三倍番数；番 = 底 1 + 碰碰胡 1、七对 2、混一色 1、清一色 2、门清 1、杠上开花 1、抢杠胡 1、海底捞月 1";
+export async function mjRecord(admin: Db, asker: string, where: { peer?: string | null; group?: number | null }, names: Names): Promise<string> {
+  const who = (id: string) => (names[id] ?? "好友") + (id === asker ? "(提问人)" : "");
+  if (where.group != null) {
+    const { data, error } = await admin.from("mj_scores").select("user_id,total,wins,games").eq("group_id", where.group).limit(60);
+    if (error) return JSON.stringify({ error: "record_failed" });
+    const rows = ((data ?? []) as Row[]).filter((r) => names[r.user_id as string] !== undefined && Number(r.games) > 0)
+      .sort((a, b) => Number(b.total) - Number(a.total) || Number(b.wins) - Number(a.wins));
+    return JSON.stringify({
+      game: "mahjong", scope: "本群",
+      ranking: rows.length ? rows.slice(0, 20).map((r, i) => `${i + 1}. ${who(r.user_id as string)} ${mjLine(mjSum([r]))}`) : "这个群还没人打过麻将",
+      note: MJ_NOTE,
+    });
+  }
+  const peer = where.peer;
+  if (!peer) return JSON.stringify({ error: "record_failed" });
+  const lo = asker < peer ? asker : peer, hi = asker < peer ? peer : asker;
+  const [pair, mine, theirs] = await Promise.all([
+    admin.from("mj_scores").select("user_id,total,wins,games").eq("dm_lo", lo).eq("dm_hi", hi),
+    admin.from("mj_scores").select("total,wins,games").eq("user_id", asker).limit(500),
+    admin.from("mj_scores").select("total,wins,games").eq("user_id", peer).limit(500),
+  ]);
+  if (pair.error || mine.error || theirs.error) return JSON.stringify({ error: "record_failed" });
+  const pr = (pair.data ?? []) as Row[];
+  const inPair = (id: string) => mjSum(pr.filter((r) => r.user_id === id));
+  const played = pr.some((r) => Number(r.games) > 0);
+  return JSON.stringify({
+    game: "mahjong",
+    together: played ? { [who(asker)]: mjLine(inPair(asker)), [who(peer)]: mjLine(inPair(peer)) } : "这两个人还没在私聊里一起打过麻将",
+    overall: { [who(asker)]: mjLine(mjSum((mine.data ?? []) as Row[])), [who(peer)]: mjLine(mjSum((theirs.data ?? []) as Row[])) },
+    note: MJ_NOTE + "；together 是两人在这个私聊里一起打的（可能还有机器人），overall 是各自在所有群和私聊里的总计",
   });
 }

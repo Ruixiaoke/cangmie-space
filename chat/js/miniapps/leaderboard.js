@@ -1,21 +1,22 @@
 // 排行榜：井字棋 / 弹弓 / 9球 / 8球 四张胜场榜（后端 game_leaderboard，见 supabase/migrations/20261123000000_leaderboard.sql），
-// 加一张斗地主积分榜（后端 ddz_leaderboard，见 supabase/migrations/20261205000000_ddz_leaderboard.sql，有「好友」「本群」两个范围）
+// 加斗地主、麻将两张积分榜（后端 ddz_leaderboard / mj_leaderboard，见 supabase/migrations/20261205000000_ddz_leaderboard.sql 和 20261211000000_mahjong.sql，有「好友」「本群」两个范围）
 
 import { errText } from '../errors.js';
 import { S, makeAvatar, sb } from '../state.js';
 import { $, clear, h } from '../utils.js';
 
 // ===== 胜场排行榜 =====
-// 共用的浮层：任何小程序调 openLeaderboard('ttt' | 'sling' | 'pool' | 'pool8' | 'ddz') 就能打开，默认停在传进来的那张榜。
+// 共用的浮层：任何小程序调 openLeaderboard('ttt' | 'sling' | 'pool' | 'pool8' | 'ddz' | 'mahjong') 就能打开，默认停在传进来的那张榜。
 // 每张榜（斗地主还要加上范围和群）缓存 30 秒（切 tab 秒开）；每次打开都会重新拉一次，数据回来前先显示缓存。
 var GAMES = [
   { id: 'ttt', label: '井字棋', note: '赢下一局算 1 胜，对方认输也算，平局不计' },
   { id: 'sling', label: '弹弓', note: '赢下一整场算 1 胜，单次击倒不算' },
   { id: 'pool', label: '9球', note: '9球：每赢下一盘球算 1 胜，认输算负' },
   { id: 'pool8', label: '8球', note: '8球：每赢下一盘球算 1 胜，提前打进 8 号或认输算负' },
-  { id: 'ddz', label: '斗地主', note: '积分：地主赢拿 2 倍（四人局 3 倍），农民各拿 1 倍，输了扣同样的分；倍数看叫分、炸弹和春天', points: true }
+  { id: 'ddz', label: '斗地主', note: '积分：地主赢拿 2 倍（四人局 3 倍），农民各拿 1 倍，输了扣同样的分；倍数看叫分、炸弹和春天', points: true, rpc: 'ddz_leaderboard' },
+  { id: 'mahjong', label: '麻将', note: '积分：自摸三家各付番数，点炮一家付三倍番数；番 = 底 1 + 碰碰胡、七对、混一色、清一色、门清、杠上开花、抢杠胡、海底捞月', points: true, rpc: 'mj_leaderboard' }
 ];
-var DDZ_SUB = { friends: '我和好友的积分', group: '本群成员的积分' };
+var PTS_SUB = { friends: '我和好友的积分', group: '本群成员的积分' };
 var TTL = 30000;
 var LB = { card: null, el: null, game: 'ttt', scope: 'friends', gid: null, cache: {}, tok: 0, keyFn: null, tabs: {}, segs: {}, seg: null, sub: null, list: null, note: null, lastFocus: null };
 export function lbReset() { LB.cache = {}; closeLeaderboard(); }
@@ -69,7 +70,7 @@ function buildSheet(chat) {
     t.addEventListener('click', function () { pick(g.id); });
     LB.tabs[g.id] = t; tabs.appendChild(t);
   });
-  var seg = h('div', { class: 'rk-seg', role: 'group', 'aria-label': '斗地主榜的范围', hidden: true });
+  var seg = h('div', { class: 'rk-seg', role: 'group', 'aria-label': '积分榜的范围', hidden: true });
   [['friends', '好友'], ['group', '本群']].forEach(function (o) {
     var t = h('button', { type: 'button', class: 'rk-segb', text: o[1], 'data-s': o[0] });
     t.addEventListener('click', function () { pickScope(o[0]); });
@@ -102,7 +103,7 @@ function pick(id, force) {
   LB.segs.group.hidden = LB.gid == null;
   if (g.points) {
     Object.keys(LB.segs).forEach(function (k) { LB.segs[k].classList.toggle('on', k === LB.scope); LB.segs[k].setAttribute('aria-pressed', k === LB.scope ? 'true' : 'false'); });
-    LB.sub.textContent = DDZ_SUB[LB.scope];
+    LB.sub.textContent = PTS_SUB[LB.scope];
   } else LB.sub.textContent = '我和好友的胜场';
   var c = LB.cache[keyOf(g)];
   if (c) render(g, c.rows);
@@ -118,7 +119,7 @@ function pickScope(sc) {
 function load(g, quiet) {
   var tok = ++LB.tok, key = keyOf(g);
   if (!sb) return showMsg('暂时连不上，请稍后再试', true);
-  var call = g.points ? sb.rpc('ddz_leaderboard', { p_group: LB.scope === 'group' ? LB.gid : null }) : sb.rpc('game_leaderboard', { p_game: g.id });
+  var call = g.points ? sb.rpc(g.rpc, { p_group: LB.scope === 'group' ? LB.gid : null }) : sb.rpc('game_leaderboard', { p_game: g.id });
   call.then(function (r) {
     if (tok !== LB.tok || !LB.el || LB.el.hidden) return;
     if (r.error) { if (!quiet) showMsg(errText(r.error), true); return; }

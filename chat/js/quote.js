@@ -7,6 +7,7 @@ import { APP, closeApp } from './miniapps/host.js';
 import { poolName, poolOf } from './miniapps/pool.js';
 import { slOf } from './miniapps/sling.js';
 import { ddzOf } from './miniapps/ddz-token.js';
+import { mjOf } from './miniapps/mahjong-token.js';
 import { tttOf } from './miniapps/ttt.js';
 import { agentName } from './agent/info.js';
 import { S, convKey, profileOf, sb } from './state.js';
@@ -17,6 +18,7 @@ import { convOf, peerFromConv } from './views/chats.js';
 // 入口：startQuote(m)，m 是当前聊天 msgs 里的一条消息（长按菜单的"引用"直接调用它）
 function quoteText(body) {
   if (ddzOf(body) != null) return '斗地主';
+  if (mjOf(body) != null) return '麻将';
   if (tttOf(body) != null) return '井字棋';
   if (slOf(body) != null) return '弹弓大战';
   if (poolOf(body) != null) return poolName(body);

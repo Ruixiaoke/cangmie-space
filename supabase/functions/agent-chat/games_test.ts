@@ -116,7 +116,7 @@ Deno.test("context hint: active games only, relative to the asker, empty when no
   });
   const h = await gameHint(db, ME, PEER, names);
   if (h !== "进行中的小游戏：井字棋（轮到小明）、8球台球（2:1，轮到你）") throw new Error(h);
-  if (db.queries.length !== 3) throw new Error("one query per table");
+  if (db.queries.length !== 4) throw new Error("one query per table (ttt, sling, pool, mahjong)");
   if (await gameHint(fakeAdmin({ ttt_games: [ttt(4, ME, OTHER, "x........", ME)] }), ME, PEER, names) !== "") throw new Error("must be empty");
 });
 
@@ -269,4 +269,80 @@ Deno.test("game_leaderboard ddz: DM pair + overall totals, group ranking only th
   if (o.ranking !== "这个群还没人打过斗地主") throw new Error(JSON.stringify(o));
   o = j(await gameRecord(fakeAdmin({ ddz_scores: [] }), ME, PEER, names, { game: "ddz" }));
   if (typeof o.together !== "string" || o.overall["小明"] !== "0分，0胜/0局") throw new Error(JSON.stringify(o));
+});
+
+// ---------- 麻将：只读公开状态，绝不含手牌 ----------
+const MJ_PUB = {
+  round: 2, step: 31, dealer: 1, quan: 0, phase: "discard", turn: 0, wallLeft: 57, handCounts: [14, 13, 13, 13],
+  melds: [[], [{ kind: "peng", tile: 4, tiles: [4, 4, 4], from: 0 }], [{ kind: "angang", tile: null, tiles: [], from: 2 }], []],
+  discards: [[0, 9, 27], [1], [], [33]], lastDiscard: { seat: 3, tile: 33, n: 0 }, claim: null,
+  recent: [{ seat: 1, kind: "peng", tile: 4 }, { seat: 3, kind: "discard", tile: 33 }], result: null,
+};
+const mj = (o: Row = {}): Row => ({ id: 9, group_id: null, dm_lo: ME < PEER ? ME : PEER, dm_hi: ME < PEER ? PEER : ME, status: "playing", seats: [ME, PEER, null, null], bots: [false, false, true, true], auto: [false, false, false, false], round: 2, pub: MJ_PUB, ...o });
+const MJ_SECRET = "SECRET_HAND_DO_NOT_LEAK";
+
+Deno.test("mahjong status: public state only, asker marked, no hands even if a row carried some", async () => {
+  // 假设某一行意外带着手牌类字段：游戏详情只从 pub 取字段，不会原样输出
+  const db = fakeAdmin({ mj_games: [mj({ hands: MJ_SECRET, state: MJ_SECRET, pub: { ...MJ_PUB, hands: MJ_SECRET, wall: [1, 2, 3] } })] });
+  const out = await gameStatus(db, ME, PEER, names, { game: "mahjong" }).catch(() => "");
+  void out;
+  const { mjStatus } = await import("./games.ts");
+  const s = await mjStatus(db, { peer: PEER }, ME, names, {});
+  const o = j(s);
+  if (s.includes(MJ_SECRET) || s.includes('"wall"') || s.includes('"hands"')) throw new Error("leaked: " + s);
+  if (o.game !== "mahjong" || o.id !== 9 || o.turn !== "小红(提问人)" || o.wall_left !== 57) throw new Error(s);
+  if (o.seats[0].player !== "小红(提问人)" || o.seats[1].player !== "小明" || o.seats[2].player !== "机器人1" || o.seats[3].player !== "机器人2") throw new Error(s);
+  if (o.seats[0].hand_count !== 14 || o.seats[1].melds !== "碰五万五万五万" && o.seats[1].melds !== "碰五万五万五万") throw new Error(s);
+  if (o.seats[2].melds !== "暗杠" || o.seats[0].discards !== "一万一条东" || o.seats[3].discards !== "白") throw new Error(s);
+  if (o.seats[1].wind !== "东(庄)") throw new Error(s);
+  if (o.recent.join("|") !== "小明 碰五万|机器人2 打出白") throw new Error(s);
+  if (s.length > STATUS_MAX_CHARS) throw new Error("too long");
+});
+
+Deno.test("mahjong status: group chat uses group_id only, other chats' tables are invisible, hint line", async () => {
+  const other = mj({ id: 10, dm_lo: ME < OTHER ? ME : OTHER, dm_hi: ME < OTHER ? OTHER : ME });
+  const grp = mj({ id: 11, group_id: 7, dm_lo: null, dm_hi: null, seats: [ME, PEER, OTHER, null] });
+  const db = fakeAdmin({ mj_games: [mj(), other, grp] });
+  const { mjStatus } = await import("./games.ts");
+  // 私聊：只能看到这一对的桌子；id 指向别人的桌子或群桌 = 找不到
+  let o = j(await mjStatus(db, { peer: PEER }, ME, names, {}));
+  if (o.id !== 9) throw new Error(JSON.stringify(o));
+  for (const id of [10, 11]) { o = j(await mjStatus(db, { peer: PEER }, ME, names, { id })); if (o.error !== "game_not_found") throw new Error(JSON.stringify(o)); }
+  // 群聊：只看这个群
+  o = j(await mjStatus(db, { group: 7 }, ME, { ...names, [OTHER]: "阿杰" }, {}));
+  if (o.id !== 11 || o.seats[2].player !== "阿杰") throw new Error(JSON.stringify(o));
+  o = j(await mjStatus(db, { group: 8 }, ME, names, {}));
+  if (o.error !== "no_game") throw new Error(JSON.stringify(o));
+  // 提示行
+  const h1 = await gameHint(db, ME, PEER, names);
+  if (h1 !== "进行中的小游戏：麻将（轮到你）") throw new Error(h1);
+  const { groupGameHint } = await import("./games.ts");
+  const h2 = await groupGameHint(db, 7, PEER, names);
+  if (h2 !== "进行中的小游戏：麻将（轮到小红）") throw new Error(h2);
+  if (await groupGameHint(db, 8, PEER, names) !== "") throw new Error("no table, no hint");
+  // 对局结束：结果摘要里没有手牌，waiting 的桌子提示还没开始
+  const done = mj({ status: "over", pub: { ...MJ_PUB, phase: "over", result: { type: "zimo", winner: 1, from: null, tile: 5, fan: 3, items: [{ name: "底番", fan: 1 }, { name: "门清", fan: 1 }, { name: "杠上开花", fan: 1 }], shape: "平胡", scores: [-3, 9, -3, -3], hands: [[1, 2], [3, 4], [5, 6], [7, 8]] } } });
+  const s = await mjStatus(fakeAdmin({ mj_games: [done] }), { peer: PEER }, ME, names, {});
+  o = j(s);
+  if (o.result.winner !== "小明" || o.result.how !== "自摸" || o.result.fan !== 3 || o.result.score_changes[1] !== "小明 +9" || s.includes('"hands"')) throw new Error(s);
+  o = j(await mjStatus(fakeAdmin({ mj_games: [mj({ status: "waiting", pub: {} })] }), { peer: PEER }, ME, names, {}));
+  if (!String(o.note).includes("没有开始")) throw new Error(JSON.stringify(o));
+});
+
+Deno.test("game_leaderboard mahjong: DM pair + overall, group ranking only this group; tool list is static", async () => {
+  const { mjRecord } = await import("./games.ts");
+  const lo = ME < PEER ? ME : PEER, hi = ME < PEER ? PEER : ME;
+  const db = fakeAdmin({ mj_scores: [
+    { id: 1, dm_lo: lo, dm_hi: hi, user_id: ME, total: 12, wins: 3, games: 5 },
+    { id: 2, dm_lo: lo, dm_hi: hi, user_id: PEER, total: -12, wins: 2, games: 5 },
+    { id: 3, group_id: 7, user_id: ME, total: -4, wins: 1, games: 3 },
+    { id: 4, group_id: 7, user_id: OTHER, total: 9, wins: 2, games: 3 },
+    { id: 5, group_id: 8, user_id: PEER, total: 30, wins: 6, games: 9 },
+  ] });
+  let o = j(await gameRecord(db, ME, PEER, names, { game: "mahjong" }));
+  if (o.together["小红(提问人)"] !== "+12分，3胜/5局" || o.overall["小明"] !== "+18分，8胜/14局") throw new Error(JSON.stringify(o));
+  o = j(await mjRecord(db, ME, { group: 7 }, { [ME]: "小红", [OTHER]: "阿杰" }));
+  if (o.ranking.join("|") !== "1. 阿杰 +9分，2胜/3局|2. 小红(提问人) -4分，1胜/3局") throw new Error(JSON.stringify(o));
+  const specs = JSON.stringify(TOOL_SPECS);
+  if (!specs.includes('"mahjong"')) throw new Error("tools must mention mahjong");
 });

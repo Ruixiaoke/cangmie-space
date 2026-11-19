@@ -139,3 +139,9 @@ putGame：updated_at 更旧的不覆盖新的 → 刷新所有卡片 → 如果�
 - 后端：大厅在 SQL（`ddz_open / ddz_open_dm / ddz_sit / ddz_stand / ddz_set_bot`），开始（补机器人、压座位）/ 叫分 / 出牌 / 超时托管 / 结算在 Edge Function `ddz`（`game.ts` 可测，`ddz_commit` 原子写，patch 里可选的 `seats / bots` 只在开始时带）。手牌在 `ddz_state`（无任何用户权限）里，每个真人只能读 `ddz_hands` 里自己的那行；`ddz_games.pub` 里别人的手牌只有张数。
 - 测试：`supabase/tests/doudizhu_test.sql`、`supabase/tests/ddz_4p_dm_test.sql`、`supabase/functions/ddz/{rules_test,game_test}.ts`；Playwright 的假 Supabase 可以把 `game.ts` 用 `deno bundle -o x.js game.ts` 打包后在页面里跑真实的服务器逻辑（私聊里的另一个真人用 `__ddzAs(uid, body)` 和机器人动作替他操作；沙箱里不能起 http 服务时，用 `page.route('http://localhost:8765/**')` 直接从工作树读文件）。
 - 排行榜：斗地主有自己的一张榜（`leaderboard.js` 的 `ddz` tab，按积分排，后端 `ddz_leaderboard(p_group)`，迁移 `20261205000000_ddz_leaderboard.sql`，测试 `ddz_leaderboard_test.sql`）。「好友」= 我 + 好友在所有群和私聊的积分加总，「本群」= 只算这个群的行，只在群里打开时出现并作为默认。+ 面板的「排行榜」在私聊和群聊里都有；牌桌右上角关闭钮下方有 `rankButton('ddz', 'ddz-rk')`，结算面板有「排行榜」按钮。缓存键是 游戏|范围|群。
+
+## 麻将（推倒胡，`scope: 'any'`，群聊和私聊的四人桌）
+
+- 前端 `miniapps/mahjong.js`（缓存、卡片、实时、开桌）+ `mahjong-view.js`（牌桌、大厅、结算；牌面用 CSS 画）+ `mahjong-token.js`（`[麻将]#id`）+ `mahjong-rules.js`（规则引擎，顶部注释写了番数和计分；`supabase/functions/mahjong/gen-rules.py` 复制成 `rules.gen.js`，CI 检查）。样式 `css/mahjong.css`，所有类名都带 `mj-` 前缀（别的样式表里有 `.top` `.me` `.pl` `.back` 这类全局类名，不加前缀会被串味）。素材 `mahjong/icon-mahjong.png`、`mahjong/felt.jpg`。
+- 后端：迁移 `20261211000000_mahjong.sql`（`mj_games / mj_hands / mj_state / mj_scores`、`mj_open / mj_open_dm / mj_sit / mj_stand / mj_set_bot`、`mj_commit`、`mj_leaderboard`），Edge Function `mahjong`（开始补机器人、出牌、吃碰杠胡、超时、结算、轮到你的推送），测试 `supabase/tests/mahjong_test.sql`、`supabase/functions/mahjong/{rules_test,game_test}.ts`。
+- 手牌秘密：`mj_hands` 每个真人一行（手牌、刚摸的牌、现在能做的事 opts），只有本人能读；`mj_games.pub` 只有张数、牌河、亮出的组、牌墙剩余、吃碰窗口。榴莲（`agent-chat/games.ts` 的 `mjStatus / mjHint / mjRecord`）只读 pub 和 mj_scores，私聊和群聊都能看，绝不给任何手牌。

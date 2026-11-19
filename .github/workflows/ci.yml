@@ -134,6 +134,18 @@ jobs:
       - name: Test DDZ table logic (mocked database, clock and rng)
         run: deno test supabase/functions/ddz/game_test.ts
 
+      - name: Mahjong rules module is in sync with chat/js/miniapps/mahjong-rules.js
+        run: python3 supabase/functions/mahjong/gen-rules.py --check
+
+      - name: Test Mahjong rules engine and bot
+        run: deno test supabase/functions/mahjong/rules_test.ts
+
+      - name: Type check mahjong
+        run: deno check supabase/functions/mahjong/index.ts
+
+      - name: Test Mahjong table logic (mocked database, clock and rng)
+        run: deno test supabase/functions/mahjong/game_test.ts
+
   backend:
     name: Backend checks
     runs-on: ubuntu-latest

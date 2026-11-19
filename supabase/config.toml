@@ -434,3 +434,8 @@ verify_jwt = true
 [functions.ddz]
 enabled = true
 verify_jwt = true
+
+# 麻将牌局函数：必须带登录用户的 JWT
+[functions.mahjong]
+enabled = true
+verify_jwt = true
