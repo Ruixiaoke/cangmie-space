@@ -483,3 +483,266 @@ Deno.test("hints perf: 20-card hands", () => {
   console.log(`hints worst case ${worst.toFixed(2)} ms`);
   assert(worst < 100, "hints too slow: " + worst);
 });
+
+// ======================= 四人斗地主（两副牌） =======================
+// 用点数写两副牌：同点数前 4 张取第一副的 4 种花色，后面取第二副；'s' / 'B' 第一张在第一副，第二张在第二副
+function c4(str: string): number[] {
+  const used: Record<string, number> = {};
+  const out: number[] = [];
+  for (const t of str.trim().split(/\s+/)) {
+    const i = used[t] || 0;
+    used[t] = i + 1;
+    if (t === "s") { out.push(52 + 54 * i); continue; }
+    if (t === "B") { out.push(53 + 54 * i); continue; }
+    out.push(RANKS[t] * 4 + (i % 4) + (i >= 4 ? 54 : 0));
+  }
+  return out;
+}
+function T4(str: string) { const r = classify(c4(str), 4) as S; return r && `${r.type}:${r.rank}:${r.len}`; }
+
+Deno.test("4p: card codes use base = c % 54", () => {
+  eq(rankOf(54), 0); eq(rankOf(54 + 51), 12); eq(rankOf(54 + 52), 13); eq(rankOf(107), 14);
+  eq(suitOf(54 + 5), 1);
+  eq([54, 106, 107].map(cardLabel), ["3", "小王", "大王"]);
+  eq(sortHand([107, 53, 54, 0]), [107, 53, 54, 0]);
+});
+
+Deno.test("4p: newGame deals 25 each plus 8 bottom cards from 108 distinct cards", () => {
+  const s = newGame({ rng: mulberry32(5), firstSeat: 2, players: 4 });
+  eq(s.players, 4); eq(s.hands.length, 4); eq(s.bottom.length, 8); eq(s.turn, 2); eq(s.bids, [null, null, null, null]);
+  for (const h of s.hands) eq(h.length, 25);
+  const all = s.hands.flat().concat(s.bottom);
+  eq(new Set(all).size, 108);
+  eq(Math.min(...all), 0); eq(Math.max(...all), 107);
+  eq(newGame({ rng: mulberry32(5) }).players, 3);
+  eq(newGame({ rng: mulberry32(5), players: 7 }).players, 3);
+});
+
+Deno.test("4p: classify types", () => {
+  eq(T4("3"), "single:0:1");
+  eq(T4("5 5"), "pair:2:1");
+  eq(T4("s s"), "pair:13:1");
+  eq(T4("B B"), "pair:14:1");
+  eq(T4("s B"), null); // 大小王各一张什么都不是
+  eq(T4("7 7 7"), "trio:4:1");
+  eq(T4("3 3 3 4 4"), "trio2:0:1");
+  eq(T4("3 3 3 s s"), "trio2:0:1"); // 一对小王当对子带
+  eq(T4("3 3 3 s B"), null);
+  eq(T4("3 3 3 2"), null); // 没有三带一
+  eq(T4("3 3 3 4 4 4 5 6"), null); // 没有飞机带单
+  eq(T4("4 4 4 4 5 6"), null); // 没有四带二
+  eq(T4("4 4 4 4 5 5 6 6"), null); // 没有四带两对
+  eq(T4("3 4 5 6 7"), "straight:4:5");
+  eq(T4("3 3 4 4 5 5"), "pairs:2:3");
+  eq(T4("3 3 3 4 4 4"), "plane:1:2");
+  eq(T4("3 3 3 4 4 4 5 5 6 6"), "plane2:1:2");
+  eq(T4("3 3 3 4 4 4 5 5 s s"), "plane2:1:2");
+  eq(T4("3 3 3 4 4 4 5 6 7 8"), null);
+});
+
+Deno.test("4p: bombs are 4 to 8 cards, king bomb is four jokers", () => {
+  eq(T4("4 4 4 4"), "bomb:1:4");
+  eq(T4("4 4 4 4 4"), "bomb:1:5");
+  eq(T4("4 4 4 4 4 4"), "bomb:1:6");
+  eq(T4("4 4 4 4 4 4 4"), "bomb:1:7");
+  eq(T4("4 4 4 4 4 4 4 4"), "bomb:1:8");
+  eq(T4("2 2 2 2 2 2 2 2"), "bomb:12:8");
+  eq(T4("s s B B"), "rocket:14:4");
+  eq(T4("s s B"), null);
+  eq(T4("s s"), "pair:13:1");
+  eq(classify(c4("4 4 4 4 4 4 4 4 4"), 4), null);
+  // 三人局的写法不变：同样的四张是炸弹 len 1，两张王是火箭
+  eq(T("4 4 4 4"), "bomb:1:1"); eq(T("s B"), "rocket:14:1"); eq(T("3 3 3 2"), "trio1:0:1");
+  // 三人局拒绝第二副牌的编码
+  eq(classify([54, 55]), null);
+});
+
+Deno.test("4p: beats matrix incl. bomb sizes and king bomb", () => {
+  const b = (x: string, y: string) => beats(c4(x), c4(y), 4);
+  assert(b("5 5 5 5", "3 4 5 6 7")); // 炸弹压顺子
+  assert(b("5 5 5 5", "A A A")); // 炸弹压三条
+  assert(b("3 3 3 3 3", "2 2 2 2")); // 5 炸压 4 炸，不论点数
+  assert(!b("2 2 2 2", "3 3 3 3 3"));
+  assert(b("4 4 4 4", "3 3 3 3")); // 同张数比点数
+  assert(!b("3 3 3 3", "4 4 4 4"));
+  assert(!b("4 4 4 4", "4 4 4 4")); // 相等不能压
+  assert(b("3 3 3 3 3 3 3 3", "A A A A A A A")); // 8 炸压 7 炸
+  assert(b("3 3 3 3 3 3", "A A A A A")); // 6 压 5
+  assert(b("s s B B", "2 2 2 2 2 2 2 2")); // 天王炸压 8 炸
+  assert(!b("2 2 2 2 2 2 2 2", "s s B B"));
+  assert(!b("s s B B", "s s B B"));
+  assert(b("s s B B", "3"));
+  assert(b("B B", "s s")); // 对大王压对小王
+  assert(!b("s s", "B B"));
+  assert(b("s s", "2 2")); // 对小王压对 2
+  assert(!b("3 3 3 4 4", "3 3 3 4 4"));
+  assert(b("4 4 4 5 5", "3 3 3 9 9"));
+  assert(!b("4 4 4 4", "4 4 4 4 4")); // 4 炸不压 5 炸
+  assert(!b("3 3 3", "3 3")); // 牌型不同
+  assert(!b("3 3 3 3", "s s B B"));
+  assert(!b("3 3 3 4 4 4", "3 3 3 4 4 4"));
+  assert(b("4 4 4 5 5 5", "3 3 3 4 4 4"));
+});
+
+Deno.test("4p: hints are legal, ordered by bomb size, and respect the king bomb", () => {
+  const hand = c4("3 3 3 3 3 4 4 5 6 7 8 9 9 9 9 J K A 2 s s B B");
+  const lead = hints(hand, null, 4);
+  assert(lead.length > 5);
+  for (const h of lead) { assert(classify(h, 4) !== null); const t = classify(h, 4).type; assert(t !== "trio1" && t !== "plane1" && t !== "four2" && t !== "four22"); }
+  // 压 4 张的 8 炸：同张数更大的 9 炸、5 张的 3 炸、天王炸，按这个顺序
+  const h1 = hints(hand, c4("8 8 8 8"), 4);
+  eq(h1.map((h: number[]) => h.length), [4, 5, 4]);
+  eq(classify(h1[2], 4).type, "rocket");
+  // 天王炸压不了
+  eq(hints(hand, c4("s s B B"), 4), []);
+  // 一对小王能压对 2，天王炸排在最后
+  const h2 = hints(hand, c4("2 2"), 4);
+  assert(h2.length > 0 && h2.every((h: number[]) => beats(h, c4("2 2"), 4)));
+  eq(classify(h2[h2.length - 1], 4).type, "rocket");
+  // 4 人局的三带一不会被提示
+  const h3 = hints(c4("3 3 3 4 5"), c4("2"), 4);
+  eq(h3, []);
+  const h4 = hints(c4("3 3 3 4 4"), c4("A A A 5 5"), 4);
+  eq(h4, []);
+  const h5 = hints(c4("K K K 4 4"), c4("Q Q Q 5 5"), 4);
+  eq(h5.length, 1);
+});
+
+Deno.test("4p: bidding and passing use four seats", () => {
+  let s = newGame({ rng: mulberry32(11), firstSeat: 3, players: 4 });
+  s = ok(apply(s, 3, { kind: "bid", value: 1 }));
+  eq(s.turn, 0);
+  s = ok(apply(s, 0, { kind: "bid", value: 0 }));
+  s = ok(apply(s, 1, { kind: "bid", value: 2 }));
+  eq(s.phase, "bidding");
+  s = ok(apply(s, 2, { kind: "bid", value: 0 }));
+  eq(s.phase, "playing"); eq(s.landlord, 1); eq(s.bid, 2); eq(s.hands[1].length, 33); eq(s.turn, 1);
+  eq(s.hands.reduce((n: number, h: number[]) => n + h.length, 0), 108);
+  // 出牌后需要 3 个人不要才轮回出牌人
+  const lead = s.hands[1].slice().sort((a: number, b: number) => rankOf(a) - rankOf(b))[0];
+  s = ok(apply(s, 1, { kind: "play", cards: [lead] }));
+  eq(s.turn, 2);
+  s = ok(apply(s, 2, { kind: "pass" }));
+  s = ok(apply(s, 3, { kind: "pass" }));
+  eq(s.turn, 0); assert(s.lastPlay);
+  s = ok(apply(s, 0, { kind: "pass" }));
+  eq(s.turn, 1); eq(s.lastPlay, null);
+  // 3 家都不叫：重发，叫牌起点后移一位
+  let t = newGame({ rng: mulberry32(12), firstSeat: 0, players: 4 });
+  const rng = mulberry32(99);
+  for (let i = 0; i < 4; i++) t = ok(apply(t, t.turn, { kind: "bid", value: 0 }, rng));
+  eq(t.redeals, 1); eq(t.bidStart, 1); eq(t.turn, 1); eq(t.hands.map((h: number[]) => h.length), [25, 25, 25, 25]);
+  // 三次重发后第 4 次全不叫：叫牌起点坐地主，1 分
+  for (let r = 0; r < 3; r++) for (let i = 0; i < 4; i++) t = ok(apply(t, t.turn, { kind: "bid", value: 0 }, rng));
+  eq(t.phase, "playing"); eq(t.bid, 1);
+});
+
+Deno.test("4p: scoring sums to zero, landlord 3x, spring and bombs", () => {
+  const mk = (hands: string[], o: S = {}) => {
+    const s = playingState(hands.slice(0, 3), o);
+    s.players = 4; s.hands = hands.map(c4); s.bids = [null, null, null, null]; s.played = [[], [], [], []]; s.playCounts = o.playCounts ?? [0, 0, 0, 0];
+    s.bottom = [];
+    return s;
+  };
+  // 地主一手出完，农民没出过牌：春天，bid 2 × 2 = 4 倍：地主 +12，每个农民 -4
+  let s = mk(["9 9", "3", "4", "5"], { landlord: 0, bid: 2 });
+  s = ok(apply(s, 0, { kind: "play", cards: c4("9 9") }));
+  eq(s.phase, "over"); eq(s.winner, "landlord"); eq(s.spring, true); eq(s.multiplier, 4);
+  eq(s.scores, [12, -4, -4, -4]);
+  // 农民赢，地主只出过一手：反春；有一个炸弹和一个天王炸：2^2；bid 3
+  s = mk(["3 4", "9", "4", "A A A A"], { landlord: 0, turn: 3, bid: 3, bombs: 2, playCounts: [1, 0, 0, 0] });
+  s = ok(apply(s, 3, { kind: "play", cards: c4("A A A A") })); // 已有 2 个炸弹，这手再炸一个并出完
+  eq(s.winner, "farmers"); eq(s.spring, true);
+  eq(s.bombs, 3); eq(s.multiplier, 3 * 8 * 2);
+  eq(s.scores, [-3 * 48, 48, 48, 48]);
+  eq(s.scores.reduce((a: number, b: number) => a + b, 0), 0);
+  // 普通局：地主输，非春天
+  s = mk(["3 4", "9 9", "4", "5"], { landlord: 0, turn: 2, bid: 1, playCounts: [3, 1, 1, 1] });
+  s = ok(apply(s, 2, { kind: "play", cards: c4("4") }));
+  eq(s.winner, "farmers"); eq(s.spring, false); eq(s.scores, [-3, 1, 1, 1]);
+});
+
+Deno.test("4p: publicView never leaks other hands", () => {
+  let s = newGame({ rng: mulberry32(4), firstSeat: 0, players: 4 });
+  const v = publicView(s, 2);
+  eq(v.hands, undefined); eq(v.handCounts, [25, 25, 25, 25]); eq(v.myHand, s.hands[2]); eq(v.bottom, null); eq(v.players, 4);
+  const text = JSON.stringify(publicView(s, null));
+  for (const h of s.hands) assert(!text.includes(JSON.stringify(h)));
+  eq(publicView(s, 4).myHand, null);
+  s = ok(apply(s, 0, { kind: "bid", value: 3 }));
+  const w = publicView(s, 3);
+  eq(w.bottom, s.bottom); eq(w.handCounts, [33, 25, 25, 25]); eq(w.myHand, s.hands[3]);
+  for (const i of [0, 1, 2]) eq(JSON.stringify(w).includes(JSON.stringify(s.hands[i])), false);
+});
+
+Deno.test("4p full games: 1000 seeded bot games terminate, conserve 108 cards, scores sum to 0", () => {
+  let landlordWins = 0, springs = 0, bombGames = 0, kingBombs = 0, redealGames = 0, steps = 0;
+  for (let seed = 1; seed <= 1000; seed++) {
+    const rng = mulberry32(seed * 104729);
+    let s: S = newGame({ rng, firstSeat: seed % 4, players: 4 });
+    let n = 0;
+    while (s.phase !== "over") {
+      assert(++n <= 600, `seed ${seed} did not terminate`);
+      const seat = s.turn;
+      const a = botAction(s, seat);
+      const r = apply(s, seat, a, rng);
+      assert(r.ok, `seed ${seed} step ${n}: ${JSON.stringify(a)} -> ${r.error}`);
+      s = r.state;
+      if (s.phase === "playing" && n % 7 === 0) eq(total(s), 108, `seed ${seed} conservation`);
+      if (s.lastPlay && s.lastPlay.type === "rocket") kingBombs++;
+    }
+    steps += n;
+    eq(total(s), 108);
+    eq(s.scores.reduce((x: number, y: number) => x + y, 0), 0);
+    eq(s.hands.filter((h: number[]) => !h.length).length, 1);
+    assert(s.winner === "landlord" || s.winner === "farmers");
+    if (s.winner === "landlord") landlordWins++;
+    if (s.spring) springs++;
+    if (s.bombs) bombGames++;
+    if (s.redeals) redealGames++;
+  }
+  console.log(`4p landlord wins ${landlordWins}/1000, spring ${springs}, bomb games ${bombGames}, king bombs seen ${kingBombs}, redeal games ${redealGames}, avg steps ${(steps / 1000).toFixed(0)}`);
+  assert(landlordWins >= 250 && landlordWins <= 700, `4p landlord win rate out of band: ${landlordWins}/1000`);
+});
+
+Deno.test("4p: bot is deterministic, does not mutate state, farmers do not top teammates", () => {
+  const rng = mulberry32(77);
+  let s: S = newGame({ rng, firstSeat: 0, players: 4 });
+  s = ok(apply(s, 0, { kind: "bid", value: 3 }));
+  const snap = JSON.stringify(s);
+  const a = botAction(s, s.turn);
+  eq(botAction(s, s.turn), a);
+  eq(JSON.stringify(s), snap);
+  // 地主 seat0，农民 seat1 出 5，seat2 有 K 能压但是队友出的牌，不压
+  const t = playingState(["3 3 4 4 6 7 8 9 9 10 10", "5 5 8", "K K 7 8 9", "4 6 7 8 9"], { landlord: 0, turn: 2, lastPlay: { seat: 1, cards: "5" } });
+  t.players = 4; t.hands = ["3 3 4 4 6 7 8 9 9 10 10", "5 5 8", "K K 7 8 9", "4 6 7 8 9"].map(c4); t.bids = [null, null, null, null]; t.played = [[], [], [], []]; t.playCounts = [0, 0, 0, 0];
+  t.lastPlay = { seat: 1, cards: c4("5"), type: "single" };
+  eq(botAction(t, 2), { kind: "pass" });
+  // 地主出的 5，农民会压
+  t.lastPlay = { seat: 0, cards: c4("5"), type: "single" };
+  const b = botAction(t, 2);
+  eq(b.kind, "play"); assert(beats(b.cards, c4("5"), 4));
+  // 地主只剩 1 张，农民手里只有炸弹能压：炸
+  t.hands = [c4("K"), c4("3 4 6 6 6 6"), c4("5 8 9 10"), c4("7 7")];
+  t.turn = 1; t.lastPlay = { seat: 0, cards: c4("A"), type: "single" };
+  eq(botAction(t, 1), { kind: "play", cards: sortHand(c4("6 6 6 6")) });
+});
+
+Deno.test("4p hints perf: 33-card hands", () => {
+  const rng = mulberry32(2026);
+  let worst = 0;
+  const prevs = [null, c4("3"), c4("3 3"), c4("3 3 3"), c4("3 3 3 4 4"), c4("3 4 5 6 7"), c4("3 3 4 4 5 5"), c4("3 3 3 4 4 4"), c4("3 3 3 4 4 4 5 5 6 6"), c4("3 3 3 3"), c4("3 3 3 3 3 3")];
+  for (let i = 0; i < 150; i++) {
+    const d = deal(rng, 4);
+    const hand = sortHand(d.hands[i % 4].concat(d.bottom));
+    for (const p of prevs) {
+      const t0 = performance.now();
+      const hs = hints(hand, p, 4);
+      const dt = performance.now() - t0;
+      if (dt > worst) worst = dt;
+      for (const h of hs) assert(classify(h, 4) !== null && beats(h, p, 4));
+    }
+  }
+  console.log(`4p hints worst case ${worst.toFixed(2)} ms`);
+  assert(worst < 300, "4p hints too slow: " + worst);
+});
