@@ -2,7 +2,7 @@
 // 运行：deno test supabase/functions/agent-chat/agent_test.ts
 import {
   buildHistoryBlock, buildMemoryBlock, buildUserInput, extractReply, HISTORY_AGENT_CHARS, HISTORY_BLOCK_CHARS, HISTORY_USER_CHARS, MAX_OUTPUT_TOKENS, MAX_REPLY, MAX_ROUNDS,
-  MEMORY_BLOCK_CHARS, PINNED_MAX, runJob, SEARCH_CONTEXT_SIZE, systemInstructions, TOOL_SPECS, type Memory,
+  MEMORY_BLOCK_CHARS, PINNED_MAX, runJob, SEARCH_CONTEXT_SIZE, systemInstructions, TEMPERATURE, TOOL_SPECS, type Memory,
 } from "./agent.ts";
 
 const ASKER = "11111111-1111-1111-1111-111111111111";
@@ -313,9 +313,10 @@ Deno.test("request body carries the token-saving fields", async () => {
     admin: w.admin, apiKey: "k", model: "gpt-6-luna", push: noPush,
     fetchFn: ((_u: string, init: RequestInit) => { bodies.push(JSON.parse(String(init.body))); return Promise.resolve(json({ id: "r", output: [{ type: "message", content: [{ type: "output_text", text: "好" }] }] })); }) as unknown as typeof fetch,
   }, 7);
-  const b = bodies[0] as { max_output_tokens: number; reasoning: { effort: string }; prompt_cache_key: string; tools: { type: string; search_context_size?: string }[] };
+  const b = bodies[0] as { temperature: number; max_output_tokens: number; reasoning: { effort: string }; prompt_cache_key: string; tools: { type: string; search_context_size?: string }[] };
   if (b.max_output_tokens !== 1500 || MAX_OUTPUT_TOKENS !== 1500) throw new Error("max_output_tokens");
   if (b.reasoning?.effort !== "low") throw new Error("reasoning");
+  if (b.temperature !== 1.5 || TEMPERATURE !== 1.5) throw new Error("temperature");
   if (!b.prompt_cache_key) throw new Error("prompt_cache_key");
   if (b.tools.find((t) => t.type === "web_search")?.search_context_size !== "low" || SEARCH_CONTEXT_SIZE !== "low") throw new Error("search_context_size");
 });
@@ -517,4 +518,38 @@ Deno.test("every agent has its own persona and the shared rules; personas are di
   if (!ins[2].startsWith("# 谢云流") || !ins[3].startsWith("# 李忘生") || !ins[4].startsWith("# 唐无影")) throw new Error("wrong persona heading");
   const rules = (t: string) => t.slice(t.indexOf("## 应用规则"));
   if (rules(ins[2]).replace("谢云流", "X") !== rules(ins[3]).replace("李忘生", "X")) throw new Error("shared rules must be identical apart from the name");
+});
+
+// 放在最后：拒绝 temperature 后，本实例之后的请求都不再带它
+Deno.test("model rejects temperature: retries once without it, reply still lands, later requests skip it", async () => {
+  const w = world();
+  const bodies: Record<string, unknown>[] = [];
+  await runJob({
+    admin: w.admin, apiKey: "k", model: "m", push: noPush,
+    fetchFn: ((_u: string, init: RequestInit) => {
+      const b = JSON.parse(String(init.body));
+      bodies.push(b);
+      if ("temperature" in b) return Promise.resolve(new Response(JSON.stringify({ error: { message: "Unsupported parameter: 'temperature' is not supported with this model." } }), { status: 400 }));
+      return Promise.resolve(json({ id: "r", output: [{ type: "message", content: [{ type: "output_text", text: "好" }] }] }));
+    }) as unknown as typeof fetch,
+  }, 7);
+  if (bodies.length !== 2 || !("temperature" in bodies[0]) || "temperature" in bodies[1]) throw new Error(JSON.stringify(bodies.map((b) => "temperature" in b)));
+  if (w.state.job.status !== "done") throw new Error(JSON.stringify(w.state.job));
+  const w2 = world();
+  const later: Record<string, unknown>[] = [];
+  await runJob({
+    admin: w2.admin, apiKey: "k", model: "m", push: noPush,
+    fetchFn: ((_u: string, init: RequestInit) => { later.push(JSON.parse(String(init.body))); return Promise.resolve(json({ id: "r", output: [{ type: "message", content: [{ type: "output_text", text: "好" }] }] })); }) as unknown as typeof fetch,
+  }, 7);
+  if (later.length !== 1 || "temperature" in later[0]) throw new Error("should skip temperature after rejection");
+});
+
+Deno.test("other 400 errors are not retried", async () => {
+  const w = world();
+  let n = 0;
+  await runJob({
+    admin: w.admin, apiKey: "k", model: "m", push: noPush,
+    fetchFn: (() => { n++; return Promise.resolve(new Response(JSON.stringify({ error: { message: "bad input" } }), { status: 400 })); }) as unknown as typeof fetch,
+  }, 7);
+  if (n !== 1 || w.state.job.status !== "failed") throw new Error(n + " " + JSON.stringify(w.state.job));
 });
