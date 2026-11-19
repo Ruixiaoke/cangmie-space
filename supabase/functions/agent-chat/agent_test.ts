@@ -91,7 +91,7 @@ const json = (o: unknown) => new Response(JSON.stringify(o), { status: 200, head
 const noPush = () => Promise.resolve();
 
 Deno.test("each agent receives both speakers' history and replies under its own identity", async () => {
-  for (const [id, name] of [["durian", "沈剑心"], ["ye_ying", "叶英"], ["xie_yunliu", "谢云流"], ["li_wangsheng", "李忘生"]]) {
+  for (const [id, name] of [["durian", "沈剑心"], ["ye_ying", "叶英"], ["xie_yunliu", "谢云流"], ["li_wangsheng", "李忘生"], ["tang_wuying", "唐无影"]]) {
     const w = world({ question: "@" + name + " 你们刚才说了什么？", hist: [
       { id: 99, sender_id: ASKER, author: "ye_ying", body: "茶还温着。", created_at: "2026-11-18T01:00:00Z" },
       { id: 98, sender_id: PEER, author: "durian", body: "我来尝尝。", created_at: "2026-11-18T00:59:00Z" },
@@ -511,10 +511,10 @@ Deno.test("group job: agent switched off or asker removed -> failed, no network"
 });
 
 Deno.test("every agent has its own persona and the shared rules; personas are distinct", () => {
-  const ids = ["durian", "ye_ying", "xie_yunliu", "li_wangsheng"];
+  const ids = ["durian", "ye_ying", "xie_yunliu", "li_wangsheng", "tang_wuying"];
   const ins = ids.map((id) => systemInstructions(id));
   if (new Set(ins).size !== ids.length) throw new Error("personas must differ");
-  if (!ins[2].startsWith("# 谢云流") || !ins[3].startsWith("# 李忘生")) throw new Error("wrong persona heading");
+  if (!ins[2].startsWith("# 谢云流") || !ins[3].startsWith("# 李忘生") || !ins[4].startsWith("# 唐无影")) throw new Error("wrong persona heading");
   const rules = (t: string) => t.slice(t.indexOf("## 应用规则"));
   if (rules(ins[2]).replace("谢云流", "X") !== rules(ins[3]).replace("李忘生", "X")) throw new Error("shared rules must be identical apart from the name");
 });

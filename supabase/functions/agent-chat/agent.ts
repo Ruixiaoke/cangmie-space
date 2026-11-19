@@ -22,6 +22,7 @@ import { PERSONA } from "./persona.gen.ts";
 import { PERSONA as YE_YING_PERSONA } from "./ye-ying.gen.ts";
 import { PERSONA as XIE_YUNLIU_PERSONA } from "./xie-yunliu.gen.ts";
 import { PERSONA as LI_WANGSHENG_PERSONA } from "./li-wangsheng.gen.ts";
+import { PERSONA as TANG_WUYING_PERSONA } from "./tang-wuying.gen.ts";
 import { BOARD_GAMES, ddzRecord, gameHint, gameRecord, gameStatus } from "./games.ts";
 import { JX3_CELEBS, JX3_KINDS, jx3Info } from "./jx3.ts";
 
@@ -81,6 +82,7 @@ export const AGENTS: Record<string, { name: string; names: string[]; persona: st
   ye_ying: { name: "叶英", names: ["叶英"], persona: YE_YING_PERSONA },
   xie_yunliu: { name: "谢云流", names: ["谢云流"], persona: XIE_YUNLIU_PERSONA },
   li_wangsheng: { name: "李忘生", names: ["李忘生"], persona: LI_WANGSHENG_PERSONA },
+  tang_wuying: { name: "唐无影", names: ["唐无影"], persona: TANG_WUYING_PERSONA },
 };
 const agentOf = (id: string) => AGENTS[id] ?? AGENTS.durian;
 function agentName(id: string): string { return agentOf(id).name; }

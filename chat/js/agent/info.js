@@ -13,7 +13,8 @@ export var AGENTS = [
   { id: 'durian', name: '沈剑心', names: ['沈剑心', '榴莲'], keys: ['沈剑心', 'shenjianxin', '榴莲', 'liulian', 'durian'] },
   { id: 'ye_ying', name: '叶英', names: ['叶英'], keys: ['叶英', 'yeying', '大庄主'], avatar: '../agent/ye-ying-avatar.png' },
   { id: 'xie_yunliu', name: '谢云流', names: ['谢云流'], keys: ['谢云流', 'xieyunliu', '宗主', '剑魔'], avatar: '../agent/xie-yunliu-avatar.png' },
-  { id: 'li_wangsheng', name: '李忘生', names: ['李忘生'], keys: ['李忘生', 'liwangsheng', '掌教', '玉虚子'], avatar: '../agent/li-wangsheng-avatar.png' }
+  { id: 'li_wangsheng', name: '李忘生', names: ['李忘生'], keys: ['李忘生', 'liwangsheng', '掌教', '玉虚子'], avatar: '../agent/li-wangsheng-avatar.png' },
+  { id: 'tang_wuying', name: '唐无影', names: ['唐无影'], keys: ['唐无影', 'tangwuying', '少门主'], avatar: '../agent/tang-wuying-avatar.png' }
 ];
 AGENTS.forEach(function (a) { a.mention = '@' + a.name; });
 // 所有能 @ 的名字（长的在前，避免一个名字是另一个的前缀时先匹配到短的）
