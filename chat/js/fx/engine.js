@@ -8,6 +8,8 @@ import { unlockRecipe } from '../recipes.js';
 import { S, makeAvatar, nameOf, profileOf } from '../state.js';
 import { $, clear, h, isVisible } from '../utils.js';
 import { convOf, peerFromConv } from '../views/chats.js';
+import { groupOf, memberIds } from '../groups/data.js';
+import { makeCrowdAvatar } from '../groups/ui.js';
 
 export var fxQueue = [], fxBusy = false, fxToken = 0;
 export var fxCurKey = null, fxCurMsg = null, fxCurReplay = false, curAbort = null;
@@ -45,7 +47,7 @@ function runFx(m, token, replay) {
   return new Promise(function (done) {
     var c = S.chat, fx = fxOf(m.body), p = fxParse(m.body);
     var own = m.sender_id === S.me.id;
-    var grp = m.receiver_id == null; // 群聊：目标是被指定的那条消息的发送者；没指定就是「大家」
+    var grp = m.receiver_id == null; // 群聊：目标是 @ 的那个人或被指定的那条消息的发送者；都没有就是「大家」
     var other = grp ? m.sender_id : own ? m.receiver_id : m.sender_id;
     var otherP = profileOf(other) || (convOf(other) ? peerFromConv(convOf(other)) : null);
     // 我发的：喷对方的头像；对方发的：喷我的头像
@@ -55,17 +57,30 @@ function runFx(m, token, replay) {
     var st = $('fxStage');
     clear(st);
     var cap = (own ? fx.own : fx.peer).replace('{n}', nameOf(other));
+    var crowd = null;
     if (grp) {
-      var tm = p.tid != null && c ? c.msgs.find(function (x) { return x.id === p.tid; }) : null;
-      var tuid = tm && tm.sender_id !== m.sender_id ? tm.sender_id : null;
+      var tuid = null;
+      if (p.tid != null) {
+        var tm = c ? c.msgs.find(function (x) { return x.id === p.tid; }) : null;
+        tuid = tm && tm.sender_id !== m.sender_id ? tm.sender_id : null;
+      } else if (p.uid && p.uid !== m.sender_id) tuid = p.uid;
       var tname = tuid ? (tuid === S.me.id ? '你' : nameOf(tuid)) : '大家';
-      cap = own ? fx.own.replace('{n}', tname === '你' ? '自己' : tname) : fx.peer.replace('你', tname).replace('{n}', nameOf(m.sender_id));
-      target = tuid ? (profileOf(tuid) || S.me) : S.me;
-      otherP = target;
+      cap = own ? fx.own.replace('{n}', tname) : fx.peer.replace('你', tname).replace('{n}', nameOf(m.sender_id));
+      target = tuid ? (tuid === S.me.id ? S.me : profileOf(tuid) || { id: tuid }) : null;
+      // 没有目标：舞台上不放发的人，而是把其他所有人的头像缩进一个圆里
+      if (!tuid) crowd = memberIds(c && c.gid != null ? groupOf(c.gid) : null).filter(function (u) { return u !== m.sender_id; });
+      // 对战只在我是其中一方时演（我和 @ 我的人互相回敬）；旁观的人看普通动画
+      if (mode === 'battle') {
+        if (own && tuid) other = tuid;
+        else if (tuid === S.me.id) other = m.sender_id;
+        else mode = 'plain';
+        if (mode === 'battle') target = otherP = profileOf(other) || { id: other };
+      }
+      if (mode !== 'battle') otherP = target;
     }
     if (mode === 'battle') cap = '你和 ' + nameOf(other) + ' 的' + fx.name + '对战';
     var av = null;
-    if (mode !== 'battle') { av = makeAvatar(target, 116); st.appendChild(h('div', { class: 'fx-av' }, av)); }
+    if (mode !== 'battle') { av = crowd ? makeCrowdAvatar(crowd, 116, 3) : makeAvatar(target, 116); st.appendChild(h('div', { class: 'fx-av' }, av)); }
     st.appendChild(h('div', { class: 'fx-cap', text: cap }));
     st.hidden = false;
     st.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180 });

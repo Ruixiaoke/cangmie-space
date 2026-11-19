@@ -77,7 +77,9 @@ export function updateRow(el, m, prev) {
   el._m = m;
   var pf = agent || sys ? null : fxParse(m.body); // 助手的回复和系统提示永远是普通文字：不当特效 / 小游戏解析
   var q = pf && pf.tid != null ? targetQuoteText(pf.tid) : '';
-  var bsig = (agent ? 'A|' : sys ? 'S|' : '') + (grp ? 'G|' : '') + m.body + '|' + q;
+  // 群里的特效写明打的是谁：@ 了某人就是那个人，什么都没指定就是所有人
+  var who = pf && grp && pf.tid == null ? (pf.uid ? (pf.uid === m.sender_id ? '' : '对 ' + (pf.uid === S.me.id ? '你' : nameOf(pf.uid))) : '对所有人') : '';
+  var bsig = (agent ? 'A|' : sys ? 'S|' : '') + (grp ? 'G|' : '') + m.body + '|' + q + '|' + who;
   if (el._body !== bsig) {
     el._body = bsig;
     var fx = pf && pf.fx;
@@ -94,6 +96,8 @@ export function updateRow(el, m, prev) {
       if (pf.tid != null) {
         var tid = pf.tid;
         tx.appendChild(h('span', { class: 'fx-q', text: fx.hit.replace('{q}', q || '…'), onclick: function (ev) { ev.stopPropagation(); jumpTo(tid); } }));
+      } else if (who) {
+        tx.appendChild(h('span', { class: 'fx-q fx-who', text: who }));
       }
       el._bubble.appendChild(tx);
       el._bubble.title = '点一下再看一次';

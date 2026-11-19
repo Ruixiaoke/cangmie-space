@@ -10,6 +10,9 @@
 #fxStage{position:absolute;inset:0;z-index:8;pointer-events:none;overflow:hidden;background:var(--stage-bg)}
 #fxStage .fx-av{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%)}
 #fxStage .fx-av .avatar{position:relative;border-width:3px;box-shadow:0 2px 4px rgba(24,14,6,.16),0 10px 24px rgba(24,14,6,.18)}
+/* 群里打「大家」：一个圆里挤着所有人的小头像 */
+.avatar.crowd{position:relative;display:block;background:var(--mascot-bg-av)}
+.avatar.crowd .avatar,#fxStage .fx-av .avatar.crowd .avatar{position:absolute;border-width:1px;box-shadow:none}
 #fxStage .fx-cap{
   position:absolute;left:50%;top:calc(40% + 88px);transform:translateX(-50%);white-space:nowrap;max-width:calc(100% - 32px);
   overflow:hidden;text-overflow:ellipsis;padding:8px 16px;background:var(--g-card);border:1px solid var(--rim);border-radius:var(--r-card);
@@ -145,6 +148,7 @@
 /* 特效气泡里的引用（定向攻击） */
 .bubble.fx .fx-txt{display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0}
 .bubble.fx .fx-q{font-size:var(--fs-xs);font-weight:400;color:var(--t2);text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer;word-break:break-all}
+.bubble.fx .fx-who{text-decoration:none;cursor:inherit}
 
 /* 新特效的舞台零件 */
 .fx-ice{position:absolute;inset:0;border-radius:50%;opacity:0;background:radial-gradient(circle at 40% 30%,rgba(255,255,255,.78),rgba(170,215,250,.55) 55%,rgba(130,190,240,.4))}

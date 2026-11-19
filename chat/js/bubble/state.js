@@ -110,10 +110,21 @@ function keepSt(o) { return mkSt(o.k, o.lv, o.as, o.t, o.ta); }
 function tsOf(m) { var v = Date.parse(m.created_at); return isNaN(v) ? 0 : v; }
 // 走一遍消息，推出：每个人的状态 states、定向攻击只影响某条气泡的状态 tstates（按消息 id）、变化事件 evs、
 // 以及每条特效消息的附加信息 info（combo 三连、counter 对战）。now：最后一步按这个时间衰减
-export function bubbleFold(msgs, now) {
-  var states = {}, tstates = {}, evs = [], info = {}, runs = {}, prev = null, byId = {}, id, uid;
+// members：群成员 id（群聊才传）。群里不指定目标的特效打所有人：成员 + 聊天记录里出现过的人，发的人自己除外
+export function bubbleFold(msgs, now, members) {
+  var states = {}, tstates = {}, evs = [], info = {}, runs = {}, prev = null, byId = {}, id, uid, everyone = {};
   if (now == null) now = Date.now();
-  msgs.forEach(function (m) { if (m.id != null) byId[m.id] = m; });
+  (members || []).forEach(function (u) { everyone[u] = 1; });
+  msgs.forEach(function (m) { if (m.id != null) byId[m.id] = m; if (m.receiver_id == null && m.sender_id) everyone[m.sender_id] = 1; });
+  var crowd = Object.keys(everyone).sort(); // 排好序：两台设备算出的顺序一样
+  // 打中一个人的所有气泡（包括已经被单独打过的）
+  function hitAll(m, u, tok, ts, rec) {
+    var nx = bubbleStep(states[u] || NORMAL, tok, { ts: ts });
+    states[u] = keepSt(nx);
+    for (var k in tstates) if (tstates[k].uid === u) tstates[k].st = keepSt(bubbleStep(tstates[k].st, tok, { ts: ts }));
+    if (rec.ev == null && rec.x == null) { rec.ev = nx.ev; rec.x = nx.x; }
+    evs.push({ m: m, uid: u, tid: null, ev: nx.ev, x: nx.x, before: nx.before, after: states[u] });
+  }
   msgs.forEach(function (m) {
     if (m.status === 'failed' || m.sender_id === m.receiver_id) return;
     var p = fxParse(m.body), ts = tsOf(m), nx, i;
@@ -134,16 +145,29 @@ export function bubbleFold(msgs, now) {
     if (run.ts.length > 3) run.ts.shift();
     var combo = false;
     if (run.ts.length === 3 && run.ts[2] - run.ts[0] <= COMBO_MS) { combo = true; run.ts = []; }
-    // 对战：对方刚发过同样的特效，10 秒内回敬
-    var grp = m.receiver_id == null; // 群里：没有「对方」，没指定目标的特效只播全屏动画，不改任何人的气泡；指定了某条消息就改那条消息的发送者
-    var counter = !grp && !!(prev && prev.sender !== s && prev.tok === tok && ts - prev.ts >= 0 && ts - prev.ts <= COUNTER_MS);
-    prev = { sender: s, tok: tok, ts: ts };
-    var rec = info[m.key] = { combo: combo, counter: counter, ev: null, x: null, tid: null, uid: uid };
+    // 群里：@ 了某人（"[雪球]@uid"）只打那个人；指定了某条消息（"#id"）只打那条气泡；什么都没指定就打所有人（发的人自己除外）
+    var grp = m.receiver_id == null;
+    var gto = grp && p.tid == null && p.uid && p.uid !== s ? p.uid : null;
+    // 对战：对方刚发过同样的特效，10 秒内回敬（群里要互相 @ 对方才算）
+    var near = !!(prev && prev.tok === tok && ts - prev.ts >= 0 && ts - prev.ts <= COUNTER_MS);
+    var counter = grp ? !!(gto && near && prev.sender === gto && prev.to === s) : !!(near && prev.sender !== s);
+    prev = { sender: s, to: grp ? gto : m.receiver_id, tok: tok, ts: ts };
+    var rec = info[m.key] = { combo: combo, counter: counter, ev: null, x: null, tid: null, uid: uid, all: false };
     if (grp) {
-      if (p.tid == null) return;
-      var gt = byId[p.tid];
-      if (!gt || gt.sender_id === s) return;
-      uid = gt.sender_id; rec.uid = uid;
+      if (p.tid != null) {
+        var gt = byId[p.tid];
+        if (!gt || gt.sender_id === s) return;
+        uid = gt.sender_id;
+      } else if (gto) {
+        uid = gto;
+      } else {
+        rec.uid = null;
+        if (p.uid) return; // @ 的是自己：不改任何人
+        rec.all = true;
+        crowd.forEach(function (u) { if (u !== s) hitAll(m, u, tok, ts, rec); });
+        return;
+      }
+      rec.uid = uid;
     }
     if (p.tid != null) {
       var tm = byId[p.tid];
@@ -155,12 +179,7 @@ export function bubbleFold(msgs, now) {
       rec.ev = nx.ev; rec.x = nx.x; rec.tid = tm.id;
       evs.push({ m: m, uid: uid, tid: tm.id, ev: nx.ev, x: nx.x, before: nx.before, after: tstates[tm.id].st });
     } else {
-      nx = bubbleStep(states[uid] || NORMAL, tok, { ts: ts });
-      states[uid] = keepSt(nx);
-      // 没指定目标的特效照旧影响所有气泡：包括已经被单独打过的
-      for (id in tstates) if (tstates[id].uid === uid) tstates[id].st = keepSt(bubbleStep(tstates[id].st, tok, { ts: ts }));
-      rec.ev = nx.ev; rec.x = nx.x;
-      evs.push({ m: m, uid: uid, tid: null, ev: nx.ev, x: nx.x, before: nx.before, after: states[uid] });
+      hitAll(m, uid, tok, ts, rec); // 没指定气泡的特效影响这个人的所有气泡
     }
   });
   for (uid in states) states[uid] = decayState(states[uid], now);

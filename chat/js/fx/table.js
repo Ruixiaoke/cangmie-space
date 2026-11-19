@@ -9,6 +9,7 @@ import { tttOf } from '../miniapps/ttt.js';
 // ===== 特效表情 =====
 // 消息内容就是 "[水枪]" 这样的文字：不用改数据库，推送通知和旧版本里也能看懂
 // 定向攻击在后面加 "#消息id"，比如 "[雪球]#123"，只打中那一条气泡
+// 群聊里 @ 了某人再发，后面加 "@用户id"，比如 "[雪球]@<uuid>"，只打那一个人；群里什么都不加就是打所有人
 export var FX = {
   '[水枪]': { icon: '🔫', name: '水枪', own: '你用水枪滋了 {n}', peer: '{n} 用水枪滋了你', hit: '滋中了「{q}」', at: 700, play: fxWater },
   '[敲头]': { icon: '🔨', name: '敲头', own: '你敲了敲 {n} 的头', peer: '{n} 敲了敲你的头', hit: '敲中了「{q}」', at: 540, play: fxHammer },
@@ -21,13 +22,13 @@ export var FX = {
   '[晚安]': { icon: '🌙', name: '晚安', own: '你对 {n} 说了晚安', peer: '{n} 对你说了晚安', hit: '对「{q}」说了晚安', at: 900, play: fxNight },
   '[送花]': { icon: '🌸', name: '送花', own: '你送了 {n} 一束花', peer: '{n} 送了你一束花', hit: '给「{q}」送了花', at: 900, play: fxFlower }
 };
-var FX_RE = /^(\[[^\[\]#]{1,4}\])(?:#(\d{1,15}))?$/;
+var FX_RE = /^(\[[^\[\]#@]{1,4}\])(?:#(\d{1,15})|@([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}))?$/i;
 export function fxParse(body) {
   if (typeof body !== 'string') return null;
   var mt = FX_RE.exec(body);
   if (!mt || !Object.prototype.hasOwnProperty.call(FX, mt[1])) return null;
-  return { tok: mt[1], fx: FX[mt[1]], tid: mt[2] ? parseInt(mt[2], 10) : null };
+  return { tok: mt[1], fx: FX[mt[1]], tid: mt[2] ? parseInt(mt[2], 10) : null, uid: mt[3] ? mt[3].toLowerCase() : null };
 }
 export function fxOf(body) { var p = fxParse(body); return p ? p.fx : null; }
-// 消息列表里的预览：定向特效不显示后面的 #id
+// 消息列表里的预览：定向特效不显示后面的 #id / @id
 export function previewOf(body) { if (ddzOf(body) != null) return '斗地主'; if (tttOf(body) != null) return '井字棋'; if (slOf(body) != null) return '弹弓大战'; if (poolOf(body) != null) return poolName(body); var p = fxParse(body); return p ? p.tok : body; }

@@ -2,7 +2,7 @@
 
 import { bubbleEv } from './bev.js';
 import { NORMAL, bubbleFold, sameSt } from './state.js';
-import { refreshCls } from '../chat/view.js';
+import { foldMembers, refreshCls } from '../chat/view.js';
 import { fxCurKey, fxQueue } from '../fx/engine.js';
 import { RC_IDX, unlockRecipe } from '../recipes.js';
 import { S } from '../state.js';
@@ -51,7 +51,7 @@ function repaintRows(c) {
 var decayTimer = 0;
 function tickDecay() {
   var c = S.chat; if (!c || !c.loaded) return;
-  var f = bubbleFold(c.msgs.filter(function (m) { return !m.author; }), Date.now());
+  var f = bubbleFold(c.msgs.filter(function (m) { return !m.author; }), Date.now(), foldMembers(c));
   c.bstate = f.states; c.btstate = f.tstates;
   if (syncShow(c)) repaintRows(c);
 }
