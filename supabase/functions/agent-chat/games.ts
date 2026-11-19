@@ -10,6 +10,8 @@
 //   绝不包含任何手牌，连提问人自己的也不给：榴莲的回复聊天里所有人都看得到。数据只读 mj_games.pub（本来就是公开的）和 mj_scores。
 // 斗地主（ddz）只有战绩：ddzRecord 读 ddz_scores。私聊 = 这两个人一起打的 + 各自所有牌局的总计；群聊 = 本群成员在本群的积分。
 
+import * as FXQ from "../fxq/rules.gen.js";
+
 // deno-lint-ignore no-explicit-any
 type Db = any;
 type Names = Record<string, string>;
@@ -18,7 +20,7 @@ type Row = Record<string, any>;
 
 export const STATUS_MAX_CHARS = 2500; // game_status 详情的字数上限，超了先去掉预计算的建议
 export const LIST_PER_KIND = 2;
-export const BOARD_GAMES = ["ttt", "sling", "pool", "pool8", "ddz", "mahjong"];
+export const BOARD_GAMES = ["ttt", "sling", "pool", "pool8", "ddz", "mahjong", "fxq"];
 
 type Kind = "ttt" | "sling" | "pool";
 const KINDS: Kind[] = ["ttt", "sling", "pool"];
@@ -61,14 +63,24 @@ export async function gameHint(admin: Db, asker: string, peer: string, names: Na
     const mj = await mjHint(admin, { peer }, asker, names);
     if (mj) parts.push(mj);
   } catch { /* 忽略 */ }
+  try {
+    const fx = await fxqHintPart(admin, asker, { peer }, names);
+    if (fx) parts.push(fx);
+  } catch { /* 忽略 */ }
   return parts.length ? "进行中的小游戏：" + parts.join("、") : "";
 }
-// 群聊里的一行：目前群里只有麻将能看
+// 群聊里的一行：群里能看局面的是麻将和飞行棋（斗地主没有给助手看局面的工具）
 export async function groupGameHint(admin: Db, gid: number, asker: string, names: Names): Promise<string> {
+  const parts: string[] = [];
   try {
     const mj = await mjHint(admin, { group: gid }, asker, names);
-    return mj ? "进行中的小游戏：" + mj : "";
-  } catch { return ""; }
+    if (mj) parts.push(mj);
+  } catch { /* 忽略 */ }
+  try {
+    const fx = await fxqHintPart(admin, asker, { group: gid }, names);
+    if (fx) parts.push(fx);
+  } catch { /* 忽略 */ }
+  return parts.length ? "进行中的小游戏：" + parts.join("、") : "";
 }
 
 // ---------- 通用 ----------
@@ -414,6 +426,7 @@ export async function gameRecord(admin: Db, asker: string, peer: string, names: 
   const game = args.game;
   if (typeof game !== "string" || !BOARD_GAMES.includes(game)) return JSON.stringify({ error: "bad_game", allowed: BOARD_GAMES });
   if (game === "ddz") return await ddzRecord(admin, asker, { peer }, names);
+  if (game === "fxq") return await fxqRecord(admin, asker, { peer }, names);
   if (game === "mahjong") return await mjRecord(admin, asker, { peer }, names);
   const { data, error } = await admin.rpc("agent_game_record", { p_a: asker, p_b: peer, p_game: game });
   if (error) return JSON.stringify({ error: "record_failed" });
@@ -607,5 +620,141 @@ export async function mjRecord(admin: Db, asker: string, where: { peer?: string 
     together: played ? { [who(asker)]: mjLine(inPair(asker)), [who(peer)]: mjLine(inPair(peer)) } : "这两个人还没在私聊里一起打过麻将",
     overall: { [who(asker)]: mjLine(mjSum((mine.data ?? []) as Row[])), [who(peer)]: mjLine(mjSum((theirs.data ?? []) as Row[])) },
     note: MJ_NOTE + "；together 是两人在这个私聊里一起打的（可能还有机器人），overall 是各自在所有群和私聊里的总计",
+  });
+}
+
+// ---------- 飞行棋（私聊和群聊都能看，只读）----------
+// 规则引擎和浏览器、fxq Edge Function 是同一份（supabase/functions/fxq/rules.gen.js，来源 chat/js/miniapps/fxq-rules.js）。
+// 整局状态都是公开的（fxq_games.pub），所以这里直接读：只取「这个私聊的一对好友」或「这个群」的桌子，查别的桌子只会得到空结果。
+// deno-lint-ignore no-explicit-any
+const FX = FXQ as any;
+type FxWhere = { peer?: string | null; group?: number | null };
+const FX_COLOR = ["红", "黄", "蓝", "绿"];
+const FX_COLS = "id,group_id,dm_lo,dm_hi,status,seats,bots,auto,round,pub,version";
+
+function fxqQuery(admin: Db, asker: string, where: FxWhere) {
+  let q = admin.from("fxq_games").select(FX_COLS);
+  if (where.group != null) q = q.eq("group_id", where.group);
+  else if (where.peer) {
+    const lo = asker < where.peer ? asker : where.peer, hi = asker < where.peer ? where.peer : asker;
+    q = q.eq("dm_lo", lo).eq("dm_hi", hi);
+  } else return null;
+  return q;
+}
+function fxqSeatName(g: Row, s: number, asker: string, names: Names): string {
+  const u = g.seats?.[s] as string | null;
+  if (u && !g.bots?.[s]) return (names[u] ?? "好友") + (u === asker ? "(提问人)" : "");
+  let n = 0;
+  for (let i = 0; i <= s; i++) if (g.bots?.[i]) n++;
+  return "机器人" + n;
+}
+export async function fxqHintPart(admin: Db, asker: string, where: FxWhere, names: Names): Promise<string> {
+  try {
+    const q = fxqQuery(admin, asker, where);
+    if (!q) return "";
+    const { data } = await q.eq("status", "playing").order("id", { ascending: false }).limit(1);
+    const g = (data ?? [])[0] as Row | undefined;
+    if (!g || !g.pub || g.pub.turn == null) return "";
+    const t = g.pub.turn as number;
+    return `飞行棋（${g.seats?.[t] === asker ? "轮到你" : "轮到" + fxqSeatName(g, t, asker, names)}）`;
+  } catch { return ""; }
+}
+const fxqPos = (r: number) => (r < 0 ? "机库" : r === 0 ? "起飞格" : r <= 45 ? "环" + r : r < 52 ? "停机坪" + (r - 45) : "到家");
+
+export function fxqDetail(g: Row, asker: string, names: Names): Row {
+  const pub = g.pub ?? {};
+  const out: Row = { game: "fxq", id: g.id, status: g.status, round: g.round };
+  if (!pub.planes) { out.note = "还没开始，等人入座"; return out; }
+  const order = pub.order as number[];
+  out.players = order.map((s) => ({
+    color: FX_COLOR[s],
+    who: fxqSeatName(g, s, asker, names),
+    planes: (pub.planes[s] as number[]).map(fxqPos),
+    home: `${FX.homeCount(pub, s)}/4`,
+    ...(g.auto?.[s] && !g.bots?.[s] ? { auto: "托管中" } : {}),
+  }));
+  out.note = "环N = 离自己起飞格走了 N 步（环45 是进停机坪前最后一格，46 步起进停机坪）；6 才能起飞，掷 6 再掷一次，连续三个 6 作废；落在自己颜色的格子（步数是 4 的倍数）跳 4 格；环16 是飞格，飞到环28；撞到别人的飞机（环上）全部送回机库；到家要刚好，多了折回";
+  if (g.status === "over") {
+    out.winner = fxqSeatName(g, pub.winner, asker, names);
+    out.ranking = (pub.rank as number[]).map((s, i) => `${i + 1}. ${fxqSeatName(g, s, asker, names)}`);
+    return out;
+  }
+  const turn = pub.turn as number;
+  out.turn = `${FX_COLOR[turn]} ${fxqSeatName(g, turn, asker, names)}`;
+  const log = (pub.log ?? []) as Row[];
+  const lastRoll = [...log].reverse().find((e) => e.k === "roll");
+  if (lastRoll) out.last_roll = `${fxqSeatName(g, lastRoll.seat as number, asker, names)} 掷到 ${lastRoll.v}`;
+  if (pub.roll == null) { out.mover = "还没掷骰子，等 Ta 掷"; return out; }
+  const roll = pub.roll as number;
+  const st = { order, planes: pub.planes, turn, roll };
+  const moves = FX.legalMoves(st, turn, roll) as { plane: number }[];
+  const label = (m: { plane: number }) => {
+    const sim = FX.simulate(st, turn, m.plane, roll);
+    const fx: string[] = [];
+    if (sim.takeoff) fx.push("起飞");
+    if (sim.jump !== null) fx.push("跳到环" + sim.jump);
+    if (sim.fly !== null) fx.push("飞到环" + sim.fly);
+    if (sim.cap.length) fx.push("撞回 " + sim.cap.map((c: number[]) => `${fxqSeatName(g, c[0], asker, names)} 的飞机`).join("、"));
+    if (sim.home) fx.push("到家");
+    return { plane: m.plane + 1, from: fxqPos(sim.from), to: fxqPos(sim.to), ...(fx.length ? { effect: fx.join("，") } : {}) };
+  };
+  out.mover = { roll, legal: moves.map(label) };
+  const pick = FX.botPick(st, turn, roll);
+  if (pick != null) out.suggestion = `机器人式的建议：走第 ${pick + 1} 架（能撞就撞，其次到家 / 起飞 / 落在跳或飞的格子，再看谁最危险，最后走最远的）`;
+  return out;
+}
+
+// game_status 的飞行棋入口：私聊（这一对好友的桌子）和群聊（这个群的桌子）都能用；给 id 就看那一局，不给就是进行中的最新一局
+export async function fxqStatus(admin: Db, asker: string, where: FxWhere, names: Names, args: Row): Promise<string> {
+  const hasId = args.id !== undefined && args.id !== null;
+  if (hasId && (!Number.isSafeInteger(args.id) || (args.id as number) <= 0)) return JSON.stringify({ error: "bad_id" });
+  let q = fxqQuery(admin, asker, where);
+  if (!q) return JSON.stringify({ error: "status_failed" });
+  if (hasId) q = q.eq("id", args.id);
+  else q = q.order("id", { ascending: false }).limit(8);
+  const { data, error } = await q;
+  if (error) return JSON.stringify({ error: "status_failed" });
+  let rows = (data ?? []) as Row[];
+  if (hasId) rows = rows.filter((r) => r.id === args.id);
+  else rows = [...rows.filter((r) => r.status === "playing"), ...rows.filter((r) => r.status !== "playing")];
+  const g = rows[0];
+  if (!g) return JSON.stringify({ error: hasId ? "game_not_found" : "no_game" });
+  return shrink(fxqDetail(g, asker, names));
+}
+
+// 飞行棋战绩（只读，service role 查 fxq_scores）：和斗地主一样，私聊 = 这两个人一起打的 + 各自所有牌局的总计；群聊 = 本群成员在本群的胜场排名。只有真人有行，机器人不算
+const FX_NOTE = "飞行棋按胜场算：第一个让 4 架飞机都到家的人算 1 胜，其他人算输一局";
+const fxqLine = (r: { wins: number; games: number }) => `${r.wins}胜/${r.games}局`;
+type FxSum = { wins: number; games: number };
+const fxqSum = (rows: Row[]) => rows.reduce<FxSum>((o, r) => ({ wins: o.wins + Number(r.wins ?? 0), games: o.games + Number(r.games ?? 0) }), { wins: 0, games: 0 });
+export async function fxqRecord(admin: Db, asker: string, where: FxWhere, names: Names): Promise<string> {
+  const who = (id: string) => (names[id] ?? "好友") + (id === asker ? "(提问人)" : "");
+  if (where.group != null) {
+    const { data, error } = await admin.from("fxq_scores").select("user_id,wins,games").eq("group_id", where.group).limit(60);
+    if (error) return JSON.stringify({ error: "record_failed" });
+    const rows = ((data ?? []) as Row[]).filter((r) => names[r.user_id as string] !== undefined && Number(r.games) > 0)
+      .sort((a, b) => Number(b.wins) - Number(a.wins) || Number(a.games) - Number(b.games));
+    return JSON.stringify({
+      game: "fxq", scope: "本群",
+      ranking: rows.length ? rows.slice(0, 20).map((r, i) => `${i + 1}. ${who(r.user_id as string)} ${fxqLine(fxqSum([r]))}`) : "这个群还没人打过飞行棋",
+      note: FX_NOTE,
+    });
+  }
+  const peer = where.peer;
+  if (!peer) return JSON.stringify({ error: "record_failed" });
+  const lo = asker < peer ? asker : peer, hi = asker < peer ? peer : asker;
+  const [pair, mine, theirs] = await Promise.all([
+    admin.from("fxq_scores").select("user_id,wins,games").eq("dm_lo", lo).eq("dm_hi", hi),
+    admin.from("fxq_scores").select("wins,games").eq("user_id", asker).limit(500),
+    admin.from("fxq_scores").select("wins,games").eq("user_id", peer).limit(500),
+  ]);
+  if (pair.error || mine.error || theirs.error) return JSON.stringify({ error: "record_failed" });
+  const pr = (pair.data ?? []) as Row[];
+  const inPair = (id: string) => fxqSum(pr.filter((r) => r.user_id === id));
+  return JSON.stringify({
+    game: "fxq",
+    together: pr.some((r) => Number(r.games) > 0) ? { [who(asker)]: fxqLine(inPair(asker)), [who(peer)]: fxqLine(inPair(peer)) } : "这两个人还没在私聊里一起打过飞行棋",
+    overall: { [who(asker)]: fxqLine(fxqSum((mine.data ?? []) as Row[])), [who(peer)]: fxqLine(fxqSum((theirs.data ?? []) as Row[])) },
+    note: FX_NOTE + "；together 是两人在这个私聊里一起打的（可能还有别人和机器人），overall 是各自在所有群和私聊里的总计",
   });
 }

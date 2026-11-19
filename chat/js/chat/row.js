@@ -8,6 +8,7 @@ import { poolFillCard } from '../miniapps/pool.js';
 import { gameKind, slFillCard } from '../miniapps/sling.js';
 import { ddzFillCard, ddzKind } from '../miniapps/ddz.js';
 import { mjFillCard, mjKind } from '../miniapps/mahjong.js';
+import { fxqFillCard, fxqKind } from '../miniapps/fxq.js';
 import { tttFillCard } from '../miniapps/ttt.js';
 import { updateQuote } from '../quote.js';
 import { dropFailed, retrySend } from '../send.js';
@@ -84,7 +85,7 @@ export function updateRow(el, m, prev) {
   if (el._body !== bsig) {
     el._body = bsig;
     var fx = pf && pf.fx;
-    var gk = agent || sys ? null : grp ? (ddzKind(m.body) || mjKind(m.body)) : (gameKind(m.body) || ddzKind(m.body) || mjKind(m.body)), gid = gk ? gk.id : null; // 群里只有斗地主和麻将是卡片，其余小游戏的邀请消息当普通文字；私聊里是井字棋 / 弹弓 / 台球 / 斗地主 / 麻将的卡片
+    var gk = agent || sys ? null : grp ? (ddzKind(m.body) || mjKind(m.body) || fxqKind(m.body)) : (gameKind(m.body) || ddzKind(m.body) || mjKind(m.body) || fxqKind(m.body)), gid = gk ? gk.id : null; // 群里只有斗地主、麻将、飞行棋是卡片，其余小游戏的邀请消息当普通文字；私聊里是井字棋 / 弹弓 / 台球 / 斗地主 / 麻将 / 飞行棋的卡片
     el._gcid = gid; el._gkind = gk ? gk.k : null; el._gsig = null; // 井字棋卡片：不是文字气泡，不套状态装饰
     el._fxb = !!fx || gid != null;
     el._bubble.classList.toggle('fx', !!fx);
@@ -112,7 +113,7 @@ export function updateRow(el, m, prev) {
       el._bubble.removeAttribute('title');
     }
   }
-  if (el._gcid != null) { if (el._gkind === 'sling') slFillCard(el); else if (el._gkind === 'pool') poolFillCard(el); else if (el._gkind === 'ddz') ddzFillCard(el); else if (el._gkind === 'mahjong') mjFillCard(el); else tttFillCard(el); }
+  if (el._gcid != null) { if (el._gkind === 'sling') slFillCard(el); else if (el._gkind === 'pool') poolFillCard(el); else if (el._gkind === 'ddz') ddzFillCard(el); else if (el._gkind === 'mahjong') mjFillCard(el); else if (el._gkind === 'fxq') fxqFillCard(el); else tttFillCard(el); }
   updateQuote(el, m);
   refreshCls(el);
   if (!own) { el._meta.hidden = true; return; }

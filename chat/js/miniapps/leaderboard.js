@@ -14,7 +14,8 @@ var GAMES = [
   { id: 'pool', label: '9球', note: '9球：每赢下一盘球算 1 胜，认输算负' },
   { id: 'pool8', label: '8球', note: '8球：每赢下一盘球算 1 胜，提前打进 8 号或认输算负' },
   { id: 'ddz', label: '斗地主', note: '积分：地主赢拿 2 倍（四人局 3 倍），农民各拿 1 倍，输了扣同样的分；倍数看叫分、炸弹和春天', points: true, rpc: 'ddz_leaderboard' },
-  { id: 'mahjong', label: '麻将', note: '积分：自摸三家各付番数，点炮一家付三倍番数；番 = 底 1 + 碰碰胡、七对、混一色、清一色、门清、杠上开花、抢杠胡、海底捞月', points: true, rpc: 'mj_leaderboard' }
+  { id: 'mahjong', label: '麻将', note: '积分：自摸三家各付番数，点炮一家付三倍番数；番 = 底 1 + 碰碰胡、七对、混一色、清一色、门清、杠上开花、抢杠胡、海底捞月', points: true, rpc: 'mj_leaderboard' },
+  { id: 'fxq', label: '飞行棋', note: '第一个让 4 架飞机都到家的人算 1 胜，其他人算输一局，机器人不计', scoped: true, rpc: 'fxq_leaderboard', subs: { friends: '我和好友的胜场', group: '本群成员的胜场' } }
 ];
 var PTS_SUB = { friends: '我和好友的积分', group: '本群成员的积分' };
 var TTL = 30000;
@@ -70,7 +71,7 @@ function buildSheet(chat) {
     t.addEventListener('click', function () { pick(g.id); });
     LB.tabs[g.id] = t; tabs.appendChild(t);
   });
-  var seg = h('div', { class: 'rk-seg', role: 'group', 'aria-label': '积分榜的范围', hidden: true });
+  var seg = h('div', { class: 'rk-seg', role: 'group', 'aria-label': '榜的范围', hidden: true });
   [['friends', '好友'], ['group', '本群']].forEach(function (o) {
     var t = h('button', { type: 'button', class: 'rk-segb', text: o[1], 'data-s': o[0] });
     t.addEventListener('click', function () { pickScope(o[0]); });
@@ -90,7 +91,7 @@ function buildSheet(chat) {
   chat.appendChild(el);
   LB.el = el;
 }
-function keyOf(g) { return g.points ? g.id + '|' + LB.scope + '|' + (LB.scope === 'group' ? LB.gid : '') : g.id; }
+function keyOf(g) { return g.points || g.scoped ? g.id + '|' + LB.scope + '|' + (LB.scope === 'group' ? LB.gid : '') : g.id; }
 function pick(id, force) {
   LB.game = id;
   var g = gameOf(id);
@@ -99,11 +100,11 @@ function pick(id, force) {
     LB.tabs[k].setAttribute('aria-selected', k === id ? 'true' : 'false');
   });
   LB.note.textContent = g.note;
-  LB.seg.hidden = !g.points;
+  LB.seg.hidden = !(g.points || g.scoped);
   LB.segs.group.hidden = LB.gid == null;
-  if (g.points) {
+  if (g.points || g.scoped) {
     Object.keys(LB.segs).forEach(function (k) { LB.segs[k].classList.toggle('on', k === LB.scope); LB.segs[k].setAttribute('aria-pressed', k === LB.scope ? 'true' : 'false'); });
-    LB.sub.textContent = PTS_SUB[LB.scope];
+    LB.sub.textContent = (g.subs || PTS_SUB)[LB.scope];
   } else LB.sub.textContent = '我和好友的胜场';
   var c = LB.cache[keyOf(g)];
   if (c) render(g, c.rows);
@@ -119,7 +120,7 @@ function pickScope(sc) {
 function load(g, quiet) {
   var tok = ++LB.tok, key = keyOf(g);
   if (!sb) return showMsg('暂时连不上，请稍后再试', true);
-  var call = g.points ? sb.rpc(g.rpc, { p_group: LB.scope === 'group' ? LB.gid : null }) : sb.rpc('game_leaderboard', { p_game: g.id });
+  var call = g.points || g.scoped ? sb.rpc(g.rpc, { p_group: LB.scope === 'group' ? LB.gid : null }) : sb.rpc('game_leaderboard', { p_game: g.id });
   call.then(function (r) {
     if (tok !== LB.tok || !LB.el || LB.el.hidden) return;
     if (r.error) { if (!quiet) showMsg(errText(r.error), true); return; }
@@ -145,9 +146,9 @@ function render(g, rows) {
   if (!rows.length) return showMsg('还没有数据');
   var solo = rows.length === 1;
   for (i = 0; i < rows.length; i++) {
-    var r = rows[i], key = g.points ? r.total + '/' + r.wins : r.wins + '/' + r.losses;
+    var r = rows[i], key = g.points ? r.total + '/' + r.wins : g.scoped ? r.wins + '/' + r.games : r.wins + '/' + r.losses;
     if (key !== prev) { rank = i + 1; prev = key; }
-    box.appendChild(g.points ? ddzRowEl(r, rank, r.user_id === me) : rowEl(r, rank, r.user_id === me));
+    box.appendChild(g.points ? ddzRowEl(r, rank, r.user_id === me) : g.scoped ? fxqRowEl(r, rank, r.user_id === me) : rowEl(r, rank, r.user_id === me));
   }
   if (solo) box.appendChild(h('div', { class: 'rk-hint', text: '加几个好友，一起比一比' }));
 }
@@ -188,4 +189,22 @@ function ddzRowEl(r, rank, mine) {
       h('span', { text: sec })),
     h('div', { class: 'rk-wins rk-pts' + (total < 0 ? ' neg' : total > 0 ? ' pos' : '') },
       h('b', { text: (total > 0 ? '+' : '') + total }), h('span', { text: '分' })));
+}
+// 飞行棋：右边是胜场，下面一行「N 局」
+function fxqRowEl(r, rank, mine) {
+  var wins = Number(r.wins), games = Number(r.games);
+  var badge = h('span', { class: 'rk-rank' + (rank <= 3 && wins > 0 ? ' top' : ''), text: String(rank) });
+  if (rank <= 3 && wins > 0) {
+    var img = h('img', { class: 'rk-medal', src: 'rank/medal-' + rank + '.png', alt: '第 ' + rank + ' 名', draggable: 'false' });
+    img.addEventListener('error', function () { img.replaceWith(h('span', { class: 'rk-rank top n' + rank, text: String(rank) })); });
+    badge = img;
+  }
+  var av = r.avatar_path ? { avatar_path: r.avatar_path, nickname: r.nickname } : { nickname: r.nickname };
+  return h('div', { class: 'rk-row' + (mine ? ' me' : '') + (games === 0 ? ' zero' : '') },
+    badge,
+    makeAvatar(av, 36),
+    h('div', { class: 'rk-who' },
+      h('b', null, r.nickname || 'Ta', mine ? h('i', { text: '我' }) : null),
+      h('span', { text: games ? games + ' 局' : '还没玩过' })),
+    h('div', { class: 'rk-wins' }, h('b', { text: String(wins) }), h('span', { text: '胜' })));
 }

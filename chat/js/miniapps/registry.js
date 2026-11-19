@@ -2,18 +2,20 @@
 
 import { ddzV } from './ddz.js';
 import { mahjongV } from './mahjong.js';
+import { fxqV } from './fxq.js';
 import { poolV } from './pool.js';
 import { slV } from './sling.js';
 import { tttV } from './ttt.js';
 
-// 每个小程序有 scope：'dm' = 只在私聊里（双人回合制小游戏），'group' = 只在群聊里，'any' = 私聊和群聊里都有（斗地主、麻将）
+// 每个小程序有 scope：'dm' = 只在私聊里（双人回合制小游戏），'group' = 只在群聊里，'any' = 私聊和群聊里都有（斗地主、麻将、飞行棋）
 export function listMiniApps() {
   return [
     tttV,
     slV,
     poolV,
     ddzV,
-    mahjongV
+    mahjongV,
+    fxqV
   ];
 }
 export function appsForScope(scope) {

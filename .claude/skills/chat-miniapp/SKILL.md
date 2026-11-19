@@ -145,3 +145,11 @@ putGame：updated_at 更旧的不覆盖新的 → 刷新所有卡片 → 如果�
 - 前端 `miniapps/mahjong.js`（缓存、卡片、实时、开桌）+ `mahjong-view.js`（牌桌、大厅、结算；牌面用 CSS 画）+ `mahjong-token.js`（`[麻将]#id`）+ `mahjong-rules.js`（规则引擎，顶部注释写了番数和计分；`supabase/functions/mahjong/gen-rules.py` 复制成 `rules.gen.js`，CI 检查）。样式 `css/mahjong.css`，所有类名都带 `mj-` 前缀（别的样式表里有 `.top` `.me` `.pl` `.back` 这类全局类名，不加前缀会被串味）。素材 `mahjong/icon-mahjong.png`、`mahjong/felt.jpg`。
 - 后端：迁移 `20261211000000_mahjong.sql`（`mj_games / mj_hands / mj_state / mj_scores`、`mj_open / mj_open_dm / mj_sit / mj_stand / mj_set_bot`、`mj_commit`、`mj_leaderboard`），Edge Function `mahjong`（开始补机器人、出牌、吃碰杠胡、超时、结算、轮到你的推送），测试 `supabase/tests/mahjong_test.sql`、`supabase/functions/mahjong/{rules_test,game_test}.ts`。
 - 手牌秘密：`mj_hands` 每个真人一行（手牌、刚摸的牌、现在能做的事 opts），只有本人能读；`mj_games.pub` 只有张数、牌河、亮出的组、牌墙剩余、吃碰窗口。榴莲（`agent-chat/games.ts` 的 `mjStatus / mjHint / mjRecord`）只读 pub 和 mj_scores，私聊和群聊都能看，绝不给任何手牌。
+
+## 飞行棋（群聊和私聊里的 2 到 4 人游戏，`scope: 'any'`）
+
+- 前端 `miniapps/fxq.js`（缓存、卡片、实时、开桌）+ `fxq-view.js`（SVG 棋盘、骰子、逐格回放动画、大厅、结算）+ `fxq-token.js`（`[飞行棋]#id`）+ `fxq-rules.js`（规则引擎，规则写在文件顶部注释里；`supabase/functions/fxq/gen-rules.py` 复制成 `rules.gen.js`，CI 用 `--check`）。
+- 座位号 = 颜色（0 红 1 黄 2 蓝 3 绿），不压紧；至少坐 2 个（真人 + 机器人）才能开始，不自动补机器人。没有秘密信息：整局状态在 `fxq_games.pub`（含最近 60 条事件 `log`，客户端按 `seq` 回放，缺一段就直接跳到最终状态）。
+- 后端：迁移 `20261212000000_feixingqi.sql`（表、大厅 RPC、触发器、`fxq_commit`、`fxq_leaderboard`），Edge Function `fxq`（`game.ts` 可测：骰子在服务器掷、超时 15 秒托管、机器人、结算、推送开局 / 轮到你了 / 结束），测试 `supabase/tests/feixingqi_test.sql`、`supabase/functions/fxq/{rules_test,game_test}.ts`。
+- 榴莲：`games.ts` 的 `fxqStatus`（`game_status` 带 `game=fxq`，私聊和群聊都能用）、`fxqRecord`（`game_leaderboard` 带 `game=fxq`）、`fxqHintPart` / `groupGameHint`（「进行中的小游戏」一行，群里也有）。只读。
+- 排行榜：`fxq` tab（胜场，「好友」「本群」两个范围）。

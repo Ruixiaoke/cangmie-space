@@ -10,6 +10,7 @@ import { onPoolGame, poolResync } from './miniapps/pool.js';
 import { onSlingGame, slResync } from './miniapps/sling.js';
 import { onDdzGame, onDdzHand, onDdzScore, ddzResync } from './miniapps/ddz.js';
 import { onMjGame, onMjHand, onMjScore, mjResync } from './miniapps/mahjong.js';
+import { onFxqGame, onFxqScore, fxqResync } from './miniapps/fxq.js';
 import { onTttGame, tttResync } from './miniapps/ttt.js';
 import { notify, notifyGroupMessage, notifyMessage } from './notify.js';
 import { applyGroupLast, dropGroup, groupLine, groupOf } from './groups/data.js';
@@ -221,6 +222,12 @@ export function startRealtime() {
   ['dm_lo', 'dm_hi'].forEach(function (col) {
     ch.on('postgres_changes', { event: '*', schema: 'public', table: 'mj_scores', filter: col + '=eq.' + me }, onMjScore);
   });
+  // 飞行棋（群聊和私聊）：同样靠 RLS 过滤；整局状态都是公开的（fxq_games.pub），没有手牌那样的秘密表
+  ch.on('postgres_changes', { event: '*', schema: 'public', table: 'fxq_games', filter: 'id=gt.0' }, onFxqGame);
+  ch.on('postgres_changes', { event: '*', schema: 'public', table: 'fxq_scores', filter: 'group_id=gt.0' }, onFxqScore);
+  ['dm_lo', 'dm_hi'].forEach(function (col) {
+    ch.on('postgres_changes', { event: '*', schema: 'public', table: 'fxq_scores', filter: col + '=eq.' + me }, onFxqScore);
+  });
   ['player_x', 'player_o'].forEach(function (col) {
     ch.on('postgres_changes', { event: '*', schema: 'public', table: 'ttt_games', filter: col + '=eq.' + me }, onTttGame);
   });
@@ -252,6 +259,6 @@ export async function refreshAll() {
   if (S.chat) {
     await fetchLatest(false); markReadIfNeeded(); agentResync();
     if (S.chat && S.chat.gid == null) { tttResync(); slResync(); poolResync(); } // 双人小游戏只在私聊里
-    if (S.chat) { ddzResync(); mjResync(); } // 斗地主、麻将私聊和群聊里都有
+    if (S.chat) { ddzResync(); mjResync(); fxqResync(); } // 斗地主、麻将、飞行棋私聊和群聊里都有
   }
 }

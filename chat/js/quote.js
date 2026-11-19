@@ -8,6 +8,7 @@ import { poolName, poolOf } from './miniapps/pool.js';
 import { slOf } from './miniapps/sling.js';
 import { ddzOf } from './miniapps/ddz-token.js';
 import { mjOf } from './miniapps/mahjong-token.js';
+import { fxqOf } from './miniapps/fxq-token.js';
 import { tttOf } from './miniapps/ttt.js';
 import { agentName } from './agent/info.js';
 import { S, convKey, profileOf, sb } from './state.js';
@@ -19,6 +20,7 @@ import { convOf, peerFromConv } from './views/chats.js';
 function quoteText(body) {
   if (ddzOf(body) != null) return '斗地主';
   if (mjOf(body) != null) return '麻将';
+  if (fxqOf(body) != null) return '飞行棋';
   if (tttOf(body) != null) return '井字棋';
   if (slOf(body) != null) return '弹弓大战';
   if (poolOf(body) != null) return poolName(body);

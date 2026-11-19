@@ -145,6 +145,17 @@ jobs:
 
       - name: Test Mahjong table logic (mocked database, clock and rng)
         run: deno test supabase/functions/mahjong/game_test.ts
+      - name: FXQ rules module is in sync with chat/js/miniapps/fxq-rules.js
+        run: python3 supabase/functions/fxq/gen-rules.py --check
+
+      - name: Test FXQ rules engine and bot
+        run: deno test supabase/functions/fxq/rules_test.ts
+
+      - name: Type check fxq
+        run: deno check supabase/functions/fxq/index.ts
+
+      - name: Test FXQ table logic (mocked database, clock and rng)
+        run: deno test supabase/functions/fxq/game_test.ts
 
   backend:
     name: Backend checks
