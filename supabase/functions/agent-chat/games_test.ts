@@ -208,7 +208,7 @@ Deno.test("game_leaderboard tool: only the two people, calls the pair-only rpc, 
 Deno.test("tools are static and read-only; rules mention game tools; hint goes in user input, not instructions", () => {
   const specs = TOOL_SPECS as { type: string; name?: string }[];
   const fn = specs.filter((t) => t.type === "function").map((t) => t.name);
-  if (fn.join() !== "search_chats,remember,forget,recall,game_status,game_leaderboard" || specs.length !== 7) throw new Error(fn.join());
+  if (fn.join() !== "search_chats,remember,forget,recall,game_status,game_leaderboard,jx3_info" || specs.length !== 8) throw new Error(fn.join());
   const ins = systemInstructions();
   if (!ins.includes("game_status") || !ins.includes("game_leaderboard") || !ins.includes("不能替任何人落子") || !ins.includes("公开、公平") || ins.includes("—") || /\p{Extended_Pictographic}/u.test(ins)) throw new Error("rules");
   if (/进行中的小游戏：/.test(ins)) throw new Error("hint must not be in instructions");
