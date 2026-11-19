@@ -16,6 +16,45 @@ export function makeGroupAvatar(g, size) {
   return box;
 }
 
+// ===== 「大家」的头像：所有人的头像缩小后排进一个圆里 =====
+// 1 个铺满；2 到 6 个绕一圈贴着圆边；更多就中间一个、外面一圈圈往外排（第 j 圈最多 6j 个，最后一圈均匀摊开）
+function crowdSlots(n) {
+  var out = [], i;
+  if (n <= 6) {
+    var s = Math.sin(Math.PI / n), r = s / (1 + s); // 小圆半径 / 大圆半径
+    for (i = 0; i < n; i++) {
+      var a = -Math.PI / 2 + i * 2 * Math.PI / n;
+      out.push({ x: .5 + (1 - r) / 2 * Math.cos(a), y: .5 + (1 - r) / 2 * Math.sin(a), d: r });
+    }
+    return out;
+  }
+  var k = 1;
+  while (1 + 3 * k * (k + 1) < n) k++;
+  var d = 1 / (2 * k + 1), left = n - 1;
+  out.push({ x: .5, y: .5, d: d });
+  for (var j = 1; j <= k && left > 0; j++) {
+    var m = Math.min(6 * j, left);
+    for (i = 0; i < m; i++) {
+      var b = -Math.PI / 2 + i * 2 * Math.PI / m;
+      out.push({ x: .5 + j * d * Math.cos(b), y: .5 + j * d * Math.sin(b), d: d });
+    }
+    left -= m;
+  }
+  return out;
+}
+export function makeCrowdAvatar(ids, size, border) {
+  ids = ids.slice(0, 61);
+  if (ids.length <= 1) return makeAvatar(ids.length ? profileOf(ids[0]) || { id: ids[0] } : null, size);
+  var box = h('div', { class: 'avatar crowd', style: 'width:' + size + 'px;height:' + size + 'px', 'aria-hidden': 'true' });
+  var D = size - 2 * (border == null ? 2 : border); // 边框里面的直径
+  crowdSlots(ids.length).forEach(function (sl, i) {
+    var w = sl.d * D * .92, a = makeAvatar(profileOf(ids[i]) || { id: ids[i] }, 0);
+    a.style.cssText = 'width:' + w.toFixed(1) + 'px;height:' + w.toFixed(1) + 'px;left:' + (sl.x * D - w / 2).toFixed(1) + 'px;top:' + (sl.y * D - w / 2).toFixed(1) + 'px';
+    box.appendChild(a);
+  });
+  return box;
+}
+
 // ===== 底部弹层 =====
 // opts：{ title, body: 元素, actions: [{ text, kind: 'primary' | 'ghost' | 'danger', onclick(btn) }], onClose }
 // 返回 { el, close, setBusy }

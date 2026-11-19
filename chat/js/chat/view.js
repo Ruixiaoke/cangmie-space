@@ -193,7 +193,7 @@ export function renderMsgs(opts) {
   var quiet = !!(opts && opts.quiet) || !c.loaded;
   var fresh = [], evQueued = false;
   // 气泡状态完全由聊天记录推出；只有“刚到的”特效消息才排队播变化动画
-  var fold = bubbleFold(c.msgs.filter(notAgent), Date.now()); // 榴莲的消息不参与特效 / 气泡状态
+  var fold = bubbleFold(c.msgs.filter(notAgent), Date.now(), foldMembers(c)); // 榴莲的消息不参与特效 / 气泡状态
   c.bstate = fold.states; c.btstate = fold.tstates; c.finfo = fold.info;
   fold.evs.forEach(function (e) {
     if (c.fxApplied.has(e.m.key)) return;
@@ -228,6 +228,8 @@ export function renderMsgs(opts) {
   if (sand.on && fresh.length && isVisible()) sandNew(fresh);
   if (evQueued) setTimeout(settleBev, 0);
 }
+// 群成员：群里不指定目标的特效打所有人
+export function foldMembers(c) { return c.gid != null ? memberIds(groupOf(c.gid)) : null; }
 function notAgent(m) { return !m.author; } // 助手的回复和系统提示都不参与特效 / 气泡状态
 function buildRow(m) {
   var el = h('div', { class: 'row' });

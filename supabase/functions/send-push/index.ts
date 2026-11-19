@@ -11,9 +11,9 @@ const FRESH_MS = 2 * 60 * 1000;
 
 type PushEvent = { type: "message" | "friend_request" | "friend_accepted" | "sling_turn" | "pool_turn"; id: number };
 
-// 特效表情 "[雪球]" 或定向的 "[雪球]#123"：去掉结尾的 #数字，不让原始 id 出现在通知里
+// 特效表情 "[雪球]"、定向的 "[雪球]#123" 或群里 @ 某人的 "[雪球]@<uuid>"：去掉结尾的 id，不让它出现在通知里
 function stripStickerId(s: string): string {
-  return s.replace(/^(\[[^\[\]]{1,6}\])#\d+$/, "$1");
+  return s.replace(/^(\[[^\[\]]{1,6}\])(?:#\d+|@[0-9a-fA-F-]{36})$/, "$1");
 }
 
 // 井字棋邀请 "[井字棋]#123" 推送成一句话，不暴露对局 id

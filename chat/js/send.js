@@ -11,8 +11,8 @@ import { firePush } from './notify.js';
 import { closePanels } from './plus.js';
 import { clearQuote } from './quote.js';
 import { applyOwnToConv } from './realtime.js';
-import { S, rowInChat, sb } from './state.js';
-import { dropGroup, groupOf } from './groups/data.js';
+import { S, profileOf, rowInChat, sb } from './state.js';
+import { dropGroup, groupOf, memberIds } from './groups/data.js';
 import { popCheer } from './mascot.js';
 import { $, lsGet, lsSet, toast } from './utils.js';
 
@@ -28,6 +28,29 @@ export async function sendCurrent() {
   autosize();
   closePanels();
   sendBody(body);
+}
+// 点特效表情：群里输入框里 @ 了某个人就只打他（发 "[水枪]@uid"，并把这个 @ 从输入框里拿掉），没 @ 人就打所有人
+export function sendFx(tok) {
+  var c = S.chat; if (!c) return;
+  var t = c.gid != null ? mentionedMember($('input').value, c.gid) : null;
+  if (!t) return sendBody(tok);
+  var input = $('input'), v = input.value;
+  v = v.slice(0, t.at) + v.slice(t.end).replace(/^ /, '');
+  input.value = /^\s*$/.test(v) ? '' : v;
+  autosize();
+  sendBody(tok + '@' + t.uid);
+}
+// 输入框里最后一个 "@昵称"（半角或全角 @）对应的群成员；同一位置能对上好几个昵称时取最长的
+function mentionedMember(v, gid) {
+  var best = null;
+  memberIds(groupOf(gid)).forEach(function (u) {
+    var p = profileOf(u);
+    if (u === S.me.id || !p || !p.nickname) return;
+    var n = p.nickname, at = Math.max(v.lastIndexOf('@' + n), v.lastIndexOf('＠' + n));
+    if (at < 0) return;
+    if (!best || at > best.at || (at === best.at && n.length > best.end - best.at - 1)) best = { uid: u, at: at, end: at + 1 + n.length };
+  });
+  return best;
 }
 export function sendBody(body) {
   var c = S.chat; if (!c) return;

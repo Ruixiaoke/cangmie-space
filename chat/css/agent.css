@@ -31,7 +31,9 @@
 
 /* @ 选择器：贴在输入栏上沿，每一项至少 44px 高 */
 #atPop{position:absolute;left:8px;right:8px;bottom:calc(100% + 6px);z-index:6;max-width:360px;display:flex;flex-direction:column;padding:4px;border-radius:var(--r-card);
-  background:var(--g-solid);border:1px solid var(--rim);box-shadow:inset 0 1px 0 var(--hi),var(--sh-2)}
+  background:var(--g-solid);border:1px solid var(--rim);box-shadow:inset 0 1px 0 var(--hi),var(--sh-2);
+  max-height:min(50vh,296px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+#atPop button{flex:none}
 #atPop[hidden]{display:none}
 #atPop button{display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 10px;border-radius:var(--r-ctl);text-align:left;color:var(--t1);font-size:var(--fs-md)}
 #atPop button.on,#atPop button:active{background:color-mix(in srgb,var(--t1) 8%,transparent)}

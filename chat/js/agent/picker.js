@@ -1,8 +1,8 @@
-// 输入框里打 @ 弹出的小列表：选一个 agent，插入 "@榴莲 "
+// 输入框里打 @ 弹出的小列表：选一个 agent（或群里的一个人），插入 "@榴莲 "
 
 import { autosize } from '../composer.js';
-import { enabledAgents, groupOf } from '../groups/data.js';
-import { S } from '../state.js';
+import { enabledAgents, groupOf, memberIds } from '../groups/data.js';
+import { S, makeAvatar, profileOf } from '../state.js';
 import { $, clear, h } from '../utils.js';
 import { AGENTS, makeAgentAvatar } from './info.js';
 
@@ -13,10 +13,16 @@ import { AGENTS, makeAgentAvatar } from './info.js';
 var TOKEN_RE = /(^|[^A-Za-z0-9_.])[@＠]([^\s@＠]{0,10})$/;
 var st = { open: false, list: [], idx: 0, start: 0 };
 
-// 群聊里只列出这个群已经打开的助手
+// 群聊里列出这个群已经打开的助手，再列群里的其他人（@ 了人再点特效表情，就只打那个人）
 function available() {
   var c = S.chat;
-  return c && c.gid != null ? enabledAgents(groupOf(c.gid)) : AGENTS;
+  if (!c || c.gid == null) return AGENTS;
+  var g = groupOf(c.gid);
+  return enabledAgents(g).concat(memberIds(g).filter(function (u) { return !S.me || u !== S.me.id; }).map(function (u) {
+    var p = profileOf(u);
+    if (!p || !p.nickname) return null;
+    return { id: 'u-' + u, uid: u, name: p.nickname, mention: '@' + p.nickname, keys: [p.nickname, p.username || ''] };
+  }).filter(Boolean));
 }
 function matches(q) {
   var l = q.toLowerCase();
@@ -43,7 +49,7 @@ function paint() {
   var pop = clear($('atPop'));
   st.list.forEach(function (a, i) {
     var b = h('button', { type: 'button', role: 'option', id: 'atOpt-' + a.id, class: i === st.idx ? 'on' : null, 'aria-selected': i === st.idx ? 'true' : 'false' },
-      makeAgentAvatar(32, a.id), h('span', { class: 'at-name', text: a.name }));
+      a.uid ? makeAvatar(profileOf(a.uid), 32) : makeAgentAvatar(32, a.id), h('span', { class: 'at-name', text: a.name }));
     b.addEventListener('pointerdown', function (ev) { ev.preventDefault(); }); // 不抢输入框焦点
     b.addEventListener('click', function () { pick(a); });
     pop.appendChild(b);

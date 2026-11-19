@@ -3,7 +3,7 @@
 import { EMOJIS } from './config.js';
 import { FX } from './fx/table.js';
 import { closePanels } from './plus.js';
-import { sendBody } from './send.js';
+import { sendFx } from './send.js';
 import { $, h } from './utils.js';
 
 // ===== 输入栏 =====
@@ -19,7 +19,7 @@ export function buildEmojiPanel() {
     var b = h('button', { type: 'button', 'aria-label': '发送' + fx.name },
       h('span', { class: 'ico', text: fx.icon, 'aria-hidden': 'true' }), fx.name);
     b.addEventListener('pointerdown', function (ev) { ev.preventDefault(); });
-    b.addEventListener('click', function () { closePanels(); sendBody(body); });
+    b.addEventListener('click', function () { closePanels(); sendFx(body); });
     row.appendChild(b);
   });
   var p = $('emojiGrid');
