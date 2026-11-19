@@ -72,6 +72,24 @@ begin
   if j.agent_id <> 'tang_wuying' or j.group_id <> g.id then raise exception 'group job: %', j; end if;
 end $$;
 
+-- 不限次数：群里也一样，24 小时里问过 60 次照样能问
+reset role;
+update public.agent_jobs set status = 'done' where group_id = current_setting('tw.g')::bigint;
+insert into public.messages (sender_id, receiver_id, body)
+select 'ae100000-0000-0000-0000-00000000000a', 'ae100000-0000-0000-0000-00000000000b', '@唐无影 批量 ' || i from generate_series(1, 60) as i;
+insert into public.agent_jobs (asker, peer, message_id, agent_id, status)
+select 'ae100000-0000-0000-0000-00000000000a', 'ae100000-0000-0000-0000-00000000000b', m.id, 'tang_wuying', 'done'
+  from public.messages m where m.body like '@唐无影 批量 %' and m.sender_id = 'ae100000-0000-0000-0000-00000000000a';
+call pg_temp.as_user('ae100000-0000-0000-0000-00000000000a');
+do $$
+declare g public.groups; m public.messages; j public.agent_jobs;
+begin
+  g := public.set_group_agents(current_setting('tw.g')::bigint, array['tang_wuying', 'ye_ying']);
+  m := public.send_group_message(current_setting('tw.g')::bigint, '@叶英 @唐无影 第六十一个');
+  j := public.agent_ask_group(m.id, 'ye_ying');
+  if j.agent_id <> 'ye_ying' then raise exception 'unlimited group ask: %', j; end if;
+end $$;
+
 reset role;
 call pg_temp.expect($$insert into public.messages (sender_id, receiver_id, body, author) values ('ae100000-0000-0000-0000-00000000000a', 'ae100000-0000-0000-0000-00000000000b', '先说你亲眼见到的。', 'tang_wuying')$$, 'ok');
 call pg_temp.expect($$insert into public.agent_memories (user_lo, user_hi, agent_id, title, content) values ('ae100000-0000-0000-0000-00000000000a', 'ae100000-0000-0000-0000-00000000000b', 'tang_wuying', '栈道·灯', '上回说夜里看不清')$$, 'ok');
