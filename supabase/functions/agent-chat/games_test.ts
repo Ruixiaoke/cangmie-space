@@ -1,5 +1,5 @@
 // games.ts（榴莲看小游戏）的测试：假数据库按真实的「这一对好友」过滤规则求值，所以能验证不会碰别的对局
-import { gameHint, gameRecord, gameStatus, poolHelper, poolTargets8, slLayoutA, STATUS_MAX_CHARS, tttWinningCells } from "./games.ts";
+import { ddzRecord, gameHint, gameRecord, gameStatus, poolHelper, poolTargets8, slLayoutA, STATUS_MAX_CHARS, tttWinningCells } from "./games.ts";
 import { buildUserInput, runJob, systemInstructions, TOOL_SPECS } from "./agent.ts";
 
 const ME = "11111111-1111-1111-1111-111111111111";
@@ -248,4 +248,25 @@ Deno.test("end to end: hint in first request input; instructions and tools byte-
   if (!a.input[0].content.includes("进行中的小游戏：井字棋（轮到小明）")) throw new Error(a.input[0].content);
   if (b.input[0].content.includes("小游戏")) throw new Error("no hint for pair without games");
   if (a.instructions !== b.instructions || JSON.stringify(a.tools) !== JSON.stringify(b.tools)) throw new Error("must stay static");
+});
+
+Deno.test("game_leaderboard ddz: DM pair + overall totals, group ranking only this group's members", async () => {
+  const lo = ME < PEER ? ME : PEER, hi = ME < PEER ? PEER : ME;
+  const db = fakeAdmin({ ddz_scores: [
+    { id: 1, dm_lo: lo, dm_hi: hi, user_id: ME, total: 12, wins: 3, games: 5 },
+    { id: 2, dm_lo: lo, dm_hi: hi, user_id: PEER, total: -12, wins: 2, games: 5 },
+    { id: 3, group_id: 7, user_id: ME, total: -4, wins: 1, games: 3 },
+    { id: 4, group_id: 7, user_id: OTHER, total: 9, wins: 2, games: 3 },
+    { id: 5, group_id: 8, user_id: PEER, total: 30, wins: 6, games: 9 },
+  ] });
+  let o = j(await gameRecord(db, ME, PEER, names, { game: "ddz" }));
+  if (o.together["小红(提问人)"] !== "+12分，3胜/5局" || o.together["小明"] !== "-12分，2胜/5局") throw new Error(JSON.stringify(o));
+  if (o.overall["小红(提问人)"] !== "+8分，4胜/8局" || o.overall["小明"] !== "+18分，8胜/14局") throw new Error(JSON.stringify(o));
+  const gnames = { [ME]: "小红", [OTHER]: "阿杰" };
+  o = j(await ddzRecord(db, ME, { group: 7 }, gnames));
+  if (o.scope !== "本群" || o.ranking.join("|") !== "1. 阿杰 +9分，2胜/3局|2. 小红(提问人) -4分，1胜/3局") throw new Error(JSON.stringify(o));
+  o = j(await ddzRecord(db, ME, { group: 99 }, gnames));
+  if (o.ranking !== "这个群还没人打过斗地主") throw new Error(JSON.stringify(o));
+  o = j(await gameRecord(fakeAdmin({ ddz_scores: [] }), ME, PEER, names, { game: "ddz" }));
+  if (typeof o.together !== "string" || o.overall["小明"] !== "0分，0胜/0局") throw new Error(JSON.stringify(o));
 });

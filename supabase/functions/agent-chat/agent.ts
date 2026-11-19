@@ -20,7 +20,7 @@
 //     每次都完全一样；prompt_cache_key 只影响路由 / 计费归类，不保证命中；GPT-5.6 及以后最短可缓存 1024 token
 import { PERSONA } from "./persona.gen.ts";
 import { PERSONA as YE_YING_PERSONA } from "./ye-ying.gen.ts";
-import { BOARD_GAMES, gameHint, gameRecord, gameStatus } from "./games.ts";
+import { BOARD_GAMES, ddzRecord, gameHint, gameRecord, gameStatus } from "./games.ts";
 
 // ---- 调参：全部数字集中在这里 ----
 export const MAX_REPLY = 4000; // 回复字数的最后保险
@@ -91,7 +91,7 @@ export function systemInstructions(id = "durian"): string {
 - 记忆由你自己做主，没有人会叫你记，也没人能手动加。你觉得以后用得上的事就主动用 remember 记下：喜好、计划、日期、正在发生的事、对方希望的称呼、他们在意的东西。情况变了就更新那一条，过时或记错的用 forget 删掉。闲聊和一次性的小事不要记。
 - 哪些记忆常驻（pinned）也由你定：称呼、过敏、禁忌这类每次都该知道的才常驻，最多 10 条，满了先取消或删掉一条再加。
 - 记忆标题用「人名·类别」或简短主题，20 字内，例如「小明·口味」「纪念日」「周末计划」。新建标题前先看记忆里有没有相近的，有就沿用，并把合并后的完整最新内容一起写进去（同标题会整条替换）。
-- 用户消息里如果写了「进行中的小游戏」，说明这两个人正在玩小游戏。聊到小游戏、或有人想要建议时，你可以用 game_status 看他们的井字棋、弹弓大战、台球（9球和8球）的当前局面，用 game_leaderboard 看这两个人的胜负战绩（含彼此的交手）。这两个工具只是看，你不能替任何人落子、出杆、认输或开局。
+- 用户消息里如果写了「进行中的小游戏」，说明这两个人正在玩小游戏。聊到小游戏、或有人想要建议时，你可以用 game_status 看他们的井字棋、弹弓大战、台球（9球和8球）的当前局面，用 game_leaderboard 看这两个人的胜负战绩（含彼此的交手）。斗地主（私聊和群聊都能玩）只能用 game_leaderboard 带 game=ddz 看积分战绩：私聊里是两个人一起打的和各自的总计，群聊里是本群成员在本群的积分排名；群聊里其他小游戏的工具都不可用。这两个工具只是看，你不能替任何人落子、出杆、认输、出牌或开局。
 - 给游戏建议要具体、正确：基于返回的局面说话。井字棋直接用返回的必胜点和必堵点；台球说清打哪个球、进哪个袋、大概多大力，也可以建议防守，但你看不到精确物理，台球的建议要说成「建议」「大概」。
 - 聊天的两个人都能看到你的回复。有人在对局中向你要建议时，公开、公平地说，不偏袒；可以善意地调侃一句。
 - 如果记忆只列了标题目录，需要细节时先用 recall 取全文再回答。`;
@@ -166,10 +166,10 @@ const TOOLS = [
   {
     type: "function",
     name: "game_leaderboard",
-    description: "只读：这两个人在某个小游戏里各自的总胜负，以及两人之间的交手战绩。只含这两个人，没有别的好友。",
+    description: "只读：战绩。ttt / sling / pool / pool8：这两个人各自的总胜负和两人之间的交手，只在私聊里可用。ddz 斗地主（按积分）：私聊里是这两个人一起打的积分和各自在所有牌局的总计，群聊里是本群成员在本群的积分排名。不含别的好友。",
     parameters: {
       type: "object",
-      properties: { game: { type: "string", enum: BOARD_GAMES, description: "ttt 井字棋 / sling 弹弓大战 / pool 9球 / pool8 8球" } },
+      properties: { game: { type: "string", enum: BOARD_GAMES, description: "ttt 井字棋 / sling 弹弓大战 / pool 9球 / pool8 8球 / ddz 斗地主" } },
       required: ["game"],
       additionalProperties: false,
     },
@@ -302,6 +302,7 @@ async function runTool(deps: Deps, job: Job, names: Names, name: string, rawArgs
       // deno-lint-ignore no-explicit-any
       return JSON.stringify({ results: (data ?? []).map((r: any) => ({ at: stamp(r.created_at), from: r.author ? agentName(r.author) : names[r.sender_id] ?? "?", text: r.body })) });
     }
+    if (name === "game_leaderboard" && args.game === "ddz") return await ddzRecord(deps.admin, job.asker, gid != null ? { group: gid } : { peer: job.peer }, names);
     if ((name === "game_status" || name === "game_leaderboard") && (gid != null || job.peer == null)) return JSON.stringify({ error: "not_available_in_group" });
     if (name === "game_status") return await gameStatus(deps.admin, job.asker, job.peer as string, names, args);
     if (name === "game_leaderboard") return await gameRecord(deps.admin, job.asker, job.peer as string, names, args);
