@@ -1,0 +1,163 @@
+/* 皮肤：唐门（墨青、银灰、血红，蜀中竹海与悬崖堡垒）。<html data-skin="tangmen"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动，那是聊天壁纸）。结构同纯阳：先覆盖设计变量，再加组件细节。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="tangmen"]{
+  --t1:#1c2a29; --t2:#40524f; --t3:#596c69;
+  --pink:#2f5150; --on-pink:#fff; --pink-text:#2a4a49; --red-text:#b02a2a; --ok:#2d6b55; --badge:#a52a2a;
+  --hair:rgba(40,70,68,.14); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(40,70,68,.14); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(241,246,245,.62); --g-card:rgba(241,246,245,.64); --g-chip:rgba(255,255,255,.6); --g-solid:#ecf2f1;
+  --field-bg:rgba(255,255,255,.52);
+  --sh-1:0 1px 2px rgba(14,32,30,.08),0 4px 14px rgba(14,32,30,.07);
+  --sh-2:0 2px 4px rgba(14,32,30,.08),0 12px 32px rgba(14,32,30,.13);
+  --sh-0:0 1px 1px rgba(14,32,30,.10);
+  --page:#d9e3e1; --stage-bg:rgba(226,236,234,.82);
+  --toast-bg:rgba(20,36,35,.92); --toast-fg:#ecf4f3;
+  --mascot-bg-av:#ecf2f1;
+  --bub-peer:rgba(248,252,251,.82); --bub-own:rgba(196,218,214,.9); --bub-fx:rgba(214,224,236,.92); --bub-fail:rgba(248,212,208,.9);
+  --chat-bub-peer:#edf2f1; --chat-bub-bd:rgba(28,42,41,.08);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(40,70,68,.12); --bub-sheen:rgba(255,255,255,.6);
+  --tm-silver:#9bb0ae; --tm-ink:#2b4a49; --tm-btn-a:#3f6b69; --tm-btn-b:#2a4847; --tm-orn:rgba(47,81,80,.22);
+  --tm-ring:rgba(47,81,80,.28); --tm-seal:#a52a2a;
+  --tm-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='1.5' y='1.5' width='20' height='9' rx='1.6' fill='%232f5150'/%3E%3Crect x='3' y='4.5' width='9' height='3' rx='.8' fill='%2312201f'/%3E%3Ccircle cx='16.5' cy='6' r='2.6' fill='none' stroke='%239bb0ae' stroke-width='1' stroke-dasharray='1.2 .9'/%3E%3Ccircle cx='16.5' cy='6' r='.9' fill='%239bb0ae'/%3E%3Cpath d='M21.5 6H118' stroke='%234a5e5c' stroke-width='1.3' stroke-linecap='round'/%3E%3Cpath d='M24 6l-3-2.6M24 6l-3 2.6M30 6l-3-2.2M30 6l-3 2.2' stroke='%237f9593' stroke-width='1' fill='none' stroke-linecap='round'/%3E%3Cpath d='M116 2.6L130.5 6 116 9.4l2.6-3.4z' fill='%2352605f'/%3E%3Cpath d='M122 6h7' stroke='%23b02a2a' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/tangmen/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(232,240,238,.06) 0,rgba(232,240,238,.18) 45%,rgba(214,226,223,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#ecf2f1 0,#dfe9e7 55%,#d0dedb 100%);
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="tangmen"][data-theme="dark"]{
+  --t1:#e6f0ee; --t2:#b2c6c3; --t3:#8aa09d;
+  --pink:#8cbdb8; --on-pink:#0c1e1d; --pink-text:#a6d0cb; --red-text:#ff9a96; --ok:#8fd6bd; --badge:#c43a3a;
+  --hair:rgba(190,225,220,.12); --rim:rgba(190,225,220,.16);
+  --hi:rgba(190,225,220,.22); --lo:rgba(0,0,0,.4); --side:rgba(190,225,220,.07);
+  --g-bar:rgba(14,26,26,.62); --g-card:rgba(14,26,26,.58); --g-chip:rgba(190,225,220,.1); --g-solid:#142323;
+  --field-bg:rgba(4,8,6,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#070e0e; --stage-bg:rgba(10,20,20,.84);
+  --toast-bg:rgba(32,54,52,.96); --toast-fg:#ecf6f4;
+  --mascot-bg:#e6f0ee; --mascot-bg-av:#e6f0ee;
+  --bub-peer:rgba(30,50,48,.84); --bub-own:rgba(46,92,88,.86); --bub-fx:rgba(48,66,84,.86); --bub-fail:rgba(122,44,44,.88);
+  --chat-bub-peer:rgba(34,54,52,.88); --chat-bub-bd:rgba(190,225,220,.14);
+  --bub-bd:rgba(190,225,220,.16); --bub-hi:rgba(190,225,220,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(190,225,220,.12);
+  --tm-silver:#668280; --tm-ink:#a6d0cb; --tm-btn-a:#6fa6a0; --tm-btn-b:#4f8883; --tm-orn:rgba(166,208,203,.2);
+  --tm-ring:rgba(140,189,184,.3); --tm-seal:#c43a3a;
+  --tm-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='1.5' y='1.5' width='20' height='9' rx='1.6' fill='%235f8f8a'/%3E%3Crect x='3' y='4.5' width='9' height='3' rx='.8' fill='%230a1414'/%3E%3Ccircle cx='16.5' cy='6' r='2.6' fill='none' stroke='%23a6d0cb' stroke-width='1' stroke-dasharray='1.2 .9'/%3E%3Ccircle cx='16.5' cy='6' r='.9' fill='%23a6d0cb'/%3E%3Cpath d='M21.5 6H118' stroke='%238aa09d' stroke-width='1.3' stroke-linecap='round'/%3E%3Cpath d='M24 6l-3-2.6M24 6l-3 2.6M30 6l-3-2.2M30 6l-3 2.2' stroke='%23b2c6c3' stroke-width='1' fill='none' stroke-linecap='round'/%3E%3Cpath d='M116 2.6L130.5 6 116 9.4l2.6-3.4z' fill='%23c4d2d0'/%3E%3Cpath d='M122 6h7' stroke='%23e05252' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/tangmen/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(6,14,14,.05) 0,rgba(6,14,14,.22) 45%,rgba(6,14,14,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(160,210,200,.2),rgba(160,210,200,0) 70%),
+    linear-gradient(180deg,#0d1a1a 0,#0a1414 55%,#060c0c 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="tangmen"]:not([data-theme="light"]){
+  --t1:#e6f0ee; --t2:#b2c6c3; --t3:#8aa09d;
+  --pink:#8cbdb8; --on-pink:#0c1e1d; --pink-text:#a6d0cb; --red-text:#ff9a96; --ok:#8fd6bd; --badge:#c43a3a;
+  --hair:rgba(190,225,220,.12); --rim:rgba(190,225,220,.16);
+  --hi:rgba(190,225,220,.22); --lo:rgba(0,0,0,.4); --side:rgba(190,225,220,.07);
+  --g-bar:rgba(14,26,26,.62); --g-card:rgba(14,26,26,.58); --g-chip:rgba(190,225,220,.1); --g-solid:#142323;
+  --field-bg:rgba(4,8,6,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#070e0e; --stage-bg:rgba(10,20,20,.84);
+  --toast-bg:rgba(32,54,52,.96); --toast-fg:#ecf6f4;
+  --mascot-bg:#e6f0ee; --mascot-bg-av:#e6f0ee;
+  --bub-peer:rgba(30,50,48,.84); --bub-own:rgba(46,92,88,.86); --bub-fx:rgba(48,66,84,.86); --bub-fail:rgba(122,44,44,.88);
+  --chat-bub-peer:rgba(34,54,52,.88); --chat-bub-bd:rgba(190,225,220,.14);
+  --bub-bd:rgba(190,225,220,.16); --bub-hi:rgba(190,225,220,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(190,225,220,.12);
+  --tm-silver:#668280; --tm-ink:#a6d0cb; --tm-btn-a:#6fa6a0; --tm-btn-b:#4f8883; --tm-orn:rgba(166,208,203,.2);
+  --tm-ring:rgba(140,189,184,.3); --tm-seal:#c43a3a;
+  --tm-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='1.5' y='1.5' width='20' height='9' rx='1.6' fill='%235f8f8a'/%3E%3Crect x='3' y='4.5' width='9' height='3' rx='.8' fill='%230a1414'/%3E%3Ccircle cx='16.5' cy='6' r='2.6' fill='none' stroke='%23a6d0cb' stroke-width='1' stroke-dasharray='1.2 .9'/%3E%3Ccircle cx='16.5' cy='6' r='.9' fill='%23a6d0cb'/%3E%3Cpath d='M21.5 6H118' stroke='%238aa09d' stroke-width='1.3' stroke-linecap='round'/%3E%3Cpath d='M24 6l-3-2.6M24 6l-3 2.6M30 6l-3-2.2M30 6l-3 2.2' stroke='%23b2c6c3' stroke-width='1' fill='none' stroke-linecap='round'/%3E%3Cpath d='M116 2.6L130.5 6 116 9.4l2.6-3.4z' fill='%23c4d2d0'/%3E%3Cpath d='M122 6h7' stroke='%23e05252' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/tangmen/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(6,14,14,.05) 0,rgba(6,14,14,.22) 45%,rgba(6,14,14,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(160,210,200,.2),rgba(160,210,200,0) 70%),
+    linear-gradient(180deg,#0d1a1a 0,#0a1414 55%,#060c0c 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="tangmen"] ::selection{background:color-mix(in srgb,var(--pink) 30%,transparent)}
+[data-skin="tangmen"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题：略加字距 */
+[data-skin="tangmen"] .top h2,[data-skin="tangmen"] #auth h1,[data-skin="tangmen"] .me-head .name,
+[data-skin="tangmen"] .panel h3,[data-skin="tangmen"] .section-title,[data-skin="tangmen"] #chat .who b{
+  letter-spacing:.06em;
+}
+[data-skin="tangmen"] .top h2,[data-skin="tangmen"] #auth h1{font-weight:700}
+[data-skin="tangmen"] .panel h3,[data-skin="tangmen"] .section-title{color:var(--tm-ink)}
+
+/* 顶栏：页名前一枚徽记，下沿一道渐隐的细线 */
+[data-skin="tangmen"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="tangmen"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--tm-silver) 18%,var(--tm-silver) 82%,transparent);opacity:.7;
+}
+[data-skin="tangmen"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="tangmen"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/tangmen/emblem.png) center/contain no-repeat;
+}
+
+/* 面板和卡片：右上角一抹纹样（遮罩取形，颜色跟主题走） */
+[data-skin="tangmen"] .panel{position:relative;overflow:hidden}
+[data-skin="tangmen"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--tm-orn);
+  -webkit-mask:url(../skins/tangmen/ornament.png) center/contain no-repeat;mask:url(../skins/tangmen/ornament.png) center/contain no-repeat;
+}
+[data-skin="tangmen"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮：门派主色渐变，上缘一道亮边 */
+[data-skin="tangmen"] .btn:not(.ghost):not(.danger){
+  background-color:var(--tm-btn-b);
+  background-image:linear-gradient(180deg,var(--tm-btn-a),var(--tm-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.14);
+}
+@media (hover:hover){ [data-skin="tangmen"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--tm-btn-a) 88%,#fff),var(--tm-btn-b))} }
+[data-skin="tangmen"] .seg button.on{background-image:linear-gradient(180deg,var(--tm-btn-a),var(--tm-btn-b));color:var(--on-pink)}
+[data-skin="tangmen"] .field:focus{box-shadow:inset 0 1px 3px rgba(0,0,0,.14),0 0 0 3px var(--tm-ring)}
+[data-skin="tangmen"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--tm-btn-a),var(--tm-btn-b))}
+
+/* 底部标签栏：选中的一格浅浅染上主色，上沿一小段主色线 */
+[data-skin="tangmen"] #tabbar button.on{
+  color:var(--tm-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="tangmen"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标：印章色，方一点 */
+[data-skin="tangmen"] .badge{background:var(--tm-seal);border-radius:6px}
+
+/* 时间分隔线：内联 SVG 画的门派兵器，代替默认的饼干棒 */
+[data-skin="tangmen"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--tm-weapon) center/contain no-repeat;
+}
+
+[data-skin="tangmen"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：副标题下方一道纹样 */
+[data-skin="tangmen"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="tangmen"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--tm-orn);
+  -webkit-mask:url(../skins/tangmen/ornament.png) center/contain no-repeat;mask:url(../skins/tangmen/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="tangmen"] .panel::after,[data-skin="tangmen"] #auth .sub::after{display:none}
+}

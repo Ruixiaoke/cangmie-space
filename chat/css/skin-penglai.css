@@ -1,0 +1,165 @@
+/* 皮肤：蓬莱（东海仙岛、海蓝、天青、珊瑚红）。<html data-skin="penglai"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动）。结构同纯阳：先覆盖设计变量，再加组件细节。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="penglai"]{
+  --t1:#14283a; --t2:#3a566e; --t3:#55718a;
+  --pink:#2c6f9e; --on-pink:#fff; --pink-text:#1f5a85; --red-text:#b0373a; --ok:#2b7a62; --badge:#d9534a;
+  --hair:rgba(30,70,110,.14); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(30,70,110,.14); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(243,249,254,.62); --g-card:rgba(243,249,254,.64); --g-chip:rgba(255,255,255,.6); --g-solid:rgb(243,249,254);
+  --field-bg:rgba(255,255,255,.52);
+  --sh-1:0 1px 2px rgba(14,34,56,.08),0 4px 14px rgba(14,34,56,.07);
+  --sh-2:0 2px 4px rgba(14,34,56,.08),0 12px 32px rgba(14,34,56,.13);
+  --sh-0:0 1px 1px rgba(14,34,56,.10);
+  --page:#dbe9f4; --stage-bg:rgba(226,240,250,.82);
+  --toast-bg:rgba(20,36,54,.92); --toast-fg:#f4f6f8;
+  --mascot-bg-av:#eef5fb;
+  --bub-peer:rgba(252,253,254,.82); --bub-own:rgba(196,224,244,.9); --bub-fx:rgba(228,236,252,.92); --bub-fail:rgba(250,214,214,.9);
+  --chat-bub-peer:#edf3f9; --chat-bub-bd:rgba(30,70,110,.1);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(30,70,110,.12); --bub-sheen:rgba(255,255,255,.6);
+  --pl-sil:#9cc3dc; --pl-ink:#1f5a85; --pl-btn-a:#3a82b4; --pl-btn-b:#25608c; --pl-orn:rgba(44,111,158,.2);
+  --pl-ring:rgba(44,111,158,.26); --pl-seal:#d9534a;
+  --pl-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M1 6H9' stroke='%238a6a50' stroke-width='1.2' stroke-linecap='round'/%3E%3Cpath d='M9 6Q16 1.2 44 1.8Q70 2.6 80 5.6L80 6.4Q70 9.4 44 10.2Q16 10.8 9 6Z' fill='%232c6f9e'/%3E%3Cpath d='M12 6Q40 4.4 80 6M16 4.2Q44 3.4 76 5.2M16 7.8Q44 8.6 76 6.8' fill='none' stroke='%23cfe6f6' stroke-width='.5' opacity='.8'/%3E%3Crect x='58' y='1.8' width='3' height='8.4' rx='1' fill='%23e0584e'/%3E%3Cpath d='M80 6H121' stroke='%238a6a50' stroke-width='1.3' stroke-linecap='round'/%3E%3Cpath d='M121 6H126a3.2 3.2 0 0 1 0 6' fill='none' stroke='%237a5a40' stroke-width='1.6' stroke-linecap='round' transform='translate(0 -3)'/%3E%3C/svg%3E");
+  --pl-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/penglai/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(238,246,252,.06) 0,rgba(238,246,252,.18) 45%,rgba(238,246,252,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#eef5fb 0,#dfecf6 50%,#cfe0ee 100%);
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="penglai"][data-theme="dark"]{
+  --t1:#e6f1fa; --t2:#b0c6d8; --t3:#88a1b6;
+  --pink:#7ec0ec; --on-pink:#0b1f33; --pink-text:#9bcff2; --red-text:#ff9d9d; --ok:#8fd6bd; --badge:#f0766a;
+  --hair:rgba(190,225,250,.12); --rim:rgba(190,225,250,.16);
+  --hi:rgba(200,230,252,.22); --lo:rgba(0,0,0,.4); --side:rgba(190,225,250,.07);
+  --g-bar:rgba(10,24,40,.62); --g-card:rgba(16,34,54,.58); --g-chip:rgba(190,225,250,.1); --g-solid:#12263c;
+  --field-bg:rgba(4,8,12,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#08121e; --stage-bg:rgba(10,22,36,.84);
+  --toast-bg:rgba(32,56,84,.96); --toast-fg:#f4f6f8;
+  --mascot-bg:#e6f1fa; --mascot-bg-av:#e6f1fa;
+  --bub-peer:rgba(28,48,72,.84); --bub-own:rgba(40,96,146,.86); --bub-fx:rgba(58,68,120,.86); --bub-fail:rgba(120,44,52,.88);
+  --chat-bub-peer:rgba(32,52,78,.88); --chat-bub-bd:rgba(190,225,250,.14);
+  --bub-bd:rgba(190,225,250,.16); --bub-hi:rgba(200,230,252,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(200,230,252,.12);
+  --pl-sil:#6f93b0; --pl-ink:#9bcff2; --pl-btn-a:#7ec0ec; --pl-btn-b:#5499cc; --pl-orn:rgba(155,207,242,.2);
+  --pl-ring:rgba(126,192,236,.3); --pl-seal:#f0766a;
+  --pl-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M1 6H9' stroke='%23b49a82' stroke-width='1.2' stroke-linecap='round'/%3E%3Cpath d='M9 6Q16 1.2 44 1.8Q70 2.6 80 5.6L80 6.4Q70 9.4 44 10.2Q16 10.8 9 6Z' fill='%235499cc'/%3E%3Cpath d='M12 6Q40 4.4 80 6M16 4.2Q44 3.4 76 5.2M16 7.8Q44 8.6 76 6.8' fill='none' stroke='%23d4ebfa' stroke-width='.5' opacity='.8'/%3E%3Crect x='58' y='1.8' width='3' height='8.4' rx='1' fill='%23f0766a'/%3E%3Cpath d='M80 6H121' stroke='%23b49a82' stroke-width='1.3' stroke-linecap='round'/%3E%3Cpath d='M121 6H126a3.2 3.2 0 0 1 0 6' fill='none' stroke='%23c4a88c' stroke-width='1.6' stroke-linecap='round' transform='translate(0 -3)'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/penglai/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(4,12,24,.05) 0,rgba(4,12,24,.22) 45%,rgba(4,12,24,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(150,200,240,.22),rgba(150,200,240,0) 70%),
+    linear-gradient(180deg,#0e1c2c 0,#0a1522 60%,#060d17 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="penglai"]:not([data-theme="light"]){
+  --t1:#e6f1fa; --t2:#b0c6d8; --t3:#88a1b6;
+  --pink:#7ec0ec; --on-pink:#0b1f33; --pink-text:#9bcff2; --red-text:#ff9d9d; --ok:#8fd6bd; --badge:#f0766a;
+  --hair:rgba(190,225,250,.12); --rim:rgba(190,225,250,.16);
+  --hi:rgba(200,230,252,.22); --lo:rgba(0,0,0,.4); --side:rgba(190,225,250,.07);
+  --g-bar:rgba(10,24,40,.62); --g-card:rgba(16,34,54,.58); --g-chip:rgba(190,225,250,.1); --g-solid:#12263c;
+  --field-bg:rgba(4,8,12,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#08121e; --stage-bg:rgba(10,22,36,.84);
+  --toast-bg:rgba(32,56,84,.96); --toast-fg:#f4f6f8;
+  --mascot-bg:#e6f1fa; --mascot-bg-av:#e6f1fa;
+  --bub-peer:rgba(28,48,72,.84); --bub-own:rgba(40,96,146,.86); --bub-fx:rgba(58,68,120,.86); --bub-fail:rgba(120,44,52,.88);
+  --chat-bub-peer:rgba(32,52,78,.88); --chat-bub-bd:rgba(190,225,250,.14);
+  --bub-bd:rgba(190,225,250,.16); --bub-hi:rgba(200,230,252,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(200,230,252,.12);
+  --pl-sil:#6f93b0; --pl-ink:#9bcff2; --pl-btn-a:#7ec0ec; --pl-btn-b:#5499cc; --pl-orn:rgba(155,207,242,.2);
+  --pl-ring:rgba(126,192,236,.3); --pl-seal:#f0766a;
+  --pl-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M1 6H9' stroke='%23b49a82' stroke-width='1.2' stroke-linecap='round'/%3E%3Cpath d='M9 6Q16 1.2 44 1.8Q70 2.6 80 5.6L80 6.4Q70 9.4 44 10.2Q16 10.8 9 6Z' fill='%235499cc'/%3E%3Cpath d='M12 6Q40 4.4 80 6M16 4.2Q44 3.4 76 5.2M16 7.8Q44 8.6 76 6.8' fill='none' stroke='%23d4ebfa' stroke-width='.5' opacity='.8'/%3E%3Crect x='58' y='1.8' width='3' height='8.4' rx='1' fill='%23f0766a'/%3E%3Cpath d='M80 6H121' stroke='%23b49a82' stroke-width='1.3' stroke-linecap='round'/%3E%3Cpath d='M121 6H126a3.2 3.2 0 0 1 0 6' fill='none' stroke='%23c4a88c' stroke-width='1.6' stroke-linecap='round' transform='translate(0 -3)'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/penglai/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(4,12,24,.05) 0,rgba(4,12,24,.22) 45%,rgba(4,12,24,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(150,200,240,.22),rgba(150,200,240,0) 70%),
+    linear-gradient(180deg,#0e1c2c 0,#0a1522 60%,#060d17 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="penglai"] ::selection{background:rgba(44,111,158,.3)}
+[data-skin="penglai"][data-theme="dark"] ::selection{background:rgba(126,192,236,.34)}
+[data-skin="penglai"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题 */
+[data-skin="penglai"] .top h2,[data-skin="penglai"] #auth h1,[data-skin="penglai"] .me-head .name,
+[data-skin="penglai"] .panel h3,[data-skin="penglai"] .section-title,[data-skin="penglai"] #chat .who b{
+  font-family:var(--pl-serif);letter-spacing:.06em;
+}
+[data-skin="penglai"] .top h2,[data-skin="penglai"] #auth h1{font-weight:700}
+[data-skin="penglai"] .panel h3,[data-skin="penglai"] .section-title{color:var(--pl-ink)}
+
+/* 顶栏：页名前一枚徽记，下沿一道渐隐的线 */
+[data-skin="penglai"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="penglai"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--pl-sil) 18%,var(--pl-sil) 82%,transparent);opacity:.7;
+}
+[data-skin="penglai"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="penglai"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/penglai/emblem.png) center/contain no-repeat;
+}
+
+/* 面板右上角的纹样（遮罩取形，颜色跟主题走） */
+[data-skin="penglai"] .panel{position:relative;overflow:hidden}
+[data-skin="penglai"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--pl-orn);
+  -webkit-mask:url(../skins/penglai/ornament.png) center/contain no-repeat;mask:url(../skins/penglai/ornament.png) center/contain no-repeat;
+}
+[data-skin="penglai"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮 */
+[data-skin="penglai"] .btn:not(.ghost):not(.danger){
+  background-color:var(--pl-btn-b);
+  background-image:linear-gradient(180deg,var(--pl-btn-a),var(--pl-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.14);
+}
+@media (hover:hover){ [data-skin="penglai"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--pl-btn-a) 88%,#fff),var(--pl-btn-b))} }
+[data-skin="penglai"] .seg button.on{background-image:linear-gradient(180deg,var(--pl-btn-a),var(--pl-btn-b));color:var(--on-pink)}
+[data-skin="penglai"] .field:focus{box-shadow:inset 0 1px 3px rgba(0,0,0,.14),0 0 0 3px var(--pl-ring)}
+[data-skin="penglai"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--pl-btn-a),var(--pl-btn-b))}
+
+/* 底部标签栏：选中的一格 */
+[data-skin="penglai"] #tabbar button.on{
+  color:var(--pl-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="penglai"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标 */
+[data-skin="penglai"] .badge{background:var(--pl-seal);border-radius:6px}
+
+/* 时间分隔线：一把收拢的长伞（珊瑚红束带、弯柄），代替默认的饼干棒 */
+[data-skin="penglai"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--pl-line) center/contain no-repeat;
+}
+
+[data-skin="penglai"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：副标题下一道纹样 */
+[data-skin="penglai"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="penglai"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--pl-orn);
+  -webkit-mask:url(../skins/penglai/ornament.png) center/contain no-repeat;mask:url(../skins/penglai/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="penglai"] .panel::after,[data-skin="penglai"] #auth .sub::after{display:none}
+}

@@ -1,0 +1,165 @@
+/* 皮肤：长歌（千岛湖、青碧、月白、墨）。<html data-skin="changge"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动）。结构同纯阳：先覆盖设计变量，再加组件细节。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="changge"]{
+  --t1:#1c2d2c; --t2:#3f5857; --t3:#587170;
+  --pink:#2f7a73; --on-pink:#fff; --pink-text:#226059; --red-text:#b0373a; --ok:#2b7a5a; --badge:#b8403a;
+  --hair:rgba(30,80,76,.14); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(30,80,76,.14); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(244,250,249,.62); --g-card:rgba(244,250,249,.64); --g-chip:rgba(255,255,255,.6); --g-solid:rgb(244,250,249);
+  --field-bg:rgba(255,255,255,.52);
+  --sh-1:0 1px 2px rgba(14,40,38,.08),0 4px 14px rgba(14,40,38,.07);
+  --sh-2:0 2px 4px rgba(14,40,38,.08),0 12px 32px rgba(14,40,38,.13);
+  --sh-0:0 1px 1px rgba(14,40,38,.10);
+  --page:#dcebea; --stage-bg:rgba(228,242,240,.82);
+  --toast-bg:rgba(20,38,38,.92); --toast-fg:#f4f6f8;
+  --mascot-bg-av:#eef6f5;
+  --bub-peer:rgba(252,253,254,.82); --bub-own:rgba(190,229,223,.9); --bub-fx:rgba(222,234,248,.92); --bub-fail:rgba(250,214,214,.9);
+  --chat-bub-peer:#eef4f3; --chat-bub-bd:rgba(30,80,76,.1);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(30,80,76,.12); --bub-sheen:rgba(255,255,255,.6);
+  --cg-sil:#9bbcb8; --cg-ink:#245650; --cg-btn-a:#35857e; --cg-btn-b:#255f59; --cg-orn:rgba(47,122,115,.2);
+  --cg-ring:rgba(47,122,115,.26); --cg-seal:#b8403a;
+  --cg-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='6' cy='6' r='3' fill='%23245650'/%3E%3Ccircle cx='6' cy='6' r='1' fill='%23eef6f5'/%3E%3Cpath d='M9 6H128' stroke='%232f7a73' stroke-width='1.1' stroke-linecap='round'/%3E%3Cpath d='M9 4.2H128' stroke='%232f7a73' stroke-width='.4' opacity='.55'/%3E%3Cpath d='M9 7.8H128' stroke='%232f7a73' stroke-width='.4' opacity='.55'/%3E%3Crect x='17' y='2' width='2.6' height='8' rx='1' fill='%23245650'/%3E%3Crect x='112' y='2.6' width='2.6' height='6.8' rx='1' fill='%23245650'/%3E%3Ccircle cx='34' cy='10.3' r='.9' fill='%239bbcb8'/%3E%3Ccircle cx='48' cy='10.3' r='.9' fill='%239bbcb8'/%3E%3Ccircle cx='62' cy='10.3' r='.9' fill='%239bbcb8'/%3E%3Ccircle cx='76' cy='10.3' r='.9' fill='%239bbcb8'/%3E%3Ccircle cx='90' cy='10.3' r='.9' fill='%239bbcb8'/%3E%3Cpath d='M128 6c2 0 3-1 3-2.6M128 6c2 0 3 1 3 2.6' fill='none' stroke='%239bbcb8' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E");
+  --cg-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/changge/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(238,247,246,.06) 0,rgba(238,247,246,.18) 45%,rgba(238,247,246,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#eef6f5 0,#dfeceb 50%,#cfe0de 100%);
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="changge"][data-theme="dark"]{
+  --t1:#e6f3f1; --t2:#b0c9c6; --t3:#89a5a2;
+  --pink:#7fcdc3; --on-pink:#0b2321; --pink-text:#9ad8cf; --red-text:#ff9d9d; --ok:#8fd6bd; --badge:#d0525a;
+  --hair:rgba(190,235,230,.12); --rim:rgba(190,235,230,.16);
+  --hi:rgba(200,242,236,.22); --lo:rgba(0,0,0,.4); --side:rgba(190,235,230,.07);
+  --g-bar:rgba(12,28,30,.62); --g-card:rgba(18,38,40,.58); --g-chip:rgba(190,235,230,.1); --g-solid:#14292b;
+  --field-bg:rgba(4,8,12,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0a1516; --stage-bg:rgba(12,24,26,.84);
+  --toast-bg:rgba(34,60,62,.96); --toast-fg:#f4f6f8;
+  --mascot-bg:#e6f3f1; --mascot-bg-av:#e6f3f1;
+  --bub-peer:rgba(30,54,56,.84); --bub-own:rgba(40,98,94,.86); --bub-fx:rgba(46,70,100,.86); --bub-fail:rgba(120,44,52,.88);
+  --chat-bub-peer:rgba(34,58,60,.88); --chat-bub-bd:rgba(190,235,230,.14);
+  --bub-bd:rgba(190,235,230,.16); --bub-hi:rgba(200,242,236,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(200,242,236,.12);
+  --cg-sil:#6a8c89; --cg-ink:#9ad8cf; --cg-btn-a:#6bbfb5; --cg-btn-b:#4a9990; --cg-orn:rgba(154,216,207,.2);
+  --cg-ring:rgba(127,205,195,.3); --cg-seal:#d0525a;
+  --cg-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='6' cy='6' r='3' fill='%236a8c89'/%3E%3Ccircle cx='6' cy='6' r='1' fill='%230f1f21'/%3E%3Cpath d='M9 6H128' stroke='%237fcdc3' stroke-width='1.1' stroke-linecap='round'/%3E%3Cpath d='M9 4.2H128' stroke='%237fcdc3' stroke-width='.4' opacity='.55'/%3E%3Cpath d='M9 7.8H128' stroke='%237fcdc3' stroke-width='.4' opacity='.55'/%3E%3Crect x='17' y='2' width='2.6' height='8' rx='1' fill='%236a8c89'/%3E%3Crect x='112' y='2.6' width='2.6' height='6.8' rx='1' fill='%236a8c89'/%3E%3Ccircle cx='34' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='48' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='62' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='76' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='90' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Cpath d='M128 6c2 0 3-1 3-2.6M128 6c2 0 3 1 3 2.6' fill='none' stroke='%239ad8cf' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/changge/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(6,14,16,.05) 0,rgba(6,14,16,.22) 45%,rgba(6,14,16,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(150,220,214,.22),rgba(150,220,214,0) 70%),
+    linear-gradient(180deg,#0f1f21 0,#0b1819 60%,#081012 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="changge"]:not([data-theme="light"]){
+  --t1:#e6f3f1; --t2:#b0c9c6; --t3:#89a5a2;
+  --pink:#7fcdc3; --on-pink:#0b2321; --pink-text:#9ad8cf; --red-text:#ff9d9d; --ok:#8fd6bd; --badge:#d0525a;
+  --hair:rgba(190,235,230,.12); --rim:rgba(190,235,230,.16);
+  --hi:rgba(200,242,236,.22); --lo:rgba(0,0,0,.4); --side:rgba(190,235,230,.07);
+  --g-bar:rgba(12,28,30,.62); --g-card:rgba(18,38,40,.58); --g-chip:rgba(190,235,230,.1); --g-solid:#14292b;
+  --field-bg:rgba(4,8,12,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0a1516; --stage-bg:rgba(12,24,26,.84);
+  --toast-bg:rgba(34,60,62,.96); --toast-fg:#f4f6f8;
+  --mascot-bg:#e6f3f1; --mascot-bg-av:#e6f3f1;
+  --bub-peer:rgba(30,54,56,.84); --bub-own:rgba(40,98,94,.86); --bub-fx:rgba(46,70,100,.86); --bub-fail:rgba(120,44,52,.88);
+  --chat-bub-peer:rgba(34,58,60,.88); --chat-bub-bd:rgba(190,235,230,.14);
+  --bub-bd:rgba(190,235,230,.16); --bub-hi:rgba(200,242,236,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(200,242,236,.12);
+  --cg-sil:#6a8c89; --cg-ink:#9ad8cf; --cg-btn-a:#6bbfb5; --cg-btn-b:#4a9990; --cg-orn:rgba(154,216,207,.2);
+  --cg-ring:rgba(127,205,195,.3); --cg-seal:#d0525a;
+  --cg-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='6' cy='6' r='3' fill='%236a8c89'/%3E%3Ccircle cx='6' cy='6' r='1' fill='%230f1f21'/%3E%3Cpath d='M9 6H128' stroke='%237fcdc3' stroke-width='1.1' stroke-linecap='round'/%3E%3Cpath d='M9 4.2H128' stroke='%237fcdc3' stroke-width='.4' opacity='.55'/%3E%3Cpath d='M9 7.8H128' stroke='%237fcdc3' stroke-width='.4' opacity='.55'/%3E%3Crect x='17' y='2' width='2.6' height='8' rx='1' fill='%236a8c89'/%3E%3Crect x='112' y='2.6' width='2.6' height='6.8' rx='1' fill='%236a8c89'/%3E%3Ccircle cx='34' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='48' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='62' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='76' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='90' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Cpath d='M128 6c2 0 3-1 3-2.6M128 6c2 0 3 1 3 2.6' fill='none' stroke='%239ad8cf' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/changge/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(6,14,16,.05) 0,rgba(6,14,16,.22) 45%,rgba(6,14,16,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(150,220,214,.22),rgba(150,220,214,0) 70%),
+    linear-gradient(180deg,#0f1f21 0,#0b1819 60%,#081012 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="changge"] ::selection{background:rgba(47,122,115,.3)}
+[data-skin="changge"][data-theme="dark"] ::selection{background:rgba(127,205,195,.34)}
+[data-skin="changge"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题 */
+[data-skin="changge"] .top h2,[data-skin="changge"] #auth h1,[data-skin="changge"] .me-head .name,
+[data-skin="changge"] .panel h3,[data-skin="changge"] .section-title,[data-skin="changge"] #chat .who b{
+  font-family:var(--cg-serif);letter-spacing:.06em;
+}
+[data-skin="changge"] .top h2,[data-skin="changge"] #auth h1{font-weight:700}
+[data-skin="changge"] .panel h3,[data-skin="changge"] .section-title{color:var(--cg-ink)}
+
+/* 顶栏：页名前一枚徽记，下沿一道渐隐的线 */
+[data-skin="changge"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="changge"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--cg-sil) 18%,var(--cg-sil) 82%,transparent);opacity:.7;
+}
+[data-skin="changge"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="changge"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/changge/emblem.png) center/contain no-repeat;
+}
+
+/* 面板右上角的纹样（遮罩取形，颜色跟主题走） */
+[data-skin="changge"] .panel{position:relative;overflow:hidden}
+[data-skin="changge"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--cg-orn);
+  -webkit-mask:url(../skins/changge/ornament.png) center/contain no-repeat;mask:url(../skins/changge/ornament.png) center/contain no-repeat;
+}
+[data-skin="changge"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮 */
+[data-skin="changge"] .btn:not(.ghost):not(.danger){
+  background-color:var(--cg-btn-b);
+  background-image:linear-gradient(180deg,var(--cg-btn-a),var(--cg-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.14);
+}
+@media (hover:hover){ [data-skin="changge"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--cg-btn-a) 88%,#fff),var(--cg-btn-b))} }
+[data-skin="changge"] .seg button.on{background-image:linear-gradient(180deg,var(--cg-btn-a),var(--cg-btn-b));color:var(--on-pink)}
+[data-skin="changge"] .field:focus{box-shadow:inset 0 1px 3px rgba(0,0,0,.14),0 0 0 3px var(--cg-ring)}
+[data-skin="changge"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--cg-btn-a),var(--cg-btn-b))}
+
+/* 底部标签栏：选中的一格 */
+[data-skin="changge"] #tabbar button.on{
+  color:var(--cg-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="changge"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标 */
+[data-skin="changge"] .badge{background:var(--cg-seal);border-radius:6px}
+
+/* 时间分隔线：一根拉直的琴弦（左端琴轸，两道岳山，右端弦尾），代替默认的饼干棒 */
+[data-skin="changge"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--cg-line) center/contain no-repeat;
+}
+
+[data-skin="changge"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：副标题下一道纹样 */
+[data-skin="changge"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="changge"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--cg-orn);
+  -webkit-mask:url(../skins/changge/ornament.png) center/contain no-repeat;mask:url(../skins/changge/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="changge"] .panel::after,[data-skin="changge"] #auth .sub::after{display:none}
+}

@@ -1,0 +1,161 @@
+/* 皮肤：万花（wanhua）。<html data-skin="wanhua"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动）。结构同纯阳：先覆盖设计变量，再加组件细节（宋体标题、页眉徽记、面板角纹样、主按钮、兵器形时间线、角标）。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="wanhua"]{
+  --t1:#241b2e; --t2:#4d4060; --t3:#6a5c7e;
+  --pink:#6d4b8f; --on-pink:#fff; --pink-text:#583a78; --red-text:#b0304f; --ok:#2f6a58; --badge:#c23a58;
+  --hair:rgba(70,46,100,.15); --rim:rgba(255,252,255,.74);
+  --hi:rgba(255,252,255,.95); --lo:rgba(70,46,100,.15); --side:rgba(252,248,255,.42);
+  --g-bar:rgba(248,244,252,.64); --g-card:rgba(250,247,254,.66); --g-chip:rgba(255,252,255,.62); --g-solid:#f3eff8;
+  --field-bg:rgba(255,252,255,.54);
+  --sh-1:0 1px 2px rgba(38,24,56,.08),0 4px 14px rgba(38,24,56,.07);
+  --sh-2:0 2px 4px rgba(38,24,56,.08),0 12px 32px rgba(38,24,56,.13);
+  --sh-0:0 1px 1px rgba(38,24,56,.10);
+  --page:#e4dded; --stage-bg:rgba(236,230,244,.84);
+  --toast-bg:rgba(36,26,50,.92); --toast-fg:#f4eefa;
+  --mascot-bg-av:#f3eff8;
+  --bub-peer:rgba(252,250,255,.84); --bub-own:rgba(216,200,238,.92); --bub-fx:rgba(226,222,246,.92); --bub-fail:rgba(250,212,222,.9);
+  --chat-bub-peer:#f1edf6; --chat-bub-bd:rgba(36,27,46,.09);
+  --bub-bd:rgba(255,252,255,.82); --bub-hi:rgba(255,252,255,.95); --bub-lo:rgba(70,46,100,.13); --bub-sheen:rgba(255,252,255,.6);
+  --wh-silver:#a995c4; --wh-ink:#4a2f68; --wh-btn-a:#8460a8; --wh-btn-b:#5a3d79; --wh-orn:rgba(109,75,143,.2);
+  --wh-ring:rgba(109,75,143,.26); --wh-seal:#c23a58;
+  --wh-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='4' cy='6' r='2' fill='%23c23a58'/%3E%3Crect x='5' y='5' width='86' height='2' rx='1' fill='%237a5a3a'/%3E%3Crect x='28' y='4.6' width='2.6' height='2.8' rx='.5' fill='%23c23a58'/%3E%3Crect x='62' y='4.6' width='2.6' height='2.8' rx='.5' fill='%23c23a58'/%3E%3Crect x='91' y='4.2' width='8' height='3.6' rx='1' fill='%236d4b8f'/%3E%3Cpath d='M91 5.2h8M91 6.8h8' stroke='%23e6d4f6' stroke-width='.5'/%3E%3Cpath d='M99 4.2c9-1.4 20-.4 32 1.8-12 2.2-23 3.2-32 1.8z' fill='%232a2230'/%3E%3Cpath d='M99 4.6c9-.6 18 0 26 1.4' fill='none' stroke='%23e6d4f6' stroke-width='.5'/%3E%3C/svg%3E");
+  --wh-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/wanhua/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(240,234,248,.06) 0,rgba(240,234,248,.18) 45%,rgba(240,234,248,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(252,248,255,.95),rgba(252,248,255,0) 60%),linear-gradient(180deg,#efe9f6 0,#e4dced 50%,#d6cce4 100%);
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="wanhua"][data-theme="dark"]{
+  --t1:#f0eaf8; --t2:#c8bcdc; --t3:#9d90b4;
+  --pink:#b99ae0; --on-pink:#1d122b; --pink-text:#cdb4ee; --red-text:#ff9db4; --ok:#9cd8bc; --badge:#d04466;
+  --hair:rgba(214,196,244,.13); --rim:rgba(214,196,244,.17);
+  --hi:rgba(226,212,250,.2); --lo:rgba(0,0,0,.44); --side:rgba(214,196,244,.07);
+  --g-bar:rgba(24,17,38,.64); --g-card:rgba(32,22,50,.6); --g-chip:rgba(214,196,244,.1); --g-solid:#221836;
+  --field-bg:rgba(10,6,20,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#100b1a; --stage-bg:rgba(18,12,30,.86);
+  --toast-bg:rgba(62,44,90,.96); --toast-fg:#f4eefa;
+  --mascot-bg:#f0eaf8; --mascot-bg-av:#f0eaf8;
+  --bub-peer:rgba(50,38,74,.84); --bub-own:rgba(98,70,140,.88); --bub-fx:rgba(70,64,110,.86); --bub-fail:rgba(120,40,66,.88);
+  --chat-bub-peer:rgba(54,40,80,.88); --chat-bub-bd:rgba(214,196,244,.15);
+  --bub-bd:rgba(214,196,244,.17); --bub-hi:rgba(226,212,250,.2); --bub-lo:rgba(0,0,0,.34); --bub-sheen:rgba(226,212,250,.12);
+  --wh-silver:#8470a4; --wh-ink:#cdb4ee; --wh-btn-a:#a98ad4; --wh-btn-b:#7e5fae; --wh-orn:rgba(205,180,238,.2);
+  --wh-ring:rgba(185,154,224,.34); --wh-seal:#d04466;
+  --wh-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='4' cy='6' r='2' fill='%23e0587a'/%3E%3Crect x='5' y='5' width='86' height='2' rx='1' fill='%23b08a5e'/%3E%3Crect x='28' y='4.6' width='2.6' height='2.8' rx='.5' fill='%23e0587a'/%3E%3Crect x='62' y='4.6' width='2.6' height='2.8' rx='.5' fill='%23e0587a'/%3E%3Crect x='91' y='4.2' width='8' height='3.6' rx='1' fill='%23b99ae0'/%3E%3Cpath d='M91 5.2h8M91 6.8h8' stroke='%23f4eafc' stroke-width='.5'/%3E%3Cpath d='M99 4.2c9-1.4 20-.4 32 1.8-12 2.2-23 3.2-32 1.8z' fill='%23e8def4'/%3E%3Cpath d='M99 4.6c9-.6 18 0 26 1.4' fill='none' stroke='%23f4eafc' stroke-width='.5'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/wanhua/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(8,5,16,.05) 0,rgba(8,5,16,.22) 45%,rgba(8,5,16,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(200,170,250,.2),rgba(200,170,250,0) 70%),linear-gradient(180deg,#191128 0,#120c20 60%,#0b0714 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="wanhua"]:not([data-theme="light"]){
+  --t1:#f0eaf8; --t2:#c8bcdc; --t3:#9d90b4;
+  --pink:#b99ae0; --on-pink:#1d122b; --pink-text:#cdb4ee; --red-text:#ff9db4; --ok:#9cd8bc; --badge:#d04466;
+  --hair:rgba(214,196,244,.13); --rim:rgba(214,196,244,.17);
+  --hi:rgba(226,212,250,.2); --lo:rgba(0,0,0,.44); --side:rgba(214,196,244,.07);
+  --g-bar:rgba(24,17,38,.64); --g-card:rgba(32,22,50,.6); --g-chip:rgba(214,196,244,.1); --g-solid:#221836;
+  --field-bg:rgba(10,6,20,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#100b1a; --stage-bg:rgba(18,12,30,.86);
+  --toast-bg:rgba(62,44,90,.96); --toast-fg:#f4eefa;
+  --mascot-bg:#f0eaf8; --mascot-bg-av:#f0eaf8;
+  --bub-peer:rgba(50,38,74,.84); --bub-own:rgba(98,70,140,.88); --bub-fx:rgba(70,64,110,.86); --bub-fail:rgba(120,40,66,.88);
+  --chat-bub-peer:rgba(54,40,80,.88); --chat-bub-bd:rgba(214,196,244,.15);
+  --bub-bd:rgba(214,196,244,.17); --bub-hi:rgba(226,212,250,.2); --bub-lo:rgba(0,0,0,.34); --bub-sheen:rgba(226,212,250,.12);
+  --wh-silver:#8470a4; --wh-ink:#cdb4ee; --wh-btn-a:#a98ad4; --wh-btn-b:#7e5fae; --wh-orn:rgba(205,180,238,.2);
+  --wh-ring:rgba(185,154,224,.34); --wh-seal:#d04466;
+  --wh-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='4' cy='6' r='2' fill='%23e0587a'/%3E%3Crect x='5' y='5' width='86' height='2' rx='1' fill='%23b08a5e'/%3E%3Crect x='28' y='4.6' width='2.6' height='2.8' rx='.5' fill='%23e0587a'/%3E%3Crect x='62' y='4.6' width='2.6' height='2.8' rx='.5' fill='%23e0587a'/%3E%3Crect x='91' y='4.2' width='8' height='3.6' rx='1' fill='%23b99ae0'/%3E%3Cpath d='M91 5.2h8M91 6.8h8' stroke='%23f4eafc' stroke-width='.5'/%3E%3Cpath d='M99 4.2c9-1.4 20-.4 32 1.8-12 2.2-23 3.2-32 1.8z' fill='%23e8def4'/%3E%3Cpath d='M99 4.6c9-.6 18 0 26 1.4' fill='none' stroke='%23f4eafc' stroke-width='.5'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/wanhua/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(8,5,16,.05) 0,rgba(8,5,16,.22) 45%,rgba(8,5,16,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(200,170,250,.2),rgba(200,170,250,0) 70%),linear-gradient(180deg,#191128 0,#120c20 60%,#0b0714 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="wanhua"] ::selection{background:rgba(109,75,143,.28)}
+[data-skin="wanhua"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题 */
+[data-skin="wanhua"] .top h2,[data-skin="wanhua"] #auth h1,[data-skin="wanhua"] .me-head .name,
+[data-skin="wanhua"] .panel h3,[data-skin="wanhua"] .section-title,[data-skin="wanhua"] #chat .who b{
+  font-family:var(--wh-serif);letter-spacing:.06em;
+}
+[data-skin="wanhua"] .top h2,[data-skin="wanhua"] #auth h1{font-weight:700}
+[data-skin="wanhua"] .panel h3,[data-skin="wanhua"] .section-title{color:var(--wh-ink)}
+
+/* 顶栏：页名前的徽记，下沿一道渐隐的线 */
+[data-skin="wanhua"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="wanhua"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--wh-silver) 18%,var(--wh-silver) 82%,transparent);opacity:.75;
+}
+[data-skin="wanhua"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="wanhua"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/wanhua/emblem.png) center/contain no-repeat;
+}
+
+/* 面板：右上角纹样（遮罩取形，颜色跟主题走） */
+[data-skin="wanhua"] .panel{position:relative;overflow:hidden}
+[data-skin="wanhua"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--wh-orn);
+  -webkit-mask:url(../skins/wanhua/ornament.png) center/contain no-repeat;mask:url(../skins/wanhua/ornament.png) center/contain no-repeat;
+}
+[data-skin="wanhua"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮 */
+[data-skin="wanhua"] .btn:not(.ghost):not(.danger){
+  background-color:var(--wh-btn-b);
+  background-image:linear-gradient(180deg,var(--wh-btn-a),var(--wh-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.16),0 4px 10px rgba(0,0,0,.12);
+}
+@media (hover:hover){ [data-skin="wanhua"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--wh-btn-a) 88%,#fff),var(--wh-btn-b))} }
+[data-skin="wanhua"] .seg button.on{background-image:linear-gradient(180deg,var(--wh-btn-a),var(--wh-btn-b));color:var(--on-pink)}
+[data-skin="wanhua"] .field:focus{box-shadow:inset 0 1px 3px rgba(0,0,0,.12),0 0 0 3px var(--wh-ring)}
+[data-skin="wanhua"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--wh-btn-a),var(--wh-btn-b))}
+
+/* 底部标签栏 */
+[data-skin="wanhua"] #tabbar button.on{
+  color:var(--wh-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="wanhua"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标 */
+[data-skin="wanhua"] .badge{background:var(--wh-seal);border-radius:6px}
+
+/* 时间分隔线：门派兵器（内联 SVG，白天晚上各一份） */
+[data-skin="wanhua"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--wh-weapon) center/contain no-repeat;
+}
+
+[data-skin="wanhua"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：副标题下一道纹样 */
+[data-skin="wanhua"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="wanhua"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--wh-orn);
+  -webkit-mask:url(../skins/wanhua/ornament.png) center/contain no-repeat;mask:url(../skins/wanhua/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="wanhua"] .panel::after,[data-skin="wanhua"] #auth .sub::after{display:none}
+}

@@ -1,0 +1,163 @@
+/* 皮肤：苍云（玄铁灰、血红、铁灰，雁门关外的城墙与风雪）。<html data-skin="cangyun"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动，那是聊天壁纸）。结构同纯阳：先覆盖设计变量，再加组件细节。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="cangyun"]{
+  --t1:#1e2229; --t2:#444b58; --t3:#5e6674;
+  --pink:#3d4450; --on-pink:#fff; --pink-text:#343b47; --red-text:#b3262d; --ok:#2d6b55; --badge:#b3262d;
+  --hair:rgba(50,60,80,.14); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(50,60,80,.14); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(243,245,248,.62); --g-card:rgba(243,245,248,.64); --g-chip:rgba(255,255,255,.6); --g-solid:#eef0f4;
+  --field-bg:rgba(255,255,255,.52);
+  --sh-1:0 1px 2px rgba(18,22,30,.08),0 4px 14px rgba(18,22,30,.07);
+  --sh-2:0 2px 4px rgba(18,22,30,.08),0 12px 32px rgba(18,22,30,.13);
+  --sh-0:0 1px 1px rgba(18,22,30,.10);
+  --page:#dde1e8; --stage-bg:rgba(230,234,240,.82);
+  --toast-bg:rgba(28,32,40,.92); --toast-fg:#eef1f6;
+  --mascot-bg-av:#eef0f4;
+  --bub-peer:rgba(250,251,253,.82); --bub-own:rgba(208,214,226,.9); --bub-fx:rgba(222,222,236,.92); --bub-fail:rgba(248,212,212,.9);
+  --chat-bub-peer:#eef0f4; --chat-bub-bd:rgba(30,34,41,.08);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(50,60,80,.12); --bub-sheen:rgba(255,255,255,.6);
+  --cy2-silver:#a4adbb; --cy2-ink:#2e3542; --cy2-btn-a:#555e6e; --cy2-btn-b:#363d49; --cy2-orn:rgba(61,68,80,.2);
+  --cy2-ring:rgba(61,68,80,.28); --cy2-seal:#b3262d;
+  --cy2-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6l3-2.2v4.4z' fill='%23b3262d'/%3E%3Crect x='4' y='4.6' width='32' height='2.8' rx='1.3' fill='%233d4450'/%3E%3Cpath d='M8 4.6l2 2.8' stroke='%238a93a2' stroke-width='.7'/%3E%3Cpath d='M12 4.6l2 2.8' stroke='%238a93a2' stroke-width='.7'/%3E%3Cpath d='M16 4.6l2 2.8' stroke='%238a93a2' stroke-width='.7'/%3E%3Cpath d='M20 4.6l2 2.8' stroke='%238a93a2' stroke-width='.7'/%3E%3Cpath d='M24 4.6l2 2.8' stroke='%238a93a2' stroke-width='.7'/%3E%3Cpath d='M28 4.6l2 2.8' stroke='%238a93a2' stroke-width='.7'/%3E%3Crect x='33' y='3.8' width='4' height='4.4' rx='.8' fill='%236b7482'/%3E%3Cpath d='M37 3.6H124l6.5 2.4-1.5 2.4H37z' fill='%23aeb7c4'/%3E%3Cpath d='M38 8.1H128' stroke='%236f7a89' stroke-width='.7'/%3E%3Cpath d='M38 4.5H122' stroke='%23f4f7fa' stroke-width='.7'/%3E%3Cpath d='M38 5.8h80' stroke='%236f7a89' stroke-width='.4' stroke-dasharray='6 3'/%3E%3C/svg%3E");
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/cangyun/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(236,239,244,.06) 0,rgba(236,239,244,.18) 45%,rgba(218,223,231,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#eef0f4 0,#e2e6ec 55%,#d4d9e2 100%);
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="cangyun"][data-theme="dark"]{
+  --t1:#eaeef4; --t2:#b8c0cc; --t3:#8f98a6;
+  --pink:#aab4c4; --on-pink:#10141b; --pink-text:#c0c9d8; --red-text:#ff9b9b; --ok:#8fd6bd; --badge:#cc3a42;
+  --hair:rgba(200,212,230,.12); --rim:rgba(200,212,230,.16);
+  --hi:rgba(200,212,230,.22); --lo:rgba(0,0,0,.4); --side:rgba(200,212,230,.07);
+  --g-bar:rgba(20,24,32,.62); --g-card:rgba(20,24,32,.58); --g-chip:rgba(200,212,230,.1); --g-solid:#1a2029;
+  --field-bg:rgba(4,8,6,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#090c11; --stage-bg:rgba(14,18,25,.84);
+  --toast-bg:rgba(44,52,66,.96); --toast-fg:#eef2f8;
+  --mascot-bg:#eaeef4; --mascot-bg-av:#eaeef4;
+  --bub-peer:rgba(38,46,60,.84); --bub-own:rgba(64,76,98,.86); --bub-fx:rgba(56,60,88,.86); --bub-fail:rgba(122,44,50,.88);
+  --chat-bub-peer:rgba(42,50,64,.88); --chat-bub-bd:rgba(200,212,230,.14);
+  --bub-bd:rgba(200,212,230,.16); --bub-hi:rgba(200,212,230,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(200,212,230,.12);
+  --cy2-silver:#6f7a8c; --cy2-ink:#c0c9d8; --cy2-btn-a:#8f9bb0; --cy2-btn-b:#6c788e; --cy2-orn:rgba(192,201,216,.2);
+  --cy2-ring:rgba(170,180,196,.3); --cy2-seal:#cc3a42;
+  --cy2-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6l3-2.2v4.4z' fill='%23cc3a42'/%3E%3Crect x='4' y='4.6' width='32' height='2.8' rx='1.3' fill='%236c788e'/%3E%3Cpath d='M8 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M12 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M16 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M20 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M24 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M28 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Crect x='33' y='3.8' width='4' height='4.4' rx='.8' fill='%238f9bb0'/%3E%3Cpath d='M37 3.6H124l6.5 2.4-1.5 2.4H37z' fill='%23a6b0be'/%3E%3Cpath d='M38 8.1H128' stroke='%235f6a7a' stroke-width='.7'/%3E%3Cpath d='M38 4.5H122' stroke='%23eef2f8' stroke-width='.7'/%3E%3Cpath d='M38 5.8h80' stroke='%235f6a7a' stroke-width='.4' stroke-dasharray='6 3'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/cangyun/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(8,10,16,.05) 0,rgba(8,10,16,.22) 45%,rgba(8,10,16,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(240,150,90,.2),rgba(240,150,90,0) 70%),
+    linear-gradient(180deg,#121720 0,#0d1118 55%,#080a0f 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="cangyun"]:not([data-theme="light"]){
+  --t1:#eaeef4; --t2:#b8c0cc; --t3:#8f98a6;
+  --pink:#aab4c4; --on-pink:#10141b; --pink-text:#c0c9d8; --red-text:#ff9b9b; --ok:#8fd6bd; --badge:#cc3a42;
+  --hair:rgba(200,212,230,.12); --rim:rgba(200,212,230,.16);
+  --hi:rgba(200,212,230,.22); --lo:rgba(0,0,0,.4); --side:rgba(200,212,230,.07);
+  --g-bar:rgba(20,24,32,.62); --g-card:rgba(20,24,32,.58); --g-chip:rgba(200,212,230,.1); --g-solid:#1a2029;
+  --field-bg:rgba(4,8,6,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#090c11; --stage-bg:rgba(14,18,25,.84);
+  --toast-bg:rgba(44,52,66,.96); --toast-fg:#eef2f8;
+  --mascot-bg:#eaeef4; --mascot-bg-av:#eaeef4;
+  --bub-peer:rgba(38,46,60,.84); --bub-own:rgba(64,76,98,.86); --bub-fx:rgba(56,60,88,.86); --bub-fail:rgba(122,44,50,.88);
+  --chat-bub-peer:rgba(42,50,64,.88); --chat-bub-bd:rgba(200,212,230,.14);
+  --bub-bd:rgba(200,212,230,.16); --bub-hi:rgba(200,212,230,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(200,212,230,.12);
+  --cy2-silver:#6f7a8c; --cy2-ink:#c0c9d8; --cy2-btn-a:#8f9bb0; --cy2-btn-b:#6c788e; --cy2-orn:rgba(192,201,216,.2);
+  --cy2-ring:rgba(170,180,196,.3); --cy2-seal:#cc3a42;
+  --cy2-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6l3-2.2v4.4z' fill='%23cc3a42'/%3E%3Crect x='4' y='4.6' width='32' height='2.8' rx='1.3' fill='%236c788e'/%3E%3Cpath d='M8 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M12 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M16 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M20 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M24 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M28 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Crect x='33' y='3.8' width='4' height='4.4' rx='.8' fill='%238f9bb0'/%3E%3Cpath d='M37 3.6H124l6.5 2.4-1.5 2.4H37z' fill='%23a6b0be'/%3E%3Cpath d='M38 8.1H128' stroke='%235f6a7a' stroke-width='.7'/%3E%3Cpath d='M38 4.5H122' stroke='%23eef2f8' stroke-width='.7'/%3E%3Cpath d='M38 5.8h80' stroke='%235f6a7a' stroke-width='.4' stroke-dasharray='6 3'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/cangyun/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(8,10,16,.05) 0,rgba(8,10,16,.22) 45%,rgba(8,10,16,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(240,150,90,.2),rgba(240,150,90,0) 70%),
+    linear-gradient(180deg,#121720 0,#0d1118 55%,#080a0f 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="cangyun"] ::selection{background:color-mix(in srgb,var(--pink) 30%,transparent)}
+[data-skin="cangyun"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题：略加字距 */
+[data-skin="cangyun"] .top h2,[data-skin="cangyun"] #auth h1,[data-skin="cangyun"] .me-head .name,
+[data-skin="cangyun"] .panel h3,[data-skin="cangyun"] .section-title,[data-skin="cangyun"] #chat .who b{
+  letter-spacing:.06em;
+}
+[data-skin="cangyun"] .top h2,[data-skin="cangyun"] #auth h1{font-weight:700}
+[data-skin="cangyun"] .panel h3,[data-skin="cangyun"] .section-title{color:var(--cy2-ink)}
+
+/* 顶栏：页名前一枚徽记，下沿一道渐隐的细线 */
+[data-skin="cangyun"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="cangyun"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--cy2-silver) 18%,var(--cy2-silver) 82%,transparent);opacity:.7;
+}
+[data-skin="cangyun"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="cangyun"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/cangyun/emblem.png) center/contain no-repeat;
+}
+
+/* 面板和卡片：右上角一抹纹样（遮罩取形，颜色跟主题走） */
+[data-skin="cangyun"] .panel{position:relative;overflow:hidden}
+[data-skin="cangyun"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--cy2-orn);
+  -webkit-mask:url(../skins/cangyun/ornament.png) center/contain no-repeat;mask:url(../skins/cangyun/ornament.png) center/contain no-repeat;
+}
+[data-skin="cangyun"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮：门派主色渐变，上缘一道亮边 */
+[data-skin="cangyun"] .btn:not(.ghost):not(.danger){
+  background-color:var(--cy2-btn-b);
+  background-image:linear-gradient(180deg,var(--cy2-btn-a),var(--cy2-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.14);
+}
+@media (hover:hover){ [data-skin="cangyun"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--cy2-btn-a) 88%,#fff),var(--cy2-btn-b))} }
+[data-skin="cangyun"] .seg button.on{background-image:linear-gradient(180deg,var(--cy2-btn-a),var(--cy2-btn-b));color:var(--on-pink)}
+[data-skin="cangyun"] .field:focus{box-shadow:inset 0 1px 3px rgba(0,0,0,.14),0 0 0 3px var(--cy2-ring)}
+[data-skin="cangyun"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--cy2-btn-a),var(--cy2-btn-b))}
+
+/* 底部标签栏：选中的一格浅浅染上主色，上沿一小段主色线 */
+[data-skin="cangyun"] #tabbar button.on{
+  color:var(--cy2-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="cangyun"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标：印章色，方一点 */
+[data-skin="cangyun"] .badge{background:var(--cy2-seal);border-radius:6px}
+
+/* 时间分隔线：内联 SVG 画的门派兵器，代替默认的饼干棒 */
+[data-skin="cangyun"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--cy2-weapon) center/contain no-repeat;
+}
+
+[data-skin="cangyun"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：副标题下方一道纹样 */
+[data-skin="cangyun"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="cangyun"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--cy2-orn);
+  -webkit-mask:url(../skins/cangyun/ornament.png) center/contain no-repeat;mask:url(../skins/cangyun/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="cangyun"] .panel::after,[data-skin="cangyun"] #auth .sub::after{display:none}
+}

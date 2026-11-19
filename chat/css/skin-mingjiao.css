@@ -1,0 +1,163 @@
+/* 皮肤：明教（赤红、金、深红，光明顶的白色穹顶与圣火）。<html data-skin="mingjiao"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动，那是聊天壁纸）。结构同纯阳：先覆盖设计变量，再加组件细节。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="mingjiao"]{
+  --t1:#2e1b14; --t2:#5e443a; --t3:#785c50;
+  --pink:#b5371f; --on-pink:#fff; --pink-text:#a02f1a; --red-text:#b02a1a; --ok:#2d6b45; --badge:#8f1f14;
+  --hair:rgba(110,50,30,.14); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(110,50,30,.14); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(255,247,240,.62); --g-card:rgba(255,247,240,.64); --g-chip:rgba(255,255,255,.6); --g-solid:#faf1e8;
+  --field-bg:rgba(255,255,255,.52);
+  --sh-1:0 1px 2px rgba(52,20,10,.08),0 4px 14px rgba(52,20,10,.07);
+  --sh-2:0 2px 4px rgba(52,20,10,.08),0 12px 32px rgba(52,20,10,.13);
+  --sh-0:0 1px 1px rgba(52,20,10,.10);
+  --page:#f0e2d6; --stage-bg:rgba(250,238,228,.82);
+  --toast-bg:rgba(52,26,18,.92); --toast-fg:#fcf0e6;
+  --mascot-bg-av:#faf1e8;
+  --bub-peer:rgba(255,252,248,.82); --bub-own:rgba(244,206,188,.9); --bub-fx:rgba(244,226,196,.92); --bub-fail:rgba(250,208,200,.9);
+  --chat-bub-peer:#f7eee6; --chat-bub-bd:rgba(46,27,20,.08);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(110,50,30,.12); --bub-sheen:rgba(255,255,255,.6);
+  --mj-silver:#d1ad5a; --mj-ink:#8c2b17; --mj-btn-a:#cb4a2e; --mj-btn-b:#9a2c17; --mj-orn:rgba(181,55,31,.2);
+  --mj-ring:rgba(181,55,31,.26); --mj-seal:#8f1f14;
+  --mj-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='3.5' cy='6' r='1.8' fill='%238f1f14'/%3E%3Crect x='5' y='4.9' width='20' height='2.4' rx='1.1' fill='%236e3a22'/%3E%3Cpath d='M9 4.7v2.8M13 4.7v2.8M17 4.7v2.8M21 4.7v2.8' stroke='%23d1a63c' stroke-width='.7'/%3E%3Cpath d='M25 1.6q2.2 1 2.2 2.4v4q0 1.4-2.2 2.4q1.2-1.6 1.2-4.4q0-2.8-1.2-4.4z' fill='%23d1a63c'/%3E%3Cpath d='M27 3.4C58 2 100 1.6 130.5 10.4C102 6.6 60 7.2 27 8z' fill='%23b8c0c8'/%3E%3Cpath d='M28 4.2C60 2.8 100 2.6 126 8.4' stroke='%23fbfcfd' stroke-width='.6' fill='none'/%3E%3C/svg%3E");
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/mingjiao/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(252,240,226,.06) 0,rgba(252,240,226,.18) 45%,rgba(240,224,210,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,244,220,.95),rgba(255,244,220,0) 60%),
+    linear-gradient(180deg,#faf1e8 0,#f0e2d4 55%,#e6d2c0 100%);
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="mingjiao"][data-theme="dark"]{
+  --t1:#f8ece4; --t2:#d2bcb0; --t3:#aa948a;
+  --pink:#f0906e; --on-pink:#2a0b05; --pink-text:#f6aa8c; --red-text:#ff9d88; --ok:#8fd6b0; --badge:#d0452f;
+  --hair:rgba(245,200,170,.12); --rim:rgba(245,200,170,.16);
+  --hi:rgba(245,200,170,.22); --lo:rgba(0,0,0,.4); --side:rgba(245,200,170,.07);
+  --g-bar:rgba(36,16,14,.62); --g-card:rgba(36,16,14,.58); --g-chip:rgba(245,200,170,.1); --g-solid:#2a1613;
+  --field-bg:rgba(4,8,6,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0f0706; --stage-bg:rgba(26,12,10,.84);
+  --toast-bg:rgba(66,34,26,.96); --toast-fg:#fcf0e6;
+  --mascot-bg:#f8ece4; --mascot-bg-av:#f8ece4;
+  --bub-peer:rgba(62,34,28,.84); --bub-own:rgba(130,54,36,.86); --bub-fx:rgba(84,60,34,.86); --bub-fail:rgba(128,40,34,.88);
+  --chat-bub-peer:rgba(66,36,30,.88); --chat-bub-bd:rgba(245,200,170,.14);
+  --bub-bd:rgba(245,200,170,.16); --bub-hi:rgba(245,200,170,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(245,200,170,.12);
+  --mj-silver:#a88a4a; --mj-ink:#f6aa8c; --mj-btn-a:#e0704c; --mj-btn-b:#b8502e; --mj-orn:rgba(246,170,140,.22);
+  --mj-ring:rgba(240,144,110,.3); --mj-seal:#d0452f;
+  --mj-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='3.5' cy='6' r='1.8' fill='%23e0452f'/%3E%3Crect x='5' y='4.9' width='20' height='2.4' rx='1.1' fill='%23a8744a'/%3E%3Cpath d='M9 4.7v2.8M13 4.7v2.8M17 4.7v2.8M21 4.7v2.8' stroke='%23e3b85a' stroke-width='.7'/%3E%3Cpath d='M25 1.6q2.2 1 2.2 2.4v4q0 1.4-2.2 2.4q1.2-1.6 1.2-4.4q0-2.8-1.2-4.4z' fill='%23e3b85a'/%3E%3Cpath d='M27 3.4C58 2 100 1.6 130.5 10.4C102 6.6 60 7.2 27 8z' fill='%23aab2ba'/%3E%3Cpath d='M28 4.2C60 2.8 100 2.6 126 8.4' stroke='%23f0f4f8' stroke-width='.6' fill='none'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/mingjiao/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(14,8,12,.05) 0,rgba(14,8,12,.22) 45%,rgba(14,8,12,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(240,150,90,.2),rgba(240,150,90,0) 70%),
+    linear-gradient(180deg,#1c0e0c 0,#140a09 55%,#0c0605 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="mingjiao"]:not([data-theme="light"]){
+  --t1:#f8ece4; --t2:#d2bcb0; --t3:#aa948a;
+  --pink:#f0906e; --on-pink:#2a0b05; --pink-text:#f6aa8c; --red-text:#ff9d88; --ok:#8fd6b0; --badge:#d0452f;
+  --hair:rgba(245,200,170,.12); --rim:rgba(245,200,170,.16);
+  --hi:rgba(245,200,170,.22); --lo:rgba(0,0,0,.4); --side:rgba(245,200,170,.07);
+  --g-bar:rgba(36,16,14,.62); --g-card:rgba(36,16,14,.58); --g-chip:rgba(245,200,170,.1); --g-solid:#2a1613;
+  --field-bg:rgba(4,8,6,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0f0706; --stage-bg:rgba(26,12,10,.84);
+  --toast-bg:rgba(66,34,26,.96); --toast-fg:#fcf0e6;
+  --mascot-bg:#f8ece4; --mascot-bg-av:#f8ece4;
+  --bub-peer:rgba(62,34,28,.84); --bub-own:rgba(130,54,36,.86); --bub-fx:rgba(84,60,34,.86); --bub-fail:rgba(128,40,34,.88);
+  --chat-bub-peer:rgba(66,36,30,.88); --chat-bub-bd:rgba(245,200,170,.14);
+  --bub-bd:rgba(245,200,170,.16); --bub-hi:rgba(245,200,170,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(245,200,170,.12);
+  --mj-silver:#a88a4a; --mj-ink:#f6aa8c; --mj-btn-a:#e0704c; --mj-btn-b:#b8502e; --mj-orn:rgba(246,170,140,.22);
+  --mj-ring:rgba(240,144,110,.3); --mj-seal:#d0452f;
+  --mj-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='3.5' cy='6' r='1.8' fill='%23e0452f'/%3E%3Crect x='5' y='4.9' width='20' height='2.4' rx='1.1' fill='%23a8744a'/%3E%3Cpath d='M9 4.7v2.8M13 4.7v2.8M17 4.7v2.8M21 4.7v2.8' stroke='%23e3b85a' stroke-width='.7'/%3E%3Cpath d='M25 1.6q2.2 1 2.2 2.4v4q0 1.4-2.2 2.4q1.2-1.6 1.2-4.4q0-2.8-1.2-4.4z' fill='%23e3b85a'/%3E%3Cpath d='M27 3.4C58 2 100 1.6 130.5 10.4C102 6.6 60 7.2 27 8z' fill='%23aab2ba'/%3E%3Cpath d='M28 4.2C60 2.8 100 2.6 126 8.4' stroke='%23f0f4f8' stroke-width='.6' fill='none'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/mingjiao/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(14,8,12,.05) 0,rgba(14,8,12,.22) 45%,rgba(14,8,12,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(240,150,90,.2),rgba(240,150,90,0) 70%),
+    linear-gradient(180deg,#1c0e0c 0,#140a09 55%,#0c0605 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="mingjiao"] ::selection{background:color-mix(in srgb,var(--pink) 30%,transparent)}
+[data-skin="mingjiao"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题：略加字距 */
+[data-skin="mingjiao"] .top h2,[data-skin="mingjiao"] #auth h1,[data-skin="mingjiao"] .me-head .name,
+[data-skin="mingjiao"] .panel h3,[data-skin="mingjiao"] .section-title,[data-skin="mingjiao"] #chat .who b{
+  letter-spacing:.06em;
+}
+[data-skin="mingjiao"] .top h2,[data-skin="mingjiao"] #auth h1{font-weight:700}
+[data-skin="mingjiao"] .panel h3,[data-skin="mingjiao"] .section-title{color:var(--mj-ink)}
+
+/* 顶栏：页名前一枚徽记，下沿一道渐隐的细线 */
+[data-skin="mingjiao"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="mingjiao"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--mj-silver) 18%,var(--mj-silver) 82%,transparent);opacity:.7;
+}
+[data-skin="mingjiao"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="mingjiao"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/mingjiao/emblem.png) center/contain no-repeat;
+}
+
+/* 面板和卡片：右上角一抹纹样（遮罩取形，颜色跟主题走） */
+[data-skin="mingjiao"] .panel{position:relative;overflow:hidden}
+[data-skin="mingjiao"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--mj-orn);
+  -webkit-mask:url(../skins/mingjiao/ornament.png) center/contain no-repeat;mask:url(../skins/mingjiao/ornament.png) center/contain no-repeat;
+}
+[data-skin="mingjiao"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮：门派主色渐变，上缘一道亮边 */
+[data-skin="mingjiao"] .btn:not(.ghost):not(.danger){
+  background-color:var(--mj-btn-b);
+  background-image:linear-gradient(180deg,var(--mj-btn-a),var(--mj-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.14);
+}
+@media (hover:hover){ [data-skin="mingjiao"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--mj-btn-a) 88%,#fff),var(--mj-btn-b))} }
+[data-skin="mingjiao"] .seg button.on{background-image:linear-gradient(180deg,var(--mj-btn-a),var(--mj-btn-b));color:var(--on-pink)}
+[data-skin="mingjiao"] .field:focus{box-shadow:inset 0 1px 3px rgba(0,0,0,.14),0 0 0 3px var(--mj-ring)}
+[data-skin="mingjiao"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--mj-btn-a),var(--mj-btn-b))}
+
+/* 底部标签栏：选中的一格浅浅染上主色，上沿一小段主色线 */
+[data-skin="mingjiao"] #tabbar button.on{
+  color:var(--mj-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="mingjiao"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标：印章色，方一点 */
+[data-skin="mingjiao"] .badge{background:var(--mj-seal);border-radius:6px}
+
+/* 时间分隔线：内联 SVG 画的门派兵器，代替默认的饼干棒 */
+[data-skin="mingjiao"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--mj-weapon) center/contain no-repeat;
+}
+
+[data-skin="mingjiao"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：副标题下方一道纹样 */
+[data-skin="mingjiao"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="mingjiao"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--mj-orn);
+  -webkit-mask:url(../skins/mingjiao/ornament.png) center/contain no-repeat;mask:url(../skins/mingjiao/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="mingjiao"] .panel::after,[data-skin="mingjiao"] #auth .sub::after{display:none}
+}

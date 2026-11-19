@@ -72,24 +72,49 @@ export function renderMe() {
   box.appendChild(h('div', { class: 'panel' }, h('h3', { text: '外观' }), themeSeg,
     h('p', { class: 'hint', style: 'margin-top:12px', text: '自动会跟随手机的白天或晚上设置。' })));
 
+  // 皮肤：上面「基础」（默认、沙子），下面「门派」，每个门派一张卡片（场景缩略图 + 左上角徽记 + 名字）。
+  // 缩略图加载失败就退回成主色和底色的斜分色块；下面的说明跟着选中项变
   var skinCur = skinMode();
-  var skinHint = h('p', { class: 'hint', style: 'margin-top:12px', text: skinById(skinCur).hint });
-  var skinBtns = SKINS.map(function (k) {
-    return h('button', {
-      type: 'button', role: 'radio', 'aria-checked': k.id === skinCur ? 'true' : 'false', class: k.id === skinCur ? 'on' : '', text: k.name,
-      onclick: function () {
-        setSkin(k.id);
-        skinHint.textContent = k.hint;
-        skinBtns.forEach(function (b, i) {
-          var on = SKINS[i].id === k.id;
-          b.className = on ? 'on' : ''; b.setAttribute('aria-checked', on ? 'true' : 'false');
-        });
-      }
+  var skinNow = h('b', { class: 'skin-now-nm', text: skinById(skinCur).name });
+  var skinHint = h('span', { text: skinById(skinCur).hint });
+  var skinCards = [];
+  function pickSkin(k) {
+    setSkin(k.id);
+    skinNow.textContent = k.name; skinHint.textContent = k.hint;
+    skinCards.forEach(function (c) {
+      var on = c._id === k.id;
+      c.classList.toggle('on', on); c.setAttribute('aria-checked', on ? 'true' : 'false');
     });
-  });
-  var skinSeg = h('div', { class: 'seg', role: 'radiogroup', 'aria-label': '皮肤', style: 'margin-bottom:0' });
-  skinBtns.forEach(function (b) { skinSeg.appendChild(b); });
-  box.appendChild(h('div', { class: 'panel' }, h('h3', { text: '皮肤' }), skinSeg, skinHint));
+  }
+  function skinCard(k) {
+    var sw = k.sw || ['#bb3862', '#f4e3c8'];
+    var art = h('span', { class: 'skin-art skin-art-' + k.id, 'aria-hidden': 'true', style: '--sw-a:' + sw[0] + ';--sw-b:' + sw[1] });
+    if (k.thumb) {
+      var img = h('img', { class: 'skin-thumb', src: k.thumb, alt: '', draggable: 'false', loading: 'lazy' });
+      img.addEventListener('error', function () { img.remove(); art.classList.add('nothumb'); });
+      art.appendChild(img);
+    }
+    if (k.em) {
+      var em = h('img', { class: 'skin-em', src: k.em, alt: '', draggable: 'false', loading: 'lazy' });
+      em.addEventListener('error', function () { em.remove(); });
+      art.appendChild(em);
+    }
+    var c = h('button', {
+      type: 'button', role: 'radio', class: 'skin-card' + (k.id === skinCur ? ' on' : ''), 'aria-checked': k.id === skinCur ? 'true' : 'false',
+      onclick: function () { pickSkin(k); }
+    }, art, h('span', { class: 'skin-nm', text: k.name }), h('span', { class: 'skin-tick', 'aria-hidden': 'true' }));
+    c._id = k.id;
+    skinCards.push(c);
+    return c;
+  }
+  var baseRow = h('div', { class: 'skin-grid skin-base' });
+  var sectRow = h('div', { class: 'skin-grid' });
+  SKINS.forEach(function (k) { (k.group === 'base' ? baseRow : sectRow).appendChild(skinCard(k)); });
+  var picker = h('div', { class: 'skin-picker', role: 'radiogroup', 'aria-label': '皮肤' },
+    h('div', { class: 'skin-sec' }, '基础'), baseRow,
+    h('div', { class: 'skin-sec' }, '门派'), sectRow);
+  box.appendChild(h('div', { class: 'panel' }, h('h3', { text: '皮肤' }), picker,
+    h('p', { class: 'hint skin-now' }, skinNow, skinHint)));
 
   var toggle = h('button', { type: 'button', class: 'toggle', role: 'switch', 'aria-label': '消息通知' });
   toggle.setAttribute('aria-checked', notifOn() ? 'true' : 'false');

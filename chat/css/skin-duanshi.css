@@ -1,0 +1,165 @@
+/* 皮肤：段氏（大理洱海苍山：鎏金、朱红、白）。<html data-skin="duanshi"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动）。结构同 skin-chunyang.css：先覆盖设计变量，再加组件细节。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="duanshi"]{
+  --t1:#2e2518; --t2:#5a4a33; --t3:#74644e;
+  --pink:#a8742a; --on-pink:#fff; --pink-text:#85591a; --red-text:#b0372a; --ok:#4a7a45; --badge:#c0392b;
+  --hair:rgba(110,76,24,.15); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(110,76,24,.15); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(252,249,242,.64); --g-card:rgba(253,251,245,.66); --g-chip:rgba(255,255,255,.6); --g-solid:#f8f3e8;
+  --field-bg:rgba(255,255,255,.54);
+  --sh-1:0 1px 2px rgba(50,34,10,0.08),0 4px 14px rgba(50,34,10,0.07);
+  --sh-2:0 2px 6px rgba(50,34,10,0.08),0 14px 36px rgba(50,34,10,0.13);
+  --sh-0:0 1px 1px rgba(50,34,10,0.1);
+  --page:#ece4d4; --stage-bg:rgba(246,240,226,.84);
+  --toast-bg:rgba(40,30,16,.92); --toast-fg:#fbf5e8;
+  --mascot-bg-av:#faf5ea;
+  --bub-peer:rgba(255,253,248,.84); --bub-own:rgba(240,222,184,.92); --bub-fx:rgba(238,230,214,.92); --bub-fail:rgba(250,214,206,.9);
+  --chat-bub-peer:#f4f0e6; --chat-bub-bd:rgba(46,37,24,.08);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(110,76,24,.12); --bub-sheen:rgba(255,255,255,.6);
+  --ds-silver:#c9a566; --ds-ink:#7a5016; --ds-btn-a:#bf8a3c; --ds-btn-b:#8f5f1c; --ds-orn:rgba(168,116,42,.24);
+  --ds-ring:rgba(168,116,42,.28); --ds-seal:#c0392b;
+  --ds-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M10 6c-1.4-2.6-4.4-3.2-7.4-1.4 2.6.2 4 1.6 4.4 2.6-2.4.4-3.6 1.6-4.2 2.8 3 1.4 5.8.4 7.2-4z' fill='%23c0392b'/%3E%3Cpath d='M13 6L128 3.4c2.4 1 2.4 4.2 0 5.2L13 6z' fill='%237a5a2a'/%3E%3Cpath d='M13 6L128 3.4c2.4 1 2.4 4.2 0 5.2L13 6z' fill='none'/%3E%3Cpath d='M13 5.6L126 2.6c1.8.6 1.8 1.6 1 2.2L13 6.6z' fill='%23d9b36a'/%3E%3Cpath d='M20 5.2l100-2.2M20 6.4l102 1.8' stroke='%23a8742a' stroke-width='.6'/%3E%3Cpath d='M104 4.1l.2 4.2M112 3.9l.2 4.6' stroke='%23c0392b' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='14' cy='6.2' r='2.2' fill='%23b8903a'/%3E%3Ccircle cx='14' cy='6.2' r='.8' fill='%237a5a2a'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/duanshi/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(250,246,236,0.06) 0,rgba(250,246,236,0.18) 45%,rgba(250,246,236,0.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#f8f3e8 0,#eee5d2 50%,#e2d7c0 100%);
+  --ds-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="duanshi"][data-theme="dark"]{
+  --t1:#f0e8d8; --t2:#c6b89e; --t3:#9f9278;
+  --pink:#e0b46a; --on-pink:#2a1a06; --pink-text:#ecc886; --red-text:#ff9a86; --ok:#a4d09a; --badge:#d0483a;
+  --hair:rgba(240,220,180,.12); --rim:rgba(240,220,180,.16);
+  --hi:rgba(250,232,198,.22); --lo:rgba(0,0,0,.42); --side:rgba(240,220,180,.07);
+  --g-bar:rgba(24,20,16,.64); --g-card:rgba(34,28,20,.6); --g-chip:rgba(240,220,180,.1); --g-solid:#221b13;
+  --field-bg:rgba(12,8,2,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,0.45),0 4px 14px rgba(0,0,0,0.28);
+  --sh-2:0 2px 6px rgba(0,0,0,0.45),0 14px 36px rgba(0,0,0,0.42);
+  --sh-0:0 1px 1px rgba(0,0,0,0.4);
+  --page:#0f0c08; --stage-bg:rgba(20,16,10,.86);
+  --toast-bg:rgba(62,48,28,.96); --toast-fg:#fbf5e8;
+  --mascot-bg:#f0e8d8; --mascot-bg-av:#f0e8d8;
+  --bub-peer:rgba(52,44,34,.84); --bub-own:rgba(122,86,34,.86); --bub-fx:rgba(70,62,76,.86); --bub-fail:rgba(124,44,40,.88);
+  --chat-bub-peer:rgba(54,46,36,.88); --chat-bub-bd:rgba(240,220,180,.14);
+  --bub-bd:rgba(240,220,180,.16); --bub-hi:rgba(250,232,198,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(250,232,198,.12);
+  --ds-silver:#8f7a52; --ds-ink:#ecc886; --ds-btn-a:#d6a558; --ds-btn-b:#a97a32; --ds-orn:rgba(236,200,134,.22);
+  --ds-ring:rgba(224,180,106,.3); --ds-seal:#d0483a;
+  --ds-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M10 6c-1.4-2.6-4.4-3.2-7.4-1.4 2.6.2 4 1.6 4.4 2.6-2.4.4-3.6 1.6-4.2 2.8 3 1.4 5.8.4 7.2-4z' fill='%23d0483a'/%3E%3Cpath d='M13 6L128 3.4c2.4 1 2.4 4.2 0 5.2L13 6z' fill='%236a4c22'/%3E%3Cpath d='M13 6L128 3.4c2.4 1 2.4 4.2 0 5.2L13 6z' fill='none'/%3E%3Cpath d='M13 5.6L126 2.6c1.8.6 1.8 1.6 1 2.2L13 6.6z' fill='%23c49a52'/%3E%3Cpath d='M20 5.2l100-2.2M20 6.4l102 1.8' stroke='%238f6a2c' stroke-width='.6'/%3E%3Cpath d='M104 4.1l.2 4.2M112 3.9l.2 4.6' stroke='%23d0483a' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='14' cy='6.2' r='2.2' fill='%23d6a558'/%3E%3Ccircle cx='14' cy='6.2' r='.8' fill='%236a4c22'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/duanshi/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(12,10,6,0.05) 0,rgba(12,10,6,0.22) 45%,rgba(12,10,6,0.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(250,224,160,.2),rgba(250,224,160,0) 70%),
+    linear-gradient(180deg,#1a1610 0,#14110b 60%,#0d0a06 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="duanshi"]:not([data-theme="light"]){
+  --t1:#f0e8d8; --t2:#c6b89e; --t3:#9f9278;
+  --pink:#e0b46a; --on-pink:#2a1a06; --pink-text:#ecc886; --red-text:#ff9a86; --ok:#a4d09a; --badge:#d0483a;
+  --hair:rgba(240,220,180,.12); --rim:rgba(240,220,180,.16);
+  --hi:rgba(250,232,198,.22); --lo:rgba(0,0,0,.42); --side:rgba(240,220,180,.07);
+  --g-bar:rgba(24,20,16,.64); --g-card:rgba(34,28,20,.6); --g-chip:rgba(240,220,180,.1); --g-solid:#221b13;
+  --field-bg:rgba(12,8,2,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,0.45),0 4px 14px rgba(0,0,0,0.28);
+  --sh-2:0 2px 6px rgba(0,0,0,0.45),0 14px 36px rgba(0,0,0,0.42);
+  --sh-0:0 1px 1px rgba(0,0,0,0.4);
+  --page:#0f0c08; --stage-bg:rgba(20,16,10,.86);
+  --toast-bg:rgba(62,48,28,.96); --toast-fg:#fbf5e8;
+  --mascot-bg:#f0e8d8; --mascot-bg-av:#f0e8d8;
+  --bub-peer:rgba(52,44,34,.84); --bub-own:rgba(122,86,34,.86); --bub-fx:rgba(70,62,76,.86); --bub-fail:rgba(124,44,40,.88);
+  --chat-bub-peer:rgba(54,46,36,.88); --chat-bub-bd:rgba(240,220,180,.14);
+  --bub-bd:rgba(240,220,180,.16); --bub-hi:rgba(250,232,198,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(250,232,198,.12);
+  --ds-silver:#8f7a52; --ds-ink:#ecc886; --ds-btn-a:#d6a558; --ds-btn-b:#a97a32; --ds-orn:rgba(236,200,134,.22);
+  --ds-ring:rgba(224,180,106,.3); --ds-seal:#d0483a;
+  --ds-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M10 6c-1.4-2.6-4.4-3.2-7.4-1.4 2.6.2 4 1.6 4.4 2.6-2.4.4-3.6 1.6-4.2 2.8 3 1.4 5.8.4 7.2-4z' fill='%23d0483a'/%3E%3Cpath d='M13 6L128 3.4c2.4 1 2.4 4.2 0 5.2L13 6z' fill='%236a4c22'/%3E%3Cpath d='M13 6L128 3.4c2.4 1 2.4 4.2 0 5.2L13 6z' fill='none'/%3E%3Cpath d='M13 5.6L126 2.6c1.8.6 1.8 1.6 1 2.2L13 6.6z' fill='%23c49a52'/%3E%3Cpath d='M20 5.2l100-2.2M20 6.4l102 1.8' stroke='%238f6a2c' stroke-width='.6'/%3E%3Cpath d='M104 4.1l.2 4.2M112 3.9l.2 4.6' stroke='%23d0483a' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='14' cy='6.2' r='2.2' fill='%23d6a558'/%3E%3Ccircle cx='14' cy='6.2' r='.8' fill='%236a4c22'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/duanshi/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(12,10,6,0.05) 0,rgba(12,10,6,0.22) 45%,rgba(12,10,6,0.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(250,224,160,.2),rgba(250,224,160,0) 70%),
+    linear-gradient(180deg,#1a1610 0,#14110b 60%,#0d0a06 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="duanshi"] ::selection{background:rgba(168,116,42,.3)}
+:root[data-skin="duanshi"][data-theme="dark"] ::selection{background:rgba(224,180,106,.35)}
+[data-skin="duanshi"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题 */
+[data-skin="duanshi"] .top h2,[data-skin="duanshi"] #auth h1,[data-skin="duanshi"] .me-head .name,
+[data-skin="duanshi"] .panel h3,[data-skin="duanshi"] .section-title,[data-skin="duanshi"] #chat .who b{
+  font-family:var(--ds-serif);letter-spacing:.06em;
+}
+[data-skin="duanshi"] .top h2,[data-skin="duanshi"] #auth h1{font-weight:700}
+[data-skin="duanshi"] .panel h3,[data-skin="duanshi"] .section-title{color:var(--ds-ink)}
+
+/* 顶栏：页名前一枚徽记，下沿一道渐隐的细线 */
+[data-skin="duanshi"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="duanshi"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--ds-silver) 18%,var(--ds-silver) 82%,transparent);opacity:.75;
+}
+[data-skin="duanshi"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="duanshi"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/duanshi/emblem.png) center/contain no-repeat;
+}
+
+/* 面板右上角的纹样（遮罩取形，颜色跟主题走） */
+[data-skin="duanshi"] .panel{position:relative;overflow:hidden}
+[data-skin="duanshi"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--ds-orn);
+  -webkit-mask:url(../skins/duanshi/ornament.png) center/contain no-repeat;mask:url(../skins/duanshi/ornament.png) center/contain no-repeat;
+}
+[data-skin="duanshi"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮 */
+[data-skin="duanshi"] .btn:not(.ghost):not(.danger){
+  background-color:var(--ds-btn-b);
+  background-image:linear-gradient(180deg,var(--ds-btn-a),var(--ds-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(50,34,10,.18),0 4px 10px rgba(50,34,10,.14);
+}
+@media (hover:hover){ [data-skin="duanshi"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--ds-btn-a) 88%,#fff),var(--ds-btn-b))} }
+[data-skin="duanshi"] .seg button.on{background-image:linear-gradient(180deg,var(--ds-btn-a),var(--ds-btn-b));color:var(--on-pink)}
+[data-skin="duanshi"] .field:focus{box-shadow:inset 0 1px 3px rgba(50,34,10,.14),0 0 0 3px var(--ds-ring)}
+[data-skin="duanshi"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--ds-btn-a),var(--ds-btn-b))}
+
+/* 底部标签栏选中格 */
+[data-skin="duanshi"] #tabbar button.on{
+  color:var(--ds-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="duanshi"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标：印章，方一点 */
+[data-skin="duanshi"] .badge{background:var(--ds-seal);border-radius:6px}
+
+/* 时间分隔线：门派兵器的剪影（内联 SVG，白天晚上各一份） */
+[data-skin="duanshi"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--ds-blade) center/contain no-repeat;
+}
+
+[data-skin="duanshi"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：吉祥物下方一道纹样 */
+[data-skin="duanshi"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="duanshi"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--ds-orn);
+  -webkit-mask:url(../skins/duanshi/ornament.png) center/contain no-repeat;mask:url(../skins/duanshi/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="duanshi"] .panel::after,[data-skin="duanshi"] #auth .sub::after{display:none}
+}

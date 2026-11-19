@@ -1,0 +1,165 @@
+/* 皮肤：凌雪阁（长安深雪、暗红、夜黑、雪白）。<html data-skin="lingxue"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动）。结构同纯阳：先覆盖设计变量，再加组件细节。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="lingxue"]{
+  --t1:#2a1c20; --t2:#5a444a; --t3:#765e64;
+  --pink:#8a2232; --on-pink:#fff; --pink-text:#7a1c2b; --red-text:#a8242c; --ok:#2b6c58; --badge:#a8242c;
+  --hair:rgba(90,40,52,.14); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(90,40,52,.14); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(250,246,247,.62); --g-card:rgba(250,246,247,.64); --g-chip:rgba(255,255,255,.6); --g-solid:rgb(250,246,247);
+  --field-bg:rgba(255,255,255,.52);
+  --sh-1:0 1px 2px rgba(40,18,24,.08),0 4px 14px rgba(40,18,24,.07);
+  --sh-2:0 2px 4px rgba(40,18,24,.08),0 12px 32px rgba(40,18,24,.13);
+  --sh-0:0 1px 1px rgba(40,18,24,.10);
+  --page:#e8e2e5; --stage-bg:rgba(240,232,235,.82);
+  --toast-bg:rgba(38,22,28,.92); --toast-fg:#f4f6f8;
+  --mascot-bg-av:#f6f1f3;
+  --bub-peer:rgba(252,253,254,.82); --bub-own:rgba(240,208,214,.9); --bub-fx:rgba(228,226,240,.92); --bub-fail:rgba(250,214,214,.9);
+  --chat-bub-peer:#f3eef0; --chat-bub-bd:rgba(90,40,52,.1);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(90,40,52,.12); --bub-sheen:rgba(255,255,255,.6);
+  --lx-sil:#b8a8ae; --lx-ink:#6a1a28; --lx-btn-a:#a53246; --lx-btn-b:#7a1c2b; --lx-orn:rgba(138,34,50,.2);
+  --lx-ring:rgba(138,34,50,.26); --lx-seal:#8a2232;
+  --lx-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cellipse cx='6' cy='6' rx='4.4' ry='2.6' fill='none' stroke='%238c7e84' stroke-width='1.1'/%3E%3Cellipse cx='14' cy='6' rx='2' ry='3.6' fill='none' stroke='%238c7e84' stroke-width='1.1'/%3E%3Cellipse cx='22' cy='6' rx='4.4' ry='2.6' fill='none' stroke='%238c7e84' stroke-width='1.1'/%3E%3Cellipse cx='30' cy='6' rx='2' ry='3.6' fill='none' stroke='%238c7e84' stroke-width='1.1'/%3E%3Cellipse cx='38' cy='6' rx='4.4' ry='2.6' fill='none' stroke='%238c7e84' stroke-width='1.1'/%3E%3Cellipse cx='46' cy='6' rx='2' ry='3.6' fill='none' stroke='%238c7e84' stroke-width='1.1'/%3E%3Ccircle cx='54' cy='6' r='2.4' fill='none' stroke='%233a2a30' stroke-width='1.3'/%3E%3Crect x='56' y='4.8' width='18' height='2.8' rx='1.2' fill='%233a2a30'/%3E%3Crect x='74' y='2.6' width='2.8' height='8' rx='1' fill='%238a2232'/%3E%3Cpath d='M77 3.4Q110 4.6 131 .8Q119 5.6 112 11Q96 9 77 9.4Z' fill='%23c8ced6'/%3E%3Cpath d='M78 4.4Q108 5.6 128 1.8' fill='none' stroke='%23ffffff' stroke-width='.6'/%3E%3Ccircle cx='99' cy='7.4' r='1.2' fill='%238a2232'/%3E%3C/svg%3E");
+  --lx-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/lingxue/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(246,242,244,.06) 0,rgba(246,242,244,.18) 45%,rgba(246,242,244,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#f6f1f3 0,#ebe4e7 50%,#dcd2d6 100%);
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="lingxue"][data-theme="dark"]{
+  --t1:#f2e8ec; --t2:#c8b4ba; --t3:#a08c94;
+  --pink:#e0788a; --on-pink:#2a0a12; --pink-text:#ea96a4; --red-text:#ff9da8; --ok:#8fd6bd; --badge:#d0384c;
+  --hair:rgba(240,200,210,.12); --rim:rgba(240,200,210,.16);
+  --hi:rgba(250,214,222,.22); --lo:rgba(0,0,0,.4); --side:rgba(240,200,210,.07);
+  --g-bar:rgba(20,14,20,.62); --g-card:rgba(30,20,28,.58); --g-chip:rgba(240,200,210,.1); --g-solid:#241822;
+  --field-bg:rgba(4,8,12,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0c080c; --stage-bg:rgba(18,12,18,.84);
+  --toast-bg:rgba(56,34,46,.96); --toast-fg:#f4f6f8;
+  --mascot-bg:#f2e8ec; --mascot-bg-av:#f2e8ec;
+  --bub-peer:rgba(46,32,42,.84); --bub-own:rgba(120,38,56,.86); --bub-fx:rgba(66,58,96,.86); --bub-fail:rgba(130,36,44,.88);
+  --chat-bub-peer:rgba(50,34,44,.88); --chat-bub-bd:rgba(240,200,210,.14);
+  --bub-bd:rgba(240,200,210,.16); --bub-hi:rgba(250,214,222,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(250,214,222,.12);
+  --lx-sil:#8c7a82; --lx-ink:#ea96a4; --lx-btn-a:#ec8a9a; --lx-btn-b:#c4506a; --lx-orn:rgba(234,150,164,.2);
+  --lx-ring:rgba(224,120,138,.3); --lx-seal:#d0384c;
+  --lx-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cellipse cx='6' cy='6' rx='4.4' ry='2.6' fill='none' stroke='%239a8a92' stroke-width='1.1'/%3E%3Cellipse cx='14' cy='6' rx='2' ry='3.6' fill='none' stroke='%239a8a92' stroke-width='1.1'/%3E%3Cellipse cx='22' cy='6' rx='4.4' ry='2.6' fill='none' stroke='%239a8a92' stroke-width='1.1'/%3E%3Cellipse cx='30' cy='6' rx='2' ry='3.6' fill='none' stroke='%239a8a92' stroke-width='1.1'/%3E%3Cellipse cx='38' cy='6' rx='4.4' ry='2.6' fill='none' stroke='%239a8a92' stroke-width='1.1'/%3E%3Cellipse cx='46' cy='6' rx='2' ry='3.6' fill='none' stroke='%239a8a92' stroke-width='1.1'/%3E%3Ccircle cx='54' cy='6' r='2.4' fill='none' stroke='%23c8b4ba' stroke-width='1.3'/%3E%3Crect x='56' y='4.8' width='18' height='2.8' rx='1.2' fill='%23c8b4ba'/%3E%3Crect x='74' y='2.6' width='2.8' height='8' rx='1' fill='%23e0788a'/%3E%3Cpath d='M77 3.4Q110 4.6 131 .8Q119 5.6 112 11Q96 9 77 9.4Z' fill='%23b8c0c8'/%3E%3Cpath d='M78 4.4Q108 5.6 128 1.8' fill='none' stroke='%23f4f6f8' stroke-width='.6'/%3E%3Ccircle cx='99' cy='7.4' r='1.2' fill='%23e0788a'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/lingxue/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(8,4,8,.05) 0,rgba(8,4,8,.22) 45%,rgba(8,4,8,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(240,120,130,.22),rgba(240,120,130,0) 70%),
+    linear-gradient(180deg,#150d14 0,#0f090f 60%,#0a060a 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="lingxue"]:not([data-theme="light"]){
+  --t1:#f2e8ec; --t2:#c8b4ba; --t3:#a08c94;
+  --pink:#e0788a; --on-pink:#2a0a12; --pink-text:#ea96a4; --red-text:#ff9da8; --ok:#8fd6bd; --badge:#d0384c;
+  --hair:rgba(240,200,210,.12); --rim:rgba(240,200,210,.16);
+  --hi:rgba(250,214,222,.22); --lo:rgba(0,0,0,.4); --side:rgba(240,200,210,.07);
+  --g-bar:rgba(20,14,20,.62); --g-card:rgba(30,20,28,.58); --g-chip:rgba(240,200,210,.1); --g-solid:#241822;
+  --field-bg:rgba(4,8,12,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0c080c; --stage-bg:rgba(18,12,18,.84);
+  --toast-bg:rgba(56,34,46,.96); --toast-fg:#f4f6f8;
+  --mascot-bg:#f2e8ec; --mascot-bg-av:#f2e8ec;
+  --bub-peer:rgba(46,32,42,.84); --bub-own:rgba(120,38,56,.86); --bub-fx:rgba(66,58,96,.86); --bub-fail:rgba(130,36,44,.88);
+  --chat-bub-peer:rgba(50,34,44,.88); --chat-bub-bd:rgba(240,200,210,.14);
+  --bub-bd:rgba(240,200,210,.16); --bub-hi:rgba(250,214,222,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(250,214,222,.12);
+  --lx-sil:#8c7a82; --lx-ink:#ea96a4; --lx-btn-a:#ec8a9a; --lx-btn-b:#c4506a; --lx-orn:rgba(234,150,164,.2);
+  --lx-ring:rgba(224,120,138,.3); --lx-seal:#d0384c;
+  --lx-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cellipse cx='6' cy='6' rx='4.4' ry='2.6' fill='none' stroke='%239a8a92' stroke-width='1.1'/%3E%3Cellipse cx='14' cy='6' rx='2' ry='3.6' fill='none' stroke='%239a8a92' stroke-width='1.1'/%3E%3Cellipse cx='22' cy='6' rx='4.4' ry='2.6' fill='none' stroke='%239a8a92' stroke-width='1.1'/%3E%3Cellipse cx='30' cy='6' rx='2' ry='3.6' fill='none' stroke='%239a8a92' stroke-width='1.1'/%3E%3Cellipse cx='38' cy='6' rx='4.4' ry='2.6' fill='none' stroke='%239a8a92' stroke-width='1.1'/%3E%3Cellipse cx='46' cy='6' rx='2' ry='3.6' fill='none' stroke='%239a8a92' stroke-width='1.1'/%3E%3Ccircle cx='54' cy='6' r='2.4' fill='none' stroke='%23c8b4ba' stroke-width='1.3'/%3E%3Crect x='56' y='4.8' width='18' height='2.8' rx='1.2' fill='%23c8b4ba'/%3E%3Crect x='74' y='2.6' width='2.8' height='8' rx='1' fill='%23e0788a'/%3E%3Cpath d='M77 3.4Q110 4.6 131 .8Q119 5.6 112 11Q96 9 77 9.4Z' fill='%23b8c0c8'/%3E%3Cpath d='M78 4.4Q108 5.6 128 1.8' fill='none' stroke='%23f4f6f8' stroke-width='.6'/%3E%3Ccircle cx='99' cy='7.4' r='1.2' fill='%23e0788a'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/lingxue/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(8,4,8,.05) 0,rgba(8,4,8,.22) 45%,rgba(8,4,8,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(240,120,130,.22),rgba(240,120,130,0) 70%),
+    linear-gradient(180deg,#150d14 0,#0f090f 60%,#0a060a 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="lingxue"] ::selection{background:rgba(138,34,50,.28)}
+[data-skin="lingxue"][data-theme="dark"] ::selection{background:rgba(224,120,138,.34)}
+[data-skin="lingxue"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题 */
+[data-skin="lingxue"] .top h2,[data-skin="lingxue"] #auth h1,[data-skin="lingxue"] .me-head .name,
+[data-skin="lingxue"] .panel h3,[data-skin="lingxue"] .section-title,[data-skin="lingxue"] #chat .who b{
+  letter-spacing:.06em;
+}
+[data-skin="lingxue"] .top h2,[data-skin="lingxue"] #auth h1{font-weight:700}
+[data-skin="lingxue"] .panel h3,[data-skin="lingxue"] .section-title{color:var(--lx-ink)}
+
+/* 顶栏：页名前一枚徽记，下沿一道渐隐的线 */
+[data-skin="lingxue"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="lingxue"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--lx-sil) 18%,var(--lx-sil) 82%,transparent);opacity:.7;
+}
+[data-skin="lingxue"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="lingxue"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/lingxue/emblem.png) center/contain no-repeat;
+}
+
+/* 面板右上角的纹样（遮罩取形，颜色跟主题走） */
+[data-skin="lingxue"] .panel{position:relative;overflow:hidden}
+[data-skin="lingxue"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--lx-orn);
+  -webkit-mask:url(../skins/lingxue/ornament.png) center/contain no-repeat;mask:url(../skins/lingxue/ornament.png) center/contain no-repeat;
+}
+[data-skin="lingxue"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮 */
+[data-skin="lingxue"] .btn:not(.ghost):not(.danger){
+  background-color:var(--lx-btn-b);
+  background-image:linear-gradient(180deg,var(--lx-btn-a),var(--lx-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.14);
+}
+@media (hover:hover){ [data-skin="lingxue"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--lx-btn-a) 88%,#fff),var(--lx-btn-b))} }
+[data-skin="lingxue"] .seg button.on{background-image:linear-gradient(180deg,var(--lx-btn-a),var(--lx-btn-b));color:var(--on-pink)}
+[data-skin="lingxue"] .field:focus{box-shadow:inset 0 1px 3px rgba(0,0,0,.14),0 0 0 3px var(--lx-ring)}
+[data-skin="lingxue"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--lx-btn-a),var(--lx-btn-b))}
+
+/* 底部标签栏：选中的一格 */
+[data-skin="lingxue"] #tabbar button.on{
+  color:var(--lx-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="lingxue"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标 */
+[data-skin="lingxue"] .badge{background:var(--lx-seal);border-radius:6px}
+
+/* 时间分隔线：一柄带锁链的弯刃，代替默认的饼干棒 */
+[data-skin="lingxue"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--lx-line) center/contain no-repeat;
+}
+
+[data-skin="lingxue"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：副标题下一道纹样 */
+[data-skin="lingxue"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="lingxue"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--lx-orn);
+  -webkit-mask:url(../skins/lingxue/ornament.png) center/contain no-repeat;mask:url(../skins/lingxue/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="lingxue"] .panel::after,[data-skin="lingxue"] #auth .sub::after{display:none}
+}

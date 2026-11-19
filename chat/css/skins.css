@@ -7,3 +7,40 @@
 #msgs.sand-rm .bw{transition:opacity .3s}
 #msgs.sand-rm .row.sand-gone .bw,#msgs.sand-rm .row.sand-build .bw{visibility:visible;opacity:0}
 
+
+/* 皮肤选择器（我的 → 皮肤）：分「基础」和「门派」两组卡片。卡片是 3:4 的小画框：
+   门派是场景缩略图 + 左上角徽记，基础皮肤用 CSS 画默认外观的暖色；名字压在底部的渐变上；选中的描主色边、右上角打勾 */
+.skin-picker{display:flex;flex-direction:column;gap:8px}
+.skin-sec{font-size:var(--fs-xs);font-weight:600;color:var(--t2);letter-spacing:.08em;margin-top:4px}
+.skin-sec:first-child{margin-top:0}
+.skin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:10px 8px}
+.skin-base{grid-template-columns:repeat(auto-fill,minmax(66px,1fr))}
+.skin-card{position:relative;display:block;aspect-ratio:3/4;padding:0;border-radius:12px;overflow:hidden;background:var(--field-bg);
+  box-shadow:0 0 0 1px var(--hair),var(--sh-0);transition:transform .16s var(--ease),box-shadow .16s var(--ease)}
+.skin-card:active{transform:translateY(1px) scale(.97)}
+.skin-card.on{box-shadow:0 0 0 2px var(--pink),0 0 0 4px color-mix(in srgb,var(--pink) 22%,transparent),var(--sh-1)}
+.skin-card:focus-visible{outline:2px solid var(--pink-text);outline-offset:3px}
+.skin-art{position:absolute;inset:0;display:block;background:linear-gradient(135deg,var(--sw-a) 0 50%,var(--sw-b) 50% 100%)}
+.skin-thumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.skin-em{position:absolute;top:5px;left:5px;width:20px;height:20px;object-fit:contain;filter:drop-shadow(0 0 1.5px rgba(255,255,255,.95)) drop-shadow(0 1px 2px rgba(0,0,0,.25))}
+/* 基础皮肤：画一小块默认外观（暖色光 + 一个粉色气泡）；沙子再撒一层沙粒 */
+.skin-art-default,.skin-art-sand{background:
+  radial-gradient(60% 40% at 30% 58%,#ffc6d8 0 46%,transparent 48%),
+  radial-gradient(120% 60% at 88% -4%,rgba(255,226,158,.95),rgba(255,226,158,0) 62%),
+  linear-gradient(180deg,#f7e8cc 0,#ebd5b2 100%)}
+.skin-art-sand::after{content:"";position:absolute;inset:0;background-image:radial-gradient(#b98a4e 0 1px,transparent 1.4px),radial-gradient(#d9b37a 0 .8px,transparent 1.2px);background-size:7px 7px,5px 5px;background-position:0 0,3px 2px;opacity:.75}
+.skin-nm{position:absolute;left:0;right:0;bottom:0;padding:14px 2px 5px;text-align:center;font-size:var(--fs-xs);font-weight:600;line-height:1.1;color:#fff;
+  white-space:nowrap;letter-spacing:.04em;background:linear-gradient(rgba(10,12,18,0),rgba(10,12,18,.62));text-shadow:0 1px 2px rgba(0,0,0,.45)}
+.skin-tick{position:absolute;top:5px;right:5px;width:18px;height:18px;border-radius:50%;background:var(--pink);box-shadow:0 0 0 1.5px #fff,0 1px 2px rgba(0,0,0,.3);opacity:0;transform:scale(.6);transition:opacity .16s var(--ease),transform .16s var(--ease)}
+.skin-tick::after{content:"";position:absolute;left:6px;top:3.5px;width:4px;height:8px;border:solid var(--on-pink);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.skin-card.on .skin-tick{opacity:1;transform:none}
+.skin-now{margin-top:12px}
+.skin-now-nm{color:var(--t1);font-weight:600;margin-right:6px}
+
+/* 整套外观皮肤（任何 data-skin）：登录页的标题、副标题和返回链接直接压在场景图上，场景花的时候看不清。
+   返回链接加一块玻璃底，标题和副标题加一圈和面板底色同色的柔光（白天是浅色光、晚上是深色光） */
+:root[data-skin] #auth .hub-link{padding:0 12px 0 8px;border-radius:999px;background:var(--g-chip);border:1px solid var(--rim);-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
+:root[data-skin] #auth h1,:root[data-skin] #auth .sub{text-shadow:0 0 6px var(--g-solid),0 0 14px var(--g-solid),0 0 2px var(--g-solid)}
+/* 页名前的徽记只有 22px：浅色部分（白色的剑、银饰）在浅色顶栏上会消失，统一加一圈随主题变色的细描边 */
+:root[data-skin] .view>.top h2::before{filter:drop-shadow(0 0 .5px var(--t2)) drop-shadow(0 0 .5px var(--t2))}
+:root[data-skin] .me-head .name,:root[data-skin] .me-head .uname{text-shadow:0 0 6px var(--g-solid),0 0 14px var(--g-solid),0 0 2px var(--g-solid)}

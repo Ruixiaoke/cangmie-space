@@ -7,7 +7,7 @@ var CHARS = [
   { normal: 'chunyang.png', cheer: 'chunyang-cheer.png', glyph: '道' }
 ];
 // 皮肤 id → 固定用 CHARS 里的第几个吉祥物（没写的皮肤照常按 seed 挑）
-var SKIN_MASCOT = { chunyang: 1 };
+var SKIN_MASCOT = { chunyang: 1, cangjian: 0 };
 // seed 可选：传同一个字符串（如用户 id）总是得到同一个角色；不传就随机
 function pick(seed) {
   var only = SKIN_MASCOT[document.documentElement.getAttribute('data-skin')];

@@ -1,7 +1,7 @@
 // 纯阳皮肤截图：SKIN=chunyang|default，主题 light / dark，390x844
 import { chromium } from 'playwright';
 import http from 'http'; import fs from 'fs'; import path from 'path';
-const WT = process.env.WT, OUT = process.env.OUT, SKIN = process.env.SKIN || 'chunyang', ONLY = process.env.ONLY || '';
+const PORT = Number(process.env.PORT || 8079), WT = process.env.WT, OUT = process.env.OUT, SKIN = process.env.SKIN || 'chunyang', ONLY = process.env.ONLY || '';
 fs.mkdirSync(OUT, { recursive: true });
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.webmanifest': 'application/json' };
 const srv = http.createServer((req, res) => {
@@ -9,8 +9,8 @@ const srv = http.createServer((req, res) => {
   if (fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, 'index.html');
   if (!fs.existsSync(f)) { res.writeHead(404); return res.end(); }
   res.writeHead(200, { 'content-type': types[path.extname(f)] || 'application/octet-stream' }); res.end(fs.readFileSync(f));
-}).listen(8079);
-const fake = fs.readFileSync(new URL('./fake-sb.js', import.meta.url), 'utf8').replaceAll('localhost:8077', 'localhost:8079');
+}).listen(PORT);
+const fake = fs.readFileSync(new URL('./fake-sb.js', import.meta.url), 'utf8').replaceAll('localhost:8077', 'localhost:' + PORT);
 const browser = await chromium.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const errs = [];
@@ -34,17 +34,17 @@ async function run(scheme) {
   const shot = (p, n) => (!ONLY || ONLY.split(',').includes(n)) ? p.screenshot({ path: `${OUT}/${tag}-${n}.png` }) : null;
   // 登录页
   let { ctx, page } = await ctxFor(scheme, true);
-  await page.goto('http://localhost:8079/chat/'); await page.waitForSelector('#auth:not([hidden])', { timeout: 8000 }); await sleep(700);
+  await page.goto('http://localhost:' + PORT + '/chat/'); await page.waitForSelector('#auth:not([hidden])', { timeout: 8000 }); await sleep(700);
   await shot(page, '01-auth'); await ctx.close();
   ({ ctx, page } = await ctxFor(scheme, false));
   const ev = (f, a) => page.evaluate(f, a);
-  await page.goto('http://localhost:8079/chat/'); await page.waitForSelector('#app:not([hidden])', { timeout: 8000 }); await sleep(900);
+  await page.goto('http://localhost:' + PORT + '/chat/'); await page.waitForSelector('#app:not([hidden])', { timeout: 8000 }); await sleep(900);
   await shot(page, '02-chats');
   await page.click('#tabbar button[data-tab="friends"]'); await sleep(500); await shot(page, '03-friends');
   await page.click('#tabbar button[data-tab="me"]'); await sleep(500); await shot(page, '04-me');
-  await ev(() => { const s = document.querySelector('#meBody'); s.scrollTop = s.scrollHeight; }); await sleep(300); await shot(page, '05-me-skin');
+  await ev(() => { const p = document.querySelector('.skin-picker'); if (p) p.closest('.panel').scrollIntoView({ block: 'start' }); const s = document.querySelector('#meBody'); s.scrollTop -= 72; }); await sleep(400); await shot(page, '05-me-skin');
   // 私聊
-  await page.goto('http://localhost:8079/chat/?peer=22222222-2222-4222-8222-222222222222');
+  await page.goto('http://localhost:' + PORT + '/chat/?peer=22222222-2222-4222-8222-222222222222');
   await page.waitForSelector('#msgs .row', { timeout: 8000 }); await sleep(800);
   await ev(() => { const m = document.querySelector('#msgs'); m.scrollTop = 0; }); await sleep(300);
   await shot(page, '06-dm');
@@ -61,7 +61,7 @@ async function run(scheme) {
   await shot(page, '11-miniapp');
   await ev(() => import('/chat/js/miniapps/host.js').then((m) => m.closeApp())); await sleep(300);
   // 群聊 + 群资料
-  await page.goto('http://localhost:8079/chat/?group=7'); await page.waitForSelector('#msgs .row', { timeout: 8000 }); await sleep(700);
+  await page.goto('http://localhost:' + PORT + '/chat/?group=7'); await page.waitForSelector('#msgs .row', { timeout: 8000 }); await sleep(700);
   await shot(page, '12-group');
   const info = await page.$('#chat .top .avatar, #chat .who');
   if (info) { await info.click(); await sleep(700); await shot(page, '13-group-info'); }

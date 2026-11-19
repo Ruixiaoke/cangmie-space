@@ -1,0 +1,165 @@
+/* 皮肤：万灵（南方深山：森绿、琥珀金、赭红）。<html data-skin="wanling"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动）。结构同 skin-chunyang.css：先覆盖设计变量，再加组件细节。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="wanling"]{
+  --t1:#212c20; --t2:#4a5a45; --t3:#62735d;
+  --pink:#3e6b3a; --on-pink:#fff; --pink-text:#2f5a2c; --red-text:#a8442a; --ok:#2d6a3e; --badge:#a8442a;
+  --hair:rgba(52,84,44,.15); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(52,84,44,.15); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(247,250,241,.62); --g-card:rgba(249,251,244,.64); --g-chip:rgba(255,255,255,.6); --g-solid:#f3f6ec;
+  --field-bg:rgba(255,255,255,.52);
+  --sh-1:0 1px 2px rgba(30,44,20,0.08),0 4px 14px rgba(30,44,20,0.07);
+  --sh-2:0 2px 6px rgba(30,44,20,0.08),0 14px 36px rgba(30,44,20,0.13);
+  --sh-0:0 1px 1px rgba(30,44,20,0.1);
+  --page:#e1e8d8; --stage-bg:rgba(236,242,226,.82);
+  --toast-bg:rgba(28,40,22,.92); --toast-fg:#f2f7ea;
+  --mascot-bg-av:#f1f5e9;
+  --bub-peer:rgba(252,254,248,.82); --bub-own:rgba(212,230,192,.9); --bub-fx:rgba(232,236,206,.92); --bub-fail:rgba(250,216,204,.9);
+  --chat-bub-peer:#f0f3ea; --chat-bub-bd:rgba(33,44,32,.08);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(52,84,44,.12); --bub-sheen:rgba(255,255,255,.6);
+  --wl-silver:#c4a25a; --wl-ink:#2f5a2c; --wl-btn-a:#548a4e; --wl-btn-b:#3a6636; --wl-orn:rgba(62,107,58,.22);
+  --wl-ring:rgba(62,107,58,.26); --wl-seal:#a8442a;
+  --wl-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 2.4l6 3.6-6 3.6 2-3.6zM6 2.4l6 3.6-6 3.6 2-3.6z' fill='%23c8962e'/%3E%3Cpath d='M10 2.8l4 3.2-4 3.2' fill='none' stroke='%23a8442a' stroke-width='.8'/%3E%3Crect x='12' y='5.2' width='106' height='1.6' rx='.8' fill='%238a6a40'/%3E%3Cpath d='M26 5.2v1.6M30 5.2v1.6' stroke='%23a8442a' stroke-width='1.2'/%3E%3Cpath d='M118 1.8L131 6 118 10.2l3-4.2z' fill='%237f8c92'/%3E%3Cpath d='M121 6h8' stroke='%23e2eaee' stroke-width='.6'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/wanling/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(242,247,234,0.06) 0,rgba(242,247,234,0.18) 45%,rgba(242,247,234,0.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#f0f5e8 0,#e3ebd8 50%,#d4dfc8 100%);
+  --wl-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="wanling"][data-theme="dark"]{
+  --t1:#e8f0e2; --t2:#b6c6ac; --t3:#8fa186;
+  --pink:#9fd08f; --on-pink:#10200e; --pink-text:#b4dea6; --red-text:#ff9c84; --ok:#9ad9a0; --badge:#c5603a;
+  --hair:rgba(210,240,196,.12); --rim:rgba(210,240,196,.16);
+  --hi:rgba(222,250,208,.22); --lo:rgba(0,0,0,.42); --side:rgba(210,240,196,.07);
+  --g-bar:rgba(12,24,12,.64); --g-card:rgba(18,34,18,.6); --g-chip:rgba(210,240,196,.1); --g-solid:#142614;
+  --field-bg:rgba(4,12,4,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,0.45),0 4px 14px rgba(0,0,0,0.28);
+  --sh-2:0 2px 6px rgba(0,0,0,0.45),0 14px 36px rgba(0,0,0,0.42);
+  --sh-0:0 1px 1px rgba(0,0,0,0.4);
+  --page:#0a120a; --stage-bg:rgba(10,20,10,.86);
+  --toast-bg:rgba(38,62,34,.96); --toast-fg:#f2f7ea;
+  --mascot-bg:#e8f0e2; --mascot-bg-av:#e8f0e2;
+  --bub-peer:rgba(34,54,30,.84); --bub-own:rgba(58,104,52,.86); --bub-fx:rgba(66,70,40,.86); --bub-fail:rgba(120,48,40,.88);
+  --chat-bub-peer:rgba(36,56,32,.88); --chat-bub-bd:rgba(210,240,196,.14);
+  --bub-bd:rgba(210,240,196,.16); --bub-hi:rgba(222,250,208,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(222,250,208,.12);
+  --wl-silver:#9a8450; --wl-ink:#b4dea6; --wl-btn-a:#86c277; --wl-btn-b:#5f9a52; --wl-orn:rgba(200,170,90,.24);
+  --wl-ring:rgba(159,208,143,.3); --wl-seal:#c5603a;
+  --wl-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 2.4l6 3.6-6 3.6 2-3.6zM6 2.4l6 3.6-6 3.6 2-3.6z' fill='%23e0b050'/%3E%3Cpath d='M10 2.8l4 3.2-4 3.2' fill='none' stroke='%23c5603a' stroke-width='.8'/%3E%3Crect x='12' y='5.2' width='106' height='1.6' rx='.8' fill='%23c8a06a'/%3E%3Cpath d='M26 5.2v1.6M30 5.2v1.6' stroke='%23c5603a' stroke-width='1.2'/%3E%3Cpath d='M118 1.8L131 6 118 10.2l3-4.2z' fill='%23a0aeb4'/%3E%3Cpath d='M121 6h8' stroke='%23eef3f5' stroke-width='.6'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/wanling/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(4,10,4,0.05) 0,rgba(4,10,4,0.22) 45%,rgba(4,10,4,0.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(200,240,150,.18),rgba(200,240,150,0) 70%),
+    linear-gradient(180deg,#10200f 0,#0c1a0b 60%,#081208 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="wanling"]:not([data-theme="light"]){
+  --t1:#e8f0e2; --t2:#b6c6ac; --t3:#8fa186;
+  --pink:#9fd08f; --on-pink:#10200e; --pink-text:#b4dea6; --red-text:#ff9c84; --ok:#9ad9a0; --badge:#c5603a;
+  --hair:rgba(210,240,196,.12); --rim:rgba(210,240,196,.16);
+  --hi:rgba(222,250,208,.22); --lo:rgba(0,0,0,.42); --side:rgba(210,240,196,.07);
+  --g-bar:rgba(12,24,12,.64); --g-card:rgba(18,34,18,.6); --g-chip:rgba(210,240,196,.1); --g-solid:#142614;
+  --field-bg:rgba(4,12,4,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,0.45),0 4px 14px rgba(0,0,0,0.28);
+  --sh-2:0 2px 6px rgba(0,0,0,0.45),0 14px 36px rgba(0,0,0,0.42);
+  --sh-0:0 1px 1px rgba(0,0,0,0.4);
+  --page:#0a120a; --stage-bg:rgba(10,20,10,.86);
+  --toast-bg:rgba(38,62,34,.96); --toast-fg:#f2f7ea;
+  --mascot-bg:#e8f0e2; --mascot-bg-av:#e8f0e2;
+  --bub-peer:rgba(34,54,30,.84); --bub-own:rgba(58,104,52,.86); --bub-fx:rgba(66,70,40,.86); --bub-fail:rgba(120,48,40,.88);
+  --chat-bub-peer:rgba(36,56,32,.88); --chat-bub-bd:rgba(210,240,196,.14);
+  --bub-bd:rgba(210,240,196,.16); --bub-hi:rgba(222,250,208,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(222,250,208,.12);
+  --wl-silver:#9a8450; --wl-ink:#b4dea6; --wl-btn-a:#86c277; --wl-btn-b:#5f9a52; --wl-orn:rgba(200,170,90,.24);
+  --wl-ring:rgba(159,208,143,.3); --wl-seal:#c5603a;
+  --wl-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 2.4l6 3.6-6 3.6 2-3.6zM6 2.4l6 3.6-6 3.6 2-3.6z' fill='%23e0b050'/%3E%3Cpath d='M10 2.8l4 3.2-4 3.2' fill='none' stroke='%23c5603a' stroke-width='.8'/%3E%3Crect x='12' y='5.2' width='106' height='1.6' rx='.8' fill='%23c8a06a'/%3E%3Cpath d='M26 5.2v1.6M30 5.2v1.6' stroke='%23c5603a' stroke-width='1.2'/%3E%3Cpath d='M118 1.8L131 6 118 10.2l3-4.2z' fill='%23a0aeb4'/%3E%3Cpath d='M121 6h8' stroke='%23eef3f5' stroke-width='.6'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/wanling/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(4,10,4,0.05) 0,rgba(4,10,4,0.22) 45%,rgba(4,10,4,0.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(200,240,150,.18),rgba(200,240,150,0) 70%),
+    linear-gradient(180deg,#10200f 0,#0c1a0b 60%,#081208 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="wanling"] ::selection{background:rgba(62,107,58,.3)}
+:root[data-skin="wanling"][data-theme="dark"] ::selection{background:rgba(159,208,143,.35)}
+[data-skin="wanling"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题 */
+[data-skin="wanling"] .top h2,[data-skin="wanling"] #auth h1,[data-skin="wanling"] .me-head .name,
+[data-skin="wanling"] .panel h3,[data-skin="wanling"] .section-title,[data-skin="wanling"] #chat .who b{
+  letter-spacing:.08em;
+}
+[data-skin="wanling"] .top h2,[data-skin="wanling"] #auth h1{font-weight:700}
+[data-skin="wanling"] .panel h3,[data-skin="wanling"] .section-title{color:var(--wl-ink)}
+
+/* 顶栏：页名前一枚徽记，下沿一道渐隐的细线 */
+[data-skin="wanling"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="wanling"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--wl-silver) 18%,var(--wl-silver) 82%,transparent);opacity:.75;
+}
+[data-skin="wanling"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="wanling"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/wanling/emblem.png) center/contain no-repeat;
+}
+
+/* 面板右上角的纹样（遮罩取形，颜色跟主题走） */
+[data-skin="wanling"] .panel{position:relative;overflow:hidden}
+[data-skin="wanling"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--wl-orn);
+  -webkit-mask:url(../skins/wanling/ornament.png) center/contain no-repeat;mask:url(../skins/wanling/ornament.png) center/contain no-repeat;
+}
+[data-skin="wanling"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮 */
+[data-skin="wanling"] .btn:not(.ghost):not(.danger){
+  background-color:var(--wl-btn-b);
+  background-image:linear-gradient(180deg,var(--wl-btn-a),var(--wl-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(30,44,20,.18),0 4px 10px rgba(30,44,20,.14);
+}
+@media (hover:hover){ [data-skin="wanling"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--wl-btn-a) 88%,#fff),var(--wl-btn-b))} }
+[data-skin="wanling"] .seg button.on{background-image:linear-gradient(180deg,var(--wl-btn-a),var(--wl-btn-b));color:var(--on-pink)}
+[data-skin="wanling"] .field:focus{box-shadow:inset 0 1px 3px rgba(30,44,20,.14),0 0 0 3px var(--wl-ring)}
+[data-skin="wanling"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--wl-btn-a),var(--wl-btn-b))}
+
+/* 底部标签栏选中格 */
+[data-skin="wanling"] #tabbar button.on{
+  color:var(--wl-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="wanling"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标：印章，方一点 */
+[data-skin="wanling"] .badge{background:var(--wl-seal);border-radius:6px}
+
+/* 时间分隔线：门派兵器的剪影（内联 SVG，白天晚上各一份） */
+[data-skin="wanling"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--wl-blade) center/contain no-repeat;
+}
+
+[data-skin="wanling"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：吉祥物下方一道纹样 */
+[data-skin="wanling"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="wanling"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--wl-orn);
+  -webkit-mask:url(../skins/wanling/ornament.png) center/contain no-repeat;mask:url(../skins/wanling/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="wanling"] .panel::after,[data-skin="wanling"] #auth .sub::after{display:none}
+}

@@ -1,0 +1,161 @@
+/* 皮肤：天策（tiance）。<html data-skin="tiance"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动）。结构同纯阳：先覆盖设计变量，再加组件细节（宋体标题、页眉徽记、面板角纹样、主按钮、兵器形时间线、角标）。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="tiance"]{
+  --t1:#2b1f1f; --t2:#574543; --t3:#74605d;
+  --pink:#a8322d; --on-pink:#fff; --pink-text:#8c2521; --red-text:#b0302b; --ok:#46663a; --badge:#b8322c;
+  --hair:rgba(92,36,32,.15); --rim:rgba(255,250,248,.74);
+  --hi:rgba(255,250,248,.95); --lo:rgba(92,36,32,.15); --side:rgba(255,248,244,.42);
+  --g-bar:rgba(250,244,241,.64); --g-card:rgba(252,247,244,.66); --g-chip:rgba(255,251,249,.62); --g-solid:#f5eeea;
+  --field-bg:rgba(255,251,249,.54);
+  --sh-1:0 1px 2px rgba(52,20,18,.08),0 4px 14px rgba(52,20,18,.07);
+  --sh-2:0 2px 4px rgba(52,20,18,.08),0 12px 32px rgba(52,20,18,.13);
+  --sh-0:0 1px 1px rgba(52,20,18,.10);
+  --page:#e6dbd6; --stage-bg:rgba(238,228,224,.84);
+  --toast-bg:rgba(40,26,26,.92); --toast-fg:#f8eeea;
+  --mascot-bg-av:#f5eeea;
+  --bub-peer:rgba(253,249,247,.84); --bub-own:rgba(238,206,198,.92); --bub-fx:rgba(232,224,230,.92); --bub-fail:rgba(248,212,204,.9);
+  --chat-bub-peer:#f3ecea; --chat-bub-bd:rgba(43,31,31,.09);
+  --bub-bd:rgba(255,250,248,.82); --bub-hi:rgba(255,250,248,.95); --bub-lo:rgba(92,36,32,.13); --bub-sheen:rgba(255,250,248,.6);
+  --tc-silver:#b8934a; --tc-ink:#7a1f1b; --tc-btn-a:#c24841; --tc-btn-b:#8e2420; --tc-orn:rgba(168,50,45,.2);
+  --tc-ring:rgba(168,50,45,.26); --tc-seal:#b8322c;
+  --tc-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='2' y='4.8' width='4' height='2.4' rx='1' fill='%23a8a8ae'/%3E%3Crect x='6' y='5.3' width='92' height='1.4' rx='.7' fill='%234a3228'/%3E%3Cpath d='M96 6c2-5 6-5.6 9-4.6-2.2.8-3 2.4-3.4 4.6.4 2.2 1.2 3.8 3.4 4.6-3 1-7 .4-9-4.6z' fill='%23c0302a'/%3E%3Cpath d='M100 6c3-3.4 7-4.6 11-4-2.6 1-4 2.4-4.6 4 .6 1.6 2 3 4.6 4-4 .6-8-.6-11-4z' fill='%23c0302a' opacity='.78'/%3E%3Crect x='108' y='4.7' width='4' height='2.6' rx='.6' fill='%23b8893a'/%3E%3Cpath d='M112 6c4-3.6 12-3.8 19.5 0-7.5 3.8-15.5 3.6-19.5 0z' fill='%23a8a8ae'/%3E%3Cpath d='M114 6h15' stroke='%23ffffff' stroke-width='.6'/%3E%3C/svg%3E");
+  --tc-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/tiance/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(244,236,232,.06) 0,rgba(244,236,232,.18) 45%,rgba(244,236,232,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,248,244,.95),rgba(255,248,244,0) 60%),linear-gradient(180deg,#f1e8e3 0,#e6dad4 50%,#d8c9c2 100%);
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="tiance"][data-theme="dark"]{
+  --t1:#f5eae7; --t2:#d0bcb8; --t3:#a59490;
+  --pink:#e9776e; --on-pink:#2a0c0a; --pink-text:#f09289; --red-text:#ff9d94; --ok:#a8d08a; --badge:#d4473d;
+  --hair:rgba(244,200,190,.13); --rim:rgba(244,200,190,.17);
+  --hi:rgba(250,214,204,.2); --lo:rgba(0,0,0,.44); --side:rgba(244,200,190,.07);
+  --g-bar:rgba(28,18,19,.64); --g-card:rgba(38,24,25,.6); --g-chip:rgba(244,200,190,.1); --g-solid:#281a1b;
+  --field-bg:rgba(14,6,6,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#120d0e; --stage-bg:rgba(22,14,15,.86);
+  --toast-bg:rgba(80,40,38,.96); --toast-fg:#f8eeea;
+  --mascot-bg:#f5eae7; --mascot-bg-av:#f5eae7;
+  --bub-peer:rgba(62,42,42,.84); --bub-own:rgba(140,50,46,.88); --bub-fx:rgba(84,64,76,.86); --bub-fail:rgba(124,40,36,.88);
+  --chat-bub-peer:rgba(66,44,44,.88); --chat-bub-bd:rgba(244,200,190,.15);
+  --bub-bd:rgba(244,200,190,.17); --bub-hi:rgba(250,214,204,.2); --bub-lo:rgba(0,0,0,.34); --bub-sheen:rgba(250,214,204,.12);
+  --tc-silver:#9a7a42; --tc-ink:#f09289; --tc-btn-a:#ec8178; --tc-btn-b:#c04a42; --tc-orn:rgba(240,146,137,.2);
+  --tc-ring:rgba(233,119,110,.34); --tc-seal:#d4473d;
+  --tc-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='2' y='4.8' width='4' height='2.4' rx='1' fill='%23c4c4cc'/%3E%3Crect x='6' y='5.3' width='92' height='1.4' rx='.7' fill='%238a6a58'/%3E%3Cpath d='M96 6c2-5 6-5.6 9-4.6-2.2.8-3 2.4-3.4 4.6.4 2.2 1.2 3.8 3.4 4.6-3 1-7 .4-9-4.6z' fill='%23e0453d'/%3E%3Cpath d='M100 6c3-3.4 7-4.6 11-4-2.6 1-4 2.4-4.6 4 .6 1.6 2 3 4.6 4-4 .6-8-.6-11-4z' fill='%23e0453d' opacity='.78'/%3E%3Crect x='108' y='4.7' width='4' height='2.6' rx='.6' fill='%23d0a24e'/%3E%3Cpath d='M112 6c4-3.6 12-3.8 19.5 0-7.5 3.8-15.5 3.6-19.5 0z' fill='%23c4c4cc'/%3E%3Cpath d='M114 6h15' stroke='%23ffffff' stroke-width='.6'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/tiance/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(10,6,6,.05) 0,rgba(10,6,6,.22) 45%,rgba(10,6,6,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(255,170,120,.2),rgba(255,170,120,0) 70%),linear-gradient(180deg,#1d1213 0,#150d0e 60%,#0e0809 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="tiance"]:not([data-theme="light"]){
+  --t1:#f5eae7; --t2:#d0bcb8; --t3:#a59490;
+  --pink:#e9776e; --on-pink:#2a0c0a; --pink-text:#f09289; --red-text:#ff9d94; --ok:#a8d08a; --badge:#d4473d;
+  --hair:rgba(244,200,190,.13); --rim:rgba(244,200,190,.17);
+  --hi:rgba(250,214,204,.2); --lo:rgba(0,0,0,.44); --side:rgba(244,200,190,.07);
+  --g-bar:rgba(28,18,19,.64); --g-card:rgba(38,24,25,.6); --g-chip:rgba(244,200,190,.1); --g-solid:#281a1b;
+  --field-bg:rgba(14,6,6,.42);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#120d0e; --stage-bg:rgba(22,14,15,.86);
+  --toast-bg:rgba(80,40,38,.96); --toast-fg:#f8eeea;
+  --mascot-bg:#f5eae7; --mascot-bg-av:#f5eae7;
+  --bub-peer:rgba(62,42,42,.84); --bub-own:rgba(140,50,46,.88); --bub-fx:rgba(84,64,76,.86); --bub-fail:rgba(124,40,36,.88);
+  --chat-bub-peer:rgba(66,44,44,.88); --chat-bub-bd:rgba(244,200,190,.15);
+  --bub-bd:rgba(244,200,190,.17); --bub-hi:rgba(250,214,204,.2); --bub-lo:rgba(0,0,0,.34); --bub-sheen:rgba(250,214,204,.12);
+  --tc-silver:#9a7a42; --tc-ink:#f09289; --tc-btn-a:#ec8178; --tc-btn-b:#c04a42; --tc-orn:rgba(240,146,137,.2);
+  --tc-ring:rgba(233,119,110,.34); --tc-seal:#d4473d;
+  --tc-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='2' y='4.8' width='4' height='2.4' rx='1' fill='%23c4c4cc'/%3E%3Crect x='6' y='5.3' width='92' height='1.4' rx='.7' fill='%238a6a58'/%3E%3Cpath d='M96 6c2-5 6-5.6 9-4.6-2.2.8-3 2.4-3.4 4.6.4 2.2 1.2 3.8 3.4 4.6-3 1-7 .4-9-4.6z' fill='%23e0453d'/%3E%3Cpath d='M100 6c3-3.4 7-4.6 11-4-2.6 1-4 2.4-4.6 4 .6 1.6 2 3 4.6 4-4 .6-8-.6-11-4z' fill='%23e0453d' opacity='.78'/%3E%3Crect x='108' y='4.7' width='4' height='2.6' rx='.6' fill='%23d0a24e'/%3E%3Cpath d='M112 6c4-3.6 12-3.8 19.5 0-7.5 3.8-15.5 3.6-19.5 0z' fill='%23c4c4cc'/%3E%3Cpath d='M114 6h15' stroke='%23ffffff' stroke-width='.6'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/tiance/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(10,6,6,.05) 0,rgba(10,6,6,.22) 45%,rgba(10,6,6,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(255,170,120,.2),rgba(255,170,120,0) 70%),linear-gradient(180deg,#1d1213 0,#150d0e 60%,#0e0809 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="tiance"] ::selection{background:rgba(168,50,45,.28)}
+[data-skin="tiance"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题 */
+[data-skin="tiance"] .top h2,[data-skin="tiance"] #auth h1,[data-skin="tiance"] .me-head .name,
+[data-skin="tiance"] .panel h3,[data-skin="tiance"] .section-title,[data-skin="tiance"] #chat .who b{
+  font-family:var(--tc-serif);letter-spacing:.06em;
+}
+[data-skin="tiance"] .top h2,[data-skin="tiance"] #auth h1{font-weight:700}
+[data-skin="tiance"] .panel h3,[data-skin="tiance"] .section-title{color:var(--tc-ink)}
+
+/* 顶栏：页名前的徽记，下沿一道渐隐的线 */
+[data-skin="tiance"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="tiance"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--tc-silver) 18%,var(--tc-silver) 82%,transparent);opacity:.75;
+}
+[data-skin="tiance"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="tiance"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/tiance/emblem.png) center/contain no-repeat;
+}
+
+/* 面板：右上角纹样（遮罩取形，颜色跟主题走） */
+[data-skin="tiance"] .panel{position:relative;overflow:hidden}
+[data-skin="tiance"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--tc-orn);
+  -webkit-mask:url(../skins/tiance/ornament.png) center/contain no-repeat;mask:url(../skins/tiance/ornament.png) center/contain no-repeat;
+}
+[data-skin="tiance"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮 */
+[data-skin="tiance"] .btn:not(.ghost):not(.danger){
+  background-color:var(--tc-btn-b);
+  background-image:linear-gradient(180deg,var(--tc-btn-a),var(--tc-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.16),0 4px 10px rgba(0,0,0,.12);
+}
+@media (hover:hover){ [data-skin="tiance"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--tc-btn-a) 88%,#fff),var(--tc-btn-b))} }
+[data-skin="tiance"] .seg button.on{background-image:linear-gradient(180deg,var(--tc-btn-a),var(--tc-btn-b));color:var(--on-pink)}
+[data-skin="tiance"] .field:focus{box-shadow:inset 0 1px 3px rgba(0,0,0,.12),0 0 0 3px var(--tc-ring)}
+[data-skin="tiance"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--tc-btn-a),var(--tc-btn-b))}
+
+/* 底部标签栏 */
+[data-skin="tiance"] #tabbar button.on{
+  color:var(--tc-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="tiance"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标 */
+[data-skin="tiance"] .badge{background:var(--tc-seal);border-radius:6px}
+
+/* 时间分隔线：门派兵器（内联 SVG，白天晚上各一份） */
+[data-skin="tiance"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--tc-weapon) center/contain no-repeat;
+}
+
+[data-skin="tiance"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：副标题下一道纹样 */
+[data-skin="tiance"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="tiance"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--tc-orn);
+  -webkit-mask:url(../skins/tiance/ornament.png) center/contain no-repeat;mask:url(../skins/tiance/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="tiance"] .panel::after,[data-skin="tiance"] #auth .sub::after{display:none}
+}

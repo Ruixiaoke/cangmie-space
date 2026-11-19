@@ -1,0 +1,165 @@
+/* 皮肤：霸刀（太行山庄、赤褐、黑、金）。<html data-skin="badao"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动）。结构同纯阳：先覆盖设计变量，再加组件细节。 */
+
+/* ---------- 设计变量：白天 ---------- */
+:root[data-skin="badao"]{
+  --t1:#2a1d19; --t2:#5a4038; --t3:#7a5f56;
+  --pink:#8e2f1f; --on-pink:#fff; --pink-text:#7a2517; --red-text:#a8291c; --ok:#5b7a3a; --badge:#b23a22;
+  --hair:rgba(96,48,32,.14); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(96,48,32,.14); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(251,246,242,.62); --g-card:rgba(251,246,242,.64); --g-chip:rgba(255,255,255,.6); --g-solid:rgb(251,246,242);
+  --field-bg:rgba(255,255,255,.52);
+  --sh-1:0 1px 2px rgba(50,24,14,.08),0 4px 14px rgba(50,24,14,.07);
+  --sh-2:0 2px 4px rgba(50,24,14,.08),0 12px 32px rgba(50,24,14,.13);
+  --sh-0:0 1px 1px rgba(50,24,14,.10);
+  --page:#ece0d6; --stage-bg:rgba(244,232,222,.82);
+  --toast-bg:rgba(42,24,18,.92); --toast-fg:#f4f6f8;
+  --mascot-bg-av:#f6eee8;
+  --bub-peer:rgba(252,253,254,.82); --bub-own:rgba(238,206,190,.9); --bub-fx:rgba(236,226,214,.92); --bub-fail:rgba(250,214,214,.9);
+  --chat-bub-peer:#f4ede8; --chat-bub-bd:rgba(96,48,32,.1);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(96,48,32,.12); --bub-sheen:rgba(255,255,255,.6);
+  --bd-sil:#c0a070; --bd-ink:#6b2214; --bd-btn-a:#a8412b; --bd-btn-b:#7a2517; --bd-orn:rgba(142,47,31,.2);
+  --bd-ring:rgba(142,47,31,.26); --bd-seal:#a8291c;
+  --bd-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='5' cy='6' r='3' fill='none' stroke='%23b98d3e' stroke-width='1.3'/%3E%3Cpath d='M2.4 7.6L0.6 11.4' stroke='%23a8291c' stroke-width='1.3' stroke-linecap='round'/%3E%3Crect x='8' y='4.8' width='20' height='2.4' rx='1' fill='%232a1d19'/%3E%3Cpath d='M12 4.8l1.6 2.4' stroke='%23b98d3e' stroke-width='.6'/%3E%3Cpath d='M16 4.8l1.6 2.4' stroke='%23b98d3e' stroke-width='.6'/%3E%3Cpath d='M20 4.8l1.6 2.4' stroke='%23b98d3e' stroke-width='.6'/%3E%3Cpath d='M24 4.8l1.6 2.4' stroke='%23b98d3e' stroke-width='.6'/%3E%3Crect x='28' y='.8' width='3' height='10.4' rx='1.2' fill='%23b98d3e'/%3E%3Cpath d='M31 2.2H116Q126 2.4 131 8.4L126.5 9.6H31Z' fill='%23c4ccd2'/%3E%3Cpath d='M31 2.2H116Q126 2.4 131 8.4' fill='none' stroke='%233a3030' stroke-width='1.8'/%3E%3Cpath d='M33 7.6H122' stroke='%23ffffff' stroke-width='.6'/%3E%3C/svg%3E");
+  --bd-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/badao/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(248,240,232,.06) 0,rgba(248,240,232,.18) 45%,rgba(248,240,232,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#f6eee8 0,#ebdfd4 50%,#dccdbd 100%);
+}
+
+/* ---------- 设计变量：晚上 ---------- */
+:root[data-skin="badao"][data-theme="dark"]{
+  --t1:#f4e8df; --t2:#cdb5a6; --t3:#a58f82;
+  --pink:#e08a6e; --on-pink:#2a0f08; --pink-text:#eaa088; --red-text:#ff9d8d; --ok:#a3cf8a; --badge:#d9553a;
+  --hair:rgba(240,200,170,.12); --rim:rgba(240,200,170,.16);
+  --hi:rgba(250,214,186,.22); --lo:rgba(0,0,0,.4); --side:rgba(240,200,170,.07);
+  --g-bar:rgba(28,16,14,.62); --g-card:rgba(38,22,18,.58); --g-chip:rgba(240,200,170,.1); --g-solid:#2a1a16;
+  --field-bg:rgba(4,8,12,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#130c0a; --stage-bg:rgba(24,14,12,.84);
+  --toast-bg:rgba(62,38,30,.96); --toast-fg:#f4f6f8;
+  --mascot-bg:#f4e8df; --mascot-bg-av:#f4e8df;
+  --bub-peer:rgba(54,36,30,.84); --bub-own:rgba(120,52,36,.86); --bub-fx:rgba(84,64,90,.86); --bub-fail:rgba(130,40,40,.88);
+  --chat-bub-peer:rgba(58,38,32,.88); --chat-bub-bd:rgba(240,200,170,.14);
+  --bub-bd:rgba(240,200,170,.16); --bub-hi:rgba(250,214,186,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(250,214,186,.12);
+  --bd-sil:#d9ad5c; --bd-ink:#eaa088; --bd-btn-a:#e89a7e; --bd-btn-b:#c4694d; --bd-orn:rgba(217,173,92,.2);
+  --bd-ring:rgba(224,138,110,.3); --bd-seal:#d9553a;
+  --bd-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='5' cy='6' r='3' fill='none' stroke='%23d9ad5c' stroke-width='1.3'/%3E%3Cpath d='M2.4 7.6L0.6 11.4' stroke='%23d9553a' stroke-width='1.3' stroke-linecap='round'/%3E%3Crect x='8' y='4.8' width='20' height='2.4' rx='1' fill='%23d8c2b0'/%3E%3Cpath d='M12 4.8l1.6 2.4' stroke='%23d9ad5c' stroke-width='.6'/%3E%3Cpath d='M16 4.8l1.6 2.4' stroke='%23d9ad5c' stroke-width='.6'/%3E%3Cpath d='M20 4.8l1.6 2.4' stroke='%23d9ad5c' stroke-width='.6'/%3E%3Cpath d='M24 4.8l1.6 2.4' stroke='%23d9ad5c' stroke-width='.6'/%3E%3Crect x='28' y='.8' width='3' height='10.4' rx='1.2' fill='%23d9ad5c'/%3E%3Cpath d='M31 2.2H116Q126 2.4 131 8.4L126.5 9.6H31Z' fill='%23aeb6bd'/%3E%3Cpath d='M31 2.2H116Q126 2.4 131 8.4' fill='none' stroke='%23e8e0d8' stroke-width='1.8'/%3E%3Cpath d='M33 7.6H122' stroke='%23f4f6f8' stroke-width='.6'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/badao/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(14,8,6,.05) 0,rgba(14,8,6,.22) 45%,rgba(14,8,6,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(240,170,120,.22),rgba(240,170,120,0) 70%),
+    linear-gradient(180deg,#1c110e 0,#150d0a 60%,#0e0807 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="badao"]:not([data-theme="light"]){
+  --t1:#f4e8df; --t2:#cdb5a6; --t3:#a58f82;
+  --pink:#e08a6e; --on-pink:#2a0f08; --pink-text:#eaa088; --red-text:#ff9d8d; --ok:#a3cf8a; --badge:#d9553a;
+  --hair:rgba(240,200,170,.12); --rim:rgba(240,200,170,.16);
+  --hi:rgba(250,214,186,.22); --lo:rgba(0,0,0,.4); --side:rgba(240,200,170,.07);
+  --g-bar:rgba(28,16,14,.62); --g-card:rgba(38,22,18,.58); --g-chip:rgba(240,200,170,.1); --g-solid:#2a1a16;
+  --field-bg:rgba(4,8,12,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#130c0a; --stage-bg:rgba(24,14,12,.84);
+  --toast-bg:rgba(62,38,30,.96); --toast-fg:#f4f6f8;
+  --mascot-bg:#f4e8df; --mascot-bg-av:#f4e8df;
+  --bub-peer:rgba(54,36,30,.84); --bub-own:rgba(120,52,36,.86); --bub-fx:rgba(84,64,90,.86); --bub-fail:rgba(130,40,40,.88);
+  --chat-bub-peer:rgba(58,38,32,.88); --chat-bub-bd:rgba(240,200,170,.14);
+  --bub-bd:rgba(240,200,170,.16); --bub-hi:rgba(250,214,186,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(250,214,186,.12);
+  --bd-sil:#d9ad5c; --bd-ink:#eaa088; --bd-btn-a:#e89a7e; --bd-btn-b:#c4694d; --bd-orn:rgba(217,173,92,.2);
+  --bd-ring:rgba(224,138,110,.3); --bd-seal:#d9553a;
+  --bd-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='5' cy='6' r='3' fill='none' stroke='%23d9ad5c' stroke-width='1.3'/%3E%3Cpath d='M2.4 7.6L0.6 11.4' stroke='%23d9553a' stroke-width='1.3' stroke-linecap='round'/%3E%3Crect x='8' y='4.8' width='20' height='2.4' rx='1' fill='%23d8c2b0'/%3E%3Cpath d='M12 4.8l1.6 2.4' stroke='%23d9ad5c' stroke-width='.6'/%3E%3Cpath d='M16 4.8l1.6 2.4' stroke='%23d9ad5c' stroke-width='.6'/%3E%3Cpath d='M20 4.8l1.6 2.4' stroke='%23d9ad5c' stroke-width='.6'/%3E%3Cpath d='M24 4.8l1.6 2.4' stroke='%23d9ad5c' stroke-width='.6'/%3E%3Crect x='28' y='.8' width='3' height='10.4' rx='1.2' fill='%23d9ad5c'/%3E%3Cpath d='M31 2.2H116Q126 2.4 131 8.4L126.5 9.6H31Z' fill='%23aeb6bd'/%3E%3Cpath d='M31 2.2H116Q126 2.4 131 8.4' fill='none' stroke='%23e8e0d8' stroke-width='1.8'/%3E%3Cpath d='M33 7.6H122' stroke='%23f4f6f8' stroke-width='.6'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/badao/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(14,8,6,.05) 0,rgba(14,8,6,.22) 45%,rgba(14,8,6,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(240,170,120,.22),rgba(240,170,120,0) 70%),
+    linear-gradient(180deg,#1c110e 0,#150d0a 60%,#0e0807 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="badao"] ::selection{background:rgba(142,47,31,.28)}
+[data-skin="badao"][data-theme="dark"] ::selection{background:rgba(224,138,110,.34)}
+[data-skin="badao"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题 */
+[data-skin="badao"] .top h2,[data-skin="badao"] #auth h1,[data-skin="badao"] .me-head .name,
+[data-skin="badao"] .panel h3,[data-skin="badao"] .section-title,[data-skin="badao"] #chat .who b{
+  font-family:var(--bd-serif);letter-spacing:.06em;
+}
+[data-skin="badao"] .top h2,[data-skin="badao"] #auth h1{font-weight:700}
+[data-skin="badao"] .panel h3,[data-skin="badao"] .section-title{color:var(--bd-ink)}
+
+/* 顶栏：页名前一枚徽记，下沿一道渐隐的线 */
+[data-skin="badao"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="badao"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--bd-sil) 18%,var(--bd-sil) 82%,transparent);opacity:.7;
+}
+[data-skin="badao"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="badao"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/badao/emblem.png) center/contain no-repeat;
+}
+
+/* 面板右上角的纹样（遮罩取形，颜色跟主题走） */
+[data-skin="badao"] .panel{position:relative;overflow:hidden}
+[data-skin="badao"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--bd-orn);
+  -webkit-mask:url(../skins/badao/ornament.png) center/contain no-repeat;mask:url(../skins/badao/ornament.png) center/contain no-repeat;
+}
+[data-skin="badao"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮 */
+[data-skin="badao"] .btn:not(.ghost):not(.danger){
+  background-color:var(--bd-btn-b);
+  background-image:linear-gradient(180deg,var(--bd-btn-a),var(--bd-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.14);
+}
+@media (hover:hover){ [data-skin="badao"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--bd-btn-a) 88%,#fff),var(--bd-btn-b))} }
+[data-skin="badao"] .seg button.on{background-image:linear-gradient(180deg,var(--bd-btn-a),var(--bd-btn-b));color:var(--on-pink)}
+[data-skin="badao"] .field:focus{box-shadow:inset 0 1px 3px rgba(0,0,0,.14),0 0 0 3px var(--bd-ring)}
+[data-skin="badao"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--bd-btn-a),var(--bd-btn-b))}
+
+/* 底部标签栏：选中的一格 */
+[data-skin="badao"] #tabbar button.on{
+  color:var(--bd-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="badao"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标 */
+[data-skin="badao"] .badge{background:var(--bd-seal);border-radius:6px}
+
+/* 时间分隔线：一柄宽背大刀（刀环红缨、金护手），代替默认的饼干棒 */
+[data-skin="badao"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--bd-line) center/contain no-repeat;
+}
+
+[data-skin="badao"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：副标题下一道纹样 */
+[data-skin="badao"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="badao"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--bd-orn);
+  -webkit-mask:url(../skins/badao/ornament.png) center/contain no-repeat;mask:url(../skins/badao/ornament.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画纹样（不会出现色块） */
+@supports not ((mask-image:none) or (-webkit-mask-image:none)){
+  [data-skin="badao"] .panel::after,[data-skin="badao"] #auth .sub::after{display:none}
+}
