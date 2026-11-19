@@ -25,10 +25,11 @@
   --cy-sword:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c3-3.4 7-3.6 9-1.6M2 6c3 3.4 7 3.6 9 1.6' fill='none' stroke='%23c4473f' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='6' r='1.8' fill='%23c4473f'/%3E%3Crect x='14' y='4.6' width='16' height='2.8' rx='1.2' fill='%232f4f73'/%3E%3Cpath d='M30 1.6h3.2l1.6 4.4-1.6 4.4H30z' fill='%233b6a9c'/%3E%3Cpath d='M35 4.4h86l9 1.6-9 1.6H35z' fill='%23b9c6d6'/%3E%3Cpath d='M35 6h94' stroke='%23ffffff' stroke-width='.6'/%3E%3C/svg%3E");
   --cy-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
   --r-card:16px; --r-panel:20px;
-  --scene-img:url(../skins/chunyang/scene-day.jpg);
+  --scene-img:url(../skins/chunyang/scene-day.gif); --scene-still:url(../skins/chunyang/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(240,245,251,.06) 0,rgba(240,245,251,.18) 45%,rgba(236,242,249,.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
     linear-gradient(180deg,#eef3f9 0,#e3ebf4 50%,#d6e0ec 100%);
 }
@@ -53,10 +54,11 @@
   --cy-silver:#6f8299; --cy-ink:#a9c8ea; --cy-btn-a:#7ea9d8; --cy-btn-b:#5f8cbf; --cy-orn:rgba(169,200,234,.2);
   --cy-ring:rgba(143,182,224,.3); --cy-seal:#d0525a;
   --cy-sword:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c3-3.4 7-3.6 9-1.6M2 6c3 3.4 7 3.6 9 1.6' fill='none' stroke='%23d0525a' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='6' r='1.8' fill='%23d0525a'/%3E%3Crect x='14' y='4.6' width='16' height='2.8' rx='1.2' fill='%235f7899'/%3E%3Cpath d='M30 1.6h3.2l1.6 4.4-1.6 4.4H30z' fill='%238fb6e0'/%3E%3Cpath d='M35 4.4h86l9 1.6-9 1.6H35z' fill='%237f93ad'/%3E%3Cpath d='M35 6h94' stroke='%23c9d8ea' stroke-width='.6'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/chunyang/scene-night.jpg);
+  --scene-img:url(../skins/chunyang/scene-night.gif); --scene-still:url(../skins/chunyang/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(8,14,24,.05) 0,rgba(8,14,24,.22) 45%,rgba(8,14,24,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(170,200,240,.22),rgba(170,200,240,0) 70%),
     linear-gradient(180deg,#121c2e 0,#0f1828 60%,#0a111c 100%);
 }
@@ -80,10 +82,11 @@
   --cy-silver:#6f8299; --cy-ink:#a9c8ea; --cy-btn-a:#7ea9d8; --cy-btn-b:#5f8cbf; --cy-orn:rgba(169,200,234,.2);
   --cy-ring:rgba(143,182,224,.3); --cy-seal:#d0525a;
   --cy-sword:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c3-3.4 7-3.6 9-1.6M2 6c3 3.4 7 3.6 9 1.6' fill='none' stroke='%23d0525a' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='6' r='1.8' fill='%23d0525a'/%3E%3Crect x='14' y='4.6' width='16' height='2.8' rx='1.2' fill='%235f7899'/%3E%3Cpath d='M30 1.6h3.2l1.6 4.4-1.6 4.4H30z' fill='%238fb6e0'/%3E%3Cpath d='M35 4.4h86l9 1.6-9 1.6H35z' fill='%237f93ad'/%3E%3Cpath d='M35 6h94' stroke='%23c9d8ea' stroke-width='.6'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/chunyang/scene-night.jpg);
+  --scene-img:url(../skins/chunyang/scene-night.gif); --scene-still:url(../skins/chunyang/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(8,14,24,.05) 0,rgba(8,14,24,.22) 45%,rgba(8,14,24,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(170,200,240,.22),rgba(170,200,240,0) 70%),
     linear-gradient(180deg,#121c2e 0,#0f1828 60%,#0a111c 100%);
   }
@@ -91,7 +94,16 @@
 
 /* ---------- 组件细节 ---------- */
 [data-skin="chunyang"] ::selection{background:rgba(59,106,156,.3)}
-[data-skin="chunyang"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图（飘雪、山雾；晚上还有灯火），下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="chunyang"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="chunyang"]{--scene-img:url(../skins/chunyang/scene-day.jpg)}
+  :root[data-skin="chunyang"][data-theme="dark"]{--scene-img:url(../skins/chunyang/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="chunyang"]:not([data-theme="light"]){--scene-img:url(../skins/chunyang/scene-night.jpg)}
+}
 
 /* 标题用宋体，略加字距，像道观的匾额 */
 [data-skin="chunyang"] .top h2,[data-skin="chunyang"] #auth h1,[data-skin="chunyang"] .me-head .name,
