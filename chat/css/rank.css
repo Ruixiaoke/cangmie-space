@@ -32,6 +32,10 @@
 .rk-tabs{display:flex;gap:4px;padding:4px;margin:4px 0 8px;border:1px solid var(--hair);border-radius:var(--r-ctl);background:var(--field-bg);box-shadow:inset 0 1px 3px rgba(24,14,6,.12),inset 0 -1px 0 var(--hi)}
 .rk-tab{flex:1;min-height:40px;padding:6px 4px;font-size:var(--fs-sm);font-weight:500;color:var(--t2);border-radius:8px;transition:background-color .16s var(--ease),color .16s var(--ease)}
 .rk-tab.on{background:var(--pink);color:var(--on-pink);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 1px 2px rgba(24,14,6,.18)}
+.rk-seg{display:flex;gap:2px;width:max-content;padding:2px;margin:0 0 8px;border:1px solid var(--hair);border-radius:var(--r-ctl);background:var(--field-bg)}
+.rk-seg[hidden],.rk-segb[hidden]{display:none}
+.rk-segb{min-width:64px;min-height:36px;padding:4px 14px;font-size:var(--fs-sm);font-weight:500;color:var(--t2);border-radius:8px;transition:background-color .16s var(--ease),color .16s var(--ease)}
+.rk-segb.on{background:var(--g-solid);color:var(--pink-text);font-weight:600;box-shadow:0 1px 2px rgba(24,14,6,.2)}
 .rk-note{margin:0 0 8px;font-size:var(--fs-xs);color:var(--t3)}
 .rk-list{flex:1;min-height:120px;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:6px;margin:0 -4px;padding:2px 4px}
 .rk-msg{margin:auto;padding:24px 0;display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--t2);font-size:var(--fs-sm);text-align:center}
@@ -53,4 +57,6 @@
 .rk-wins b{font-size:var(--fs-xl);font-weight:700;font-variant-numeric:tabular-nums}
 .rk-wins span{font-size:var(--fs-xs);color:var(--t2)}
 .rk-row.zero .rk-wins{opacity:.6}
+.rk-pts.pos b{color:var(--ok)}
+.rk-pts.neg b{color:var(--red-text)}
 @media (prefers-reduced-motion:reduce){#rankSheet,.rk-card{transition:none}}

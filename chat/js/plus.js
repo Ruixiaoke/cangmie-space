@@ -12,13 +12,17 @@ import { $, clear, h } from './utils.js';
 // ===== "+" 工具面板 =====
 // 以后加工具：新建 miniapps/<名字>.js，再到 miniapps/registry.js 的 listMiniApps() 里加一行即可（图标用 SVG 符号 id，run 里调用 openApp(id, params)）
 // 排行榜不是小程序（没有 mount），但也放在这个面板里；开着哪个游戏就先看哪张榜
-var RANK_TOOL = { scope: 'dm', label: '排行榜', img: 'rank/icon-rank.png', run: function () { openLeaderboard(APP.cur ? (APP.cur.id === 'pool' ? poolRankGame() : APP.cur.id) : 'ttt'); } };
-// 只列出和当前会话（私聊 / 群聊）匹配的工具；排行榜只在私聊里
+// 私聊和群聊里都有：开着哪个游戏就先看哪张榜（开着斗地主就是斗地主榜）；没开游戏时私聊停在井字棋，群里停在斗地主（本群）
+var RANK_TOOL = { scope: 'any', label: '排行榜', img: 'rank/icon-rank.png', run: function () {
+  var inGroup = S.chat && S.chat.gid != null;
+  openLeaderboard(APP.cur ? (APP.cur.id === 'pool' ? poolRankGame() : APP.cur.id) : inGroup ? 'ddz' : 'ttt');
+} };
+// 只列出和当前会话（私聊 / 群聊）匹配的工具；排行榜两边都有
 function plusTools() {
   var scope = S.chat && S.chat.gid != null ? 'group' : 'dm';
-  return appsForScope(scope).concat(scope === 'dm' ? [RANK_TOOL] : []);
+  return appsForScope(scope).concat([RANK_TOOL]);
 }
-// 打开会话时重建；一个工具都没有（比如现在的群聊）就把 + 按钮藏起来
+// 打开会话时重建；一个工具都没有就把 + 按钮藏起来
 export function refreshPlusPanel() {
   var g = clear($('toolGrid')), tools = plusTools();
   $('plusBtn').hidden = tools.length === 0;

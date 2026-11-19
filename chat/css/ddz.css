@@ -159,7 +159,7 @@
 .ddz-tot-r b{font-variant-numeric:tabular-nums}
 .ddz-tot-r em{font-style:normal;font-size:var(--fs-xs);color:var(--t3)}
 .ddz-sheet-ops{display:flex;gap:10px}
-.ddz-sheet-ops .btn{flex:1;min-height:48px}
+.ddz-sheet-ops .btn{flex:1;min-height:48px;padding-left:6px;padding-right:6px;white-space:nowrap}
 .ddz-peek{align-self:center;min-height:44px;padding:0 18px;background:none;border:0;color:var(--t3);font-size:var(--fs-sm)}
 
 /* 四人局：对手在左 / 上 / 右，底牌 8 张叠成一排放在最上面 */
@@ -199,3 +199,7 @@
 @media (prefers-reduced-motion:reduce){.ddz-flash{animation:ddz-fade 1.3s both}}
 .ddz.p4 .ddz-rrow{padding:3px 8px}
 .ddz.p4 .ddz-sheet{gap:8px}
+
+/* 排行榜入口：大厅里和别的小游戏一样在左上角；牌桌上左上角是对手座位，所以放在右上角关闭钮的正下方（三人局和四人局这里都是空的） */
+.ddz-rk{position:absolute;z-index:1;top:6px;left:10px}
+.ddz:not(.lobby) .ddz-rk{left:auto;right:14px;top:58px}

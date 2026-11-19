@@ -8,6 +8,7 @@ import { beats, canPass, cardLabel, classify, hints, sortHand, suitOf } from './
 import { errText } from '../errors.js';
 import { S, makeAvatar } from '../state.js';
 import { clear, h, toast } from '../utils.js';
+import { openLeaderboard, rankButton } from './leaderboard.js';
 
 var STEP_MS = 700; // 回放：两个动作之间的间隔
 var SUITS = ['♠', '♥', '♣', '♦']; // 花色 0..3（c % 4），♥ ♦ 红
@@ -240,6 +241,7 @@ export function createTable(box, host) {
       again.addEventListener('click', function () { T.sheet = true; T.sheetHidden = false; render(); });
       root.appendChild(again);
     }
+    root.appendChild(rankButton('ddz', 'ddz-rk'));
     root.appendChild(fxLayer);
     updateUi();
   }
@@ -609,6 +611,7 @@ export function createTable(box, host) {
       var again = lbtn('再来一局', 'btn', function () { host.rematch(); });
       ops.appendChild(again);
     }
+    ops.appendChild(lbtn('排行榜', 'btn ghost', function () { openLeaderboard('ddz'); }));
     ops.appendChild(lbtn('离开', 'btn ghost', function () { host.leave(); }));
     sh.appendChild(ops);
     var peek = lbtn('收起', 'ddz-peek', function () { T.sheet = false; T.sheetHidden = true; render(); });
