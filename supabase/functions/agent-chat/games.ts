@@ -6,6 +6,7 @@
 //   井字棋 chat/js/miniapps/ttt.js；弹弓 chat/js/miniapps/sling-sim.js（slLayout 摆堡垒）；台球 chat/js/miniapps/pool-sim.js
 //   （PW / PH / BR / POCKETS / poolRack / poolRack8 / poolTargets8 / poolGroupOf）。改了那边的规则或尺寸，这里要跟着改。
 // 新增一个小游戏时，也要在这里加：gameHint 一行、game_status 的详情、game_leaderboard 的游戏名（见 .claude/skills/chat-miniapp/SKILL.md）。
+// 斗地主（ddz）只有战绩：ddzRecord 读 ddz_scores。私聊 = 这两个人一起打的 + 各自所有牌局的总计；群聊 = 本群成员在本群的积分。
 
 // deno-lint-ignore no-explicit-any
 type Db = any;
@@ -15,7 +16,7 @@ type Row = Record<string, any>;
 
 export const STATUS_MAX_CHARS = 2500; // game_status 详情的字数上限，超了先去掉预计算的建议
 export const LIST_PER_KIND = 2;
-export const BOARD_GAMES = ["ttt", "sling", "pool", "pool8"];
+export const BOARD_GAMES = ["ttt", "sling", "pool", "pool8", "ddz"];
 
 type Kind = "ttt" | "sling" | "pool";
 const KINDS: Kind[] = ["ttt", "sling", "pool"];
@@ -399,6 +400,7 @@ export async function gameStatus(admin: Db, asker: string, peer: string, names: 
 export async function gameRecord(admin: Db, asker: string, peer: string, names: Names, args: Row): Promise<string> {
   const game = args.game;
   if (typeof game !== "string" || !BOARD_GAMES.includes(game)) return JSON.stringify({ error: "bad_game", allowed: BOARD_GAMES });
+  if (game === "ddz") return await ddzRecord(admin, asker, { peer }, names);
   const { data, error } = await admin.rpc("agent_game_record", { p_a: asker, p_b: peer, p_game: game });
   if (error) return JSON.stringify({ error: "record_failed" });
   const r = (Array.isArray(data) ? data[0] : data) as Row | null;
@@ -409,5 +411,45 @@ export async function gameRecord(admin: Db, asker: string, peer: string, names: 
     totals: { [a]: `${r.a_wins}胜${r.a_losses}负`, [b]: `${r.b_wins}胜${r.b_losses}负` },
     head_to_head: `${a} ${r.a_h2h} : ${r.b_h2h} ${b}`,
     note: game === "ttt" ? "平局不算" : game === "sling" ? "按整场算" : "按盘算",
+  });
+}
+
+// 斗地主战绩（只读，service role 查 ddz_scores）。只有真人有行，机器人不算。
+//   私聊（where.peer）：这一对好友一起打的（dm_lo/dm_hi 行），加上两个人各自在所有群和私聊里的总计（好友排行榜本来就能看到）
+//   群聊（where.group）：只看本群的行，按积分排，只列群里的人
+type DdzSum = { total: number; wins: number; games: number };
+const ddzSum = (rows: Row[]): DdzSum => rows.reduce<DdzSum>((o, r) => ({ total: o.total + Number(r.total ?? 0), wins: o.wins + Number(r.wins ?? 0), games: o.games + Number(r.games ?? 0) }), { total: 0, wins: 0, games: 0 });
+const ddzLine = (s: DdzSum) => `${s.total > 0 ? "+" : ""}${s.total}分，${s.wins}胜/${s.games}局`;
+const DDZ_NOTE = "斗地主按积分算：地主赢拿 2 倍（四人局 3 倍），农民各拿 1 倍，输了扣同样的分；倍数看叫分、炸弹和春天";
+export async function ddzRecord(admin: Db, asker: string, where: { peer?: string | null; group?: number | null }, names: Names): Promise<string> {
+  const who = (id: string) => (names[id] ?? "好友") + (id === asker ? "(提问人)" : "");
+  if (where.group != null) {
+    const { data, error } = await admin.from("ddz_scores").select("user_id,total,wins,games").eq("group_id", where.group).limit(60);
+    if (error) return JSON.stringify({ error: "record_failed" });
+    const rows = ((data ?? []) as Row[]).filter((r) => names[r.user_id as string] !== undefined && Number(r.games) > 0)
+      .sort((a, b) => Number(b.total) - Number(a.total) || Number(b.wins) - Number(a.wins));
+    return JSON.stringify({
+      game: "ddz", scope: "本群",
+      ranking: rows.length ? rows.slice(0, 20).map((r, i) => `${i + 1}. ${who(r.user_id as string)} ${ddzLine(ddzSum([r]))}`) : "这个群还没人打过斗地主",
+      note: DDZ_NOTE,
+    });
+  }
+  const peer = where.peer;
+  if (!peer) return JSON.stringify({ error: "record_failed" });
+  const lo = asker < peer ? asker : peer, hi = asker < peer ? peer : asker;
+  const [pair, mine, theirs] = await Promise.all([
+    admin.from("ddz_scores").select("user_id,total,wins,games").eq("dm_lo", lo).eq("dm_hi", hi),
+    admin.from("ddz_scores").select("total,wins,games").eq("user_id", asker).limit(500),
+    admin.from("ddz_scores").select("total,wins,games").eq("user_id", peer).limit(500),
+  ]);
+  if (pair.error || mine.error || theirs.error) return JSON.stringify({ error: "record_failed" });
+  const pr = (pair.data ?? []) as Row[];
+  const inPair = (id: string) => ddzSum(pr.filter((r) => r.user_id === id));
+  const played = pr.some((r) => Number(r.games) > 0);
+  return JSON.stringify({
+    game: "ddz",
+    together: played ? { [who(asker)]: ddzLine(inPair(asker)), [who(peer)]: ddzLine(inPair(peer)) } : "这两个人还没在私聊里一起打过斗地主",
+    overall: { [who(asker)]: ddzLine(ddzSum((mine.data ?? []) as Row[])), [who(peer)]: ddzLine(ddzSum((theirs.data ?? []) as Row[])) },
+    note: DDZ_NOTE + "；together 是两人在这个私聊里一起打的（可能还有机器人），overall 是各自在所有群和私聊里的总计",
   });
 }
