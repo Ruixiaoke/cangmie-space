@@ -14,7 +14,7 @@ import { refreshAll } from './realtime.js';
 import { sendCurrent } from './send.js';
 import { S } from './state.js';
 import { $, isVisible } from './utils.js';
-import { fitViewport } from './viewport.js';
+import { fitViewport, refitSoon } from './viewport.js';
 import { doSearch } from './views/friends.js';
 import { showTab } from './views/tabs.js';
 
@@ -65,6 +65,9 @@ export function bind() {
     window.visualViewport.addEventListener('resize', fitViewport);
     window.visualViewport.addEventListener('scroll', fitViewport);
   }
+  window.addEventListener('orientationchange', refitSoon);
+  window.addEventListener('resize', refitSoon);
+  document.addEventListener('focusout', function () { setTimeout(fitViewport, 50); }); // 收起键盘后还原
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', function (ev) {
       var d = ev.data || {};
