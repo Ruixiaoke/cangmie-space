@@ -32,6 +32,8 @@ export const MAX_ROUNDS = 4; // 工具循环最多几轮，最后一轮强制直
 export const TOTAL_TIMEOUT_MS = 120_000;
 export const MAX_OUTPUT_TOKENS = 1500; // 单次请求的输出上限（含推理 token；太小会把推理吃光、回复变空）
 export const REASONING_EFFORT = "low";
+export const TEMPERATURE = 1.5; // 默认 1，范围 0 到 2；调高让回复更多变化。模型不接受这个参数时自动去掉重发
+let temperatureRejected = false; // 本实例里 OpenAI 拒绝过 temperature，之后就不再带
 export const SEARCH_CONTEXT_SIZE = "low"; // web_search 工具
 export const HISTORY_LIMIT = 20; // 取最近几条消息
 export const HISTORY_USER_CHARS = 200; // 真人消息每条最多留多少字
@@ -515,16 +517,26 @@ export async function runJob(deps: Deps, jobId: number): Promise<void> {
           reasoning: { effort: REASONING_EFFORT },
           prompt_cache_key: promptCacheKey,
         };
+        if (!temperatureRejected) body.temperature = TEMPERATURE;
         if (prev) body.previous_response_id = prev;
         if (round === MAX_ROUNDS - 1) body.tool_choice = "none"; // 最后一轮必须直接回答
+        const send = () => deps.fetchFn("https://api.openai.com/v1/responses", {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + deps.apiKey, "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+          signal: ctl.signal,
+        });
         let res: Response;
         try {
-          res = await deps.fetchFn("https://api.openai.com/v1/responses", {
-            method: "POST",
-            headers: { "Authorization": "Bearer " + deps.apiKey, "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-            signal: ctl.signal,
-          });
+          res = await send();
+          // 模型不支持 temperature（推理模型常见）：去掉后重发一次，以后也不再带
+          if (res.status === 400 && "temperature" in body && /temperature/i.test(await res.clone().text())) {
+            await res.body?.cancel();
+            temperatureRejected = true;
+            delete body.temperature;
+            console.error("openai rejected temperature; retrying without it");
+            res = await send();
+          }
         } catch (e) {
           if (ctl.signal.aborted || (e as Error)?.name === "AbortError") throw new AgentError("timeout");
           throw new AgentError("openai_http");
