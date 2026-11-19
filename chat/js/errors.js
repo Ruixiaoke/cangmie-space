@@ -13,7 +13,6 @@ export var ERR_TEXT = {
   empty_message: '消息不能是空的',
   message_too_long: '消息太长啦（最多 2000 字）',
   agent_busy: '助手还在想上一个问题呢，等它回完再问',
-  agent_rate_limited: '今天问助手的次数用完啦，明天再来',
   agent_forbidden: '这条消息没法交给助手了，重新发一次吧',
   agent_not_mentioned: '这条消息没法交给助手了，重新发一次吧',
   agent_too_old: '这条消息太久了，重新发一次再叫助手吧',

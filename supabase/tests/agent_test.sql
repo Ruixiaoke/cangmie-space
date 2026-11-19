@@ -193,7 +193,7 @@ update public.agent_jobs set status = 'done' where id = current_setting('agent.j
 call pg_temp.as_user('a9000000-0000-0000-0000-00000000000b');
 do $$ begin perform public.agent_ask(current_setting('agent.askB')::bigint); end $$;
 
--- ===== 24 小时 50 次 =====
+-- ===== 不限次数：24 小时里问过 50 次，照样能问 =====
 reset role;
 update public.agent_jobs set status = 'done' where status in ('pending', 'running');
 do $$
@@ -215,10 +215,6 @@ begin
   m := public.send_message('a9000000-0000-0000-0000-00000000000b', '@沈剑心 第五十一个');
   perform set_config('agent.ask51', m.id::text, false);
 end $$;
-call pg_temp.expect(format($$select public.agent_ask(%s)$$, current_setting('agent.ask51')), 'agent_rate_limited');
--- 24 小时前的不算
-reset role;
-update public.agent_jobs set created_at = now() - interval '25 hours' where id = (select min(id) from public.agent_jobs where asker = 'a9000000-0000-0000-0000-00000000000a');
 call pg_temp.as_user('a9000000-0000-0000-0000-00000000000a');
 do $$ begin perform public.agent_ask(current_setting('agent.ask51')::bigint); end $$;
 

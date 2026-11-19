@@ -72,7 +72,7 @@ agent 不是用户：没有 profile，不能加好友、不能入座小游戏。
 
 ### 6. 别的地方
 
-- 每人每天 50 次的提问限额是所有 agent 共用的（`agent_ask` 里按提问人算），新 agent 不单独计数。
+- 问助手不限次数（`20261210000000_agent_no_rate_limit.sql` 取消了原来每人每天 50 次的限额）。
 - 群里新 agent 默认是关着的，在群资料页打开才能 @。私聊里所有 agent 都能 @。
 - 小游戏：agent 永远不能入座斗地主（`ddz_sit` 只接受群成员 / 好友的真人 uid），不用改。
 - 部署需要的 secret（`OPENAI_API_KEY` 等）所有 agent 共用，不用加。
