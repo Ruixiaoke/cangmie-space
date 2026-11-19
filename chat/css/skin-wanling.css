@@ -21,10 +21,11 @@
   --wl-silver:#c4a25a; --wl-ink:#2f5a2c; --wl-btn-a:#548a4e; --wl-btn-b:#3a6636; --wl-orn:rgba(62,107,58,.22);
   --wl-ring:rgba(62,107,58,.26); --wl-seal:#a8442a;
   --wl-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 2.4l6 3.6-6 3.6 2-3.6zM6 2.4l6 3.6-6 3.6 2-3.6z' fill='%23c8962e'/%3E%3Cpath d='M10 2.8l4 3.2-4 3.2' fill='none' stroke='%23a8442a' stroke-width='.8'/%3E%3Crect x='12' y='5.2' width='106' height='1.6' rx='.8' fill='%238a6a40'/%3E%3Cpath d='M26 5.2v1.6M30 5.2v1.6' stroke='%23a8442a' stroke-width='1.2'/%3E%3Cpath d='M118 1.8L131 6 118 10.2l3-4.2z' fill='%237f8c92'/%3E%3Cpath d='M121 6h8' stroke='%23e2eaee' stroke-width='.6'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/wanling/scene-day.jpg);
+  --scene-img:url(../skins/wanling/scene-day.gif); --scene-still:url(../skins/wanling/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(242,247,234,0.06) 0,rgba(242,247,234,0.18) 45%,rgba(242,247,234,0.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
     linear-gradient(180deg,#f0f5e8 0,#e3ebd8 50%,#d4dfc8 100%);
   --wl-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
@@ -51,10 +52,11 @@
   --wl-silver:#9a8450; --wl-ink:#b4dea6; --wl-btn-a:#86c277; --wl-btn-b:#5f9a52; --wl-orn:rgba(200,170,90,.24);
   --wl-ring:rgba(159,208,143,.3); --wl-seal:#c5603a;
   --wl-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 2.4l6 3.6-6 3.6 2-3.6zM6 2.4l6 3.6-6 3.6 2-3.6z' fill='%23e0b050'/%3E%3Cpath d='M10 2.8l4 3.2-4 3.2' fill='none' stroke='%23c5603a' stroke-width='.8'/%3E%3Crect x='12' y='5.2' width='106' height='1.6' rx='.8' fill='%23c8a06a'/%3E%3Cpath d='M26 5.2v1.6M30 5.2v1.6' stroke='%23c5603a' stroke-width='1.2'/%3E%3Cpath d='M118 1.8L131 6 118 10.2l3-4.2z' fill='%23a0aeb4'/%3E%3Cpath d='M121 6h8' stroke='%23eef3f5' stroke-width='.6'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/wanling/scene-night.jpg);
+  --scene-img:url(../skins/wanling/scene-night.gif); --scene-still:url(../skins/wanling/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(4,10,4,0.05) 0,rgba(4,10,4,0.22) 45%,rgba(4,10,4,0.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(200,240,150,.18),rgba(200,240,150,0) 70%),
     linear-gradient(180deg,#10200f 0,#0c1a0b 60%,#081208 100%);
 }
@@ -78,10 +80,11 @@
   --wl-silver:#9a8450; --wl-ink:#b4dea6; --wl-btn-a:#86c277; --wl-btn-b:#5f9a52; --wl-orn:rgba(200,170,90,.24);
   --wl-ring:rgba(159,208,143,.3); --wl-seal:#c5603a;
   --wl-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 2.4l6 3.6-6 3.6 2-3.6zM6 2.4l6 3.6-6 3.6 2-3.6z' fill='%23e0b050'/%3E%3Cpath d='M10 2.8l4 3.2-4 3.2' fill='none' stroke='%23c5603a' stroke-width='.8'/%3E%3Crect x='12' y='5.2' width='106' height='1.6' rx='.8' fill='%23c8a06a'/%3E%3Cpath d='M26 5.2v1.6M30 5.2v1.6' stroke='%23c5603a' stroke-width='1.2'/%3E%3Cpath d='M118 1.8L131 6 118 10.2l3-4.2z' fill='%23a0aeb4'/%3E%3Cpath d='M121 6h8' stroke='%23eef3f5' stroke-width='.6'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/wanling/scene-night.jpg);
+  --scene-img:url(../skins/wanling/scene-night.gif); --scene-still:url(../skins/wanling/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(4,10,4,0.05) 0,rgba(4,10,4,0.22) 45%,rgba(4,10,4,0.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(200,240,150,.18),rgba(200,240,150,0) 70%),
     linear-gradient(180deg,#10200f 0,#0c1a0b 60%,#081208 100%);
   }
@@ -90,7 +93,16 @@
 /* ---------- 组件细节 ---------- */
 [data-skin="wanling"] ::selection{background:rgba(62,107,58,.3)}
 :root[data-skin="wanling"][data-theme="dark"] ::selection{background:rgba(159,208,143,.35)}
-[data-skin="wanling"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="wanling"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="wanling"]{--scene-img:url(../skins/wanling/scene-day.jpg)}
+  :root[data-skin="wanling"][data-theme="dark"]{--scene-img:url(../skins/wanling/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="wanling"]:not([data-theme="light"]){--scene-img:url(../skins/wanling/scene-night.jpg)}
+}
 
 /* 标题 */
 [data-skin="wanling"] .top h2,[data-skin="wanling"] #auth h1,[data-skin="wanling"] .me-head .name,

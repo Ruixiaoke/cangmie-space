@@ -22,10 +22,11 @@
   --gb-ring:rgba(79,125,74,.26); --gb-seal:#a8402b;
   --gb-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M14 4.8v1.2' stroke='%238a5a34' stroke-width='.9'/%3E%3Ccircle cx='14' cy='7.2' r='1.4' fill='%23a8683a'/%3E%3Ccircle cx='14' cy='9.7' r='2.1' fill='%23a8683a'/%3E%3Cpath d='M12.6 9.2a1.6 1.6 0 0 1 1-1.2' stroke='%23e7c49a' stroke-width='.6' fill='none'/%3E%3Crect x='2' y='2.4' width='128' height='2.5' rx='1.25' fill='%236f9a5a'/%3E%3Cpath d='M3 3h126' stroke='%23a5c796' stroke-width='.5'/%3E%3Crect x='34' y='1.8' width='1.6' height='3.7' rx='.6' fill='%233f6a3a'/%3E%3Crect x='62' y='1.8' width='1.6' height='3.7' rx='.6' fill='%233f6a3a'/%3E%3Crect x='90' y='1.8' width='1.6' height='3.7' rx='.6' fill='%233f6a3a'/%3E%3Crect x='116' y='1.8' width='1.6' height='3.7' rx='.6' fill='%233f6a3a'/%3E%3Cpath d='M127 2.4l3 1.25-3 1.25z' fill='%236f9a5a'/%3E%3C/svg%3E");
   --r-card:16px; --r-panel:20px;
-  --scene-img:url(../skins/gaibang/scene-day.jpg);
+  --scene-img:url(../skins/gaibang/scene-day.gif); --scene-still:url(../skins/gaibang/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(238,245,235,.06) 0,rgba(238,245,235,.18) 45%,rgba(222,232,217,.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
     linear-gradient(180deg,#eef4eb 0,#e2ebdd 55%,#d4e0cf 100%);
 }
@@ -50,10 +51,11 @@
   --gb-silver:#6f8a6c; --gb-ink:#b2d8aa; --gb-btn-a:#82b87a; --gb-btn-b:#5f975a; --gb-orn:rgba(178,216,170,.2);
   --gb-ring:rgba(156,203,148,.3); --gb-seal:#c4573f;
   --gb-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M14 4.8v1.2' stroke='%23b58a60' stroke-width='.9'/%3E%3Ccircle cx='14' cy='7.2' r='1.4' fill='%23c98a56'/%3E%3Ccircle cx='14' cy='9.7' r='2.1' fill='%23c98a56'/%3E%3Cpath d='M12.6 9.2a1.6 1.6 0 0 1 1-1.2' stroke='%23f0d3ae' stroke-width='.6' fill='none'/%3E%3Crect x='2' y='2.4' width='128' height='2.5' rx='1.25' fill='%2386b274'/%3E%3Cpath d='M3 3h126' stroke='%23bfe0ae' stroke-width='.5'/%3E%3Crect x='34' y='1.8' width='1.6' height='3.7' rx='.6' fill='%234f7d48'/%3E%3Crect x='62' y='1.8' width='1.6' height='3.7' rx='.6' fill='%234f7d48'/%3E%3Crect x='90' y='1.8' width='1.6' height='3.7' rx='.6' fill='%234f7d48'/%3E%3Crect x='116' y='1.8' width='1.6' height='3.7' rx='.6' fill='%234f7d48'/%3E%3Cpath d='M127 2.4l3 1.25-3 1.25z' fill='%2386b274'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/gaibang/scene-night.jpg);
+  --scene-img:url(../skins/gaibang/scene-night.gif); --scene-still:url(../skins/gaibang/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(6,12,8,.05) 0,rgba(6,12,8,.22) 45%,rgba(6,12,8,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(170,220,170,.2),rgba(170,220,170,0) 70%),
     linear-gradient(180deg,#0f1b13 0,#0c150f 55%,#080f0a 100%);
 }
@@ -77,10 +79,11 @@
   --gb-silver:#6f8a6c; --gb-ink:#b2d8aa; --gb-btn-a:#82b87a; --gb-btn-b:#5f975a; --gb-orn:rgba(178,216,170,.2);
   --gb-ring:rgba(156,203,148,.3); --gb-seal:#c4573f;
   --gb-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M14 4.8v1.2' stroke='%23b58a60' stroke-width='.9'/%3E%3Ccircle cx='14' cy='7.2' r='1.4' fill='%23c98a56'/%3E%3Ccircle cx='14' cy='9.7' r='2.1' fill='%23c98a56'/%3E%3Cpath d='M12.6 9.2a1.6 1.6 0 0 1 1-1.2' stroke='%23f0d3ae' stroke-width='.6' fill='none'/%3E%3Crect x='2' y='2.4' width='128' height='2.5' rx='1.25' fill='%2386b274'/%3E%3Cpath d='M3 3h126' stroke='%23bfe0ae' stroke-width='.5'/%3E%3Crect x='34' y='1.8' width='1.6' height='3.7' rx='.6' fill='%234f7d48'/%3E%3Crect x='62' y='1.8' width='1.6' height='3.7' rx='.6' fill='%234f7d48'/%3E%3Crect x='90' y='1.8' width='1.6' height='3.7' rx='.6' fill='%234f7d48'/%3E%3Crect x='116' y='1.8' width='1.6' height='3.7' rx='.6' fill='%234f7d48'/%3E%3Cpath d='M127 2.4l3 1.25-3 1.25z' fill='%2386b274'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/gaibang/scene-night.jpg);
+  --scene-img:url(../skins/gaibang/scene-night.gif); --scene-still:url(../skins/gaibang/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(6,12,8,.05) 0,rgba(6,12,8,.22) 45%,rgba(6,12,8,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(170,220,170,.2),rgba(170,220,170,0) 70%),
     linear-gradient(180deg,#0f1b13 0,#0c150f 55%,#080f0a 100%);
   }
@@ -88,7 +91,16 @@
 
 /* ---------- 组件细节 ---------- */
 [data-skin="gaibang"] ::selection{background:color-mix(in srgb,var(--pink) 30%,transparent)}
-[data-skin="gaibang"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="gaibang"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="gaibang"]{--scene-img:url(../skins/gaibang/scene-day.jpg)}
+  :root[data-skin="gaibang"][data-theme="dark"]{--scene-img:url(../skins/gaibang/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="gaibang"]:not([data-theme="light"]){--scene-img:url(../skins/gaibang/scene-night.jpg)}
+}
 
 /* 标题：略加字距 */
 [data-skin="gaibang"] .top h2,[data-skin="gaibang"] #auth h1,[data-skin="gaibang"] .me-head .name,

@@ -22,10 +22,11 @@
   --wd-ring:rgba(60,79,154,.26); --wd-seal:#8a3fa0;
   --wd-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 3.6c2 0 3.4 1 3.6 3' fill='none' stroke='%238a3fa0' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='2.6' cy='9.4' r='1.6' fill='%23a9b3c8'/%3E%3Cpath d='M5.6 6.4v1.4' stroke='%238a3fa0' stroke-width='1'/%3E%3Crect x='8' y='4' width='118' height='4' rx='2' fill='%23f0e8d2' stroke='%233c4f9a' stroke-width='.8'/%3E%3Crect x='10' y='3.6' width='3.4' height='4.8' rx='.8' fill='%23a9b3c8'/%3E%3Crect x='119.6' y='3.6' width='3.4' height='4.8' rx='.8' fill='%23a9b3c8'/%3E%3Crect x='25' y='3.8' width='2.2' height='4.4' rx='.6' fill='%238a3fa0'/%3E%3Ccircle cx='40' cy='6' r='1.1' fill='%233c4f9a'/%3E%3Ccircle cx='52' cy='6' r='1.1' fill='%233c4f9a'/%3E%3Ccircle cx='64' cy='6' r='1.1' fill='%233c4f9a'/%3E%3Ccircle cx='76' cy='6' r='1.1' fill='%233c4f9a'/%3E%3Ccircle cx='88' cy='6' r='1.1' fill='%233c4f9a'/%3E%3Ccircle cx='100' cy='6' r='1.1' fill='%233c4f9a'/%3E%3Cpath d='M14 4.7h104' stroke='%23ffffff' stroke-width='.5' opacity='.7'/%3E%3C/svg%3E");
   --r-card:16px; --r-panel:20px;
-  --scene-img:url(../skins/wudu/scene-day.jpg);
+  --scene-img:url(../skins/wudu/scene-day.gif); --scene-still:url(../skins/wudu/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(232,236,250,.06) 0,rgba(232,236,250,.18) 45%,rgba(232,236,250,.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(250,251,255,.95),rgba(250,251,255,0) 60%),linear-gradient(180deg,#eaedf8 0,#dde1f0 50%,#cdd3e6 100%);
 }
 
@@ -49,10 +50,11 @@
   --wd-silver:#7480a8; --wd-ink:#b4c2f4; --wd-btn-a:#8296e0; --wd-btn-b:#5a70c4; --wd-orn:rgba(180,194,244,.2);
   --wd-ring:rgba(159,176,236,.34); --wd-seal:#a456bc;
   --wd-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 3.6c2 0 3.4 1 3.6 3' fill='none' stroke='%23c27ad8' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='2.6' cy='9.4' r='1.6' fill='%23b4bed4'/%3E%3Cpath d='M5.6 6.4v1.4' stroke='%23c27ad8' stroke-width='1'/%3E%3Crect x='8' y='4' width='118' height='4' rx='2' fill='%23e8e0ca' stroke='%239fb0ec' stroke-width='.8'/%3E%3Crect x='10' y='3.6' width='3.4' height='4.8' rx='.8' fill='%23b4bed4'/%3E%3Crect x='119.6' y='3.6' width='3.4' height='4.8' rx='.8' fill='%23b4bed4'/%3E%3Crect x='25' y='3.8' width='2.2' height='4.4' rx='.6' fill='%23c27ad8'/%3E%3Ccircle cx='40' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='52' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='64' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='76' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='88' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='100' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Cpath d='M14 4.7h104' stroke='%23ffffff' stroke-width='.5' opacity='.7'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/wudu/scene-night.jpg);
+  --scene-img:url(../skins/wudu/scene-night.gif); --scene-still:url(../skins/wudu/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(6,8,20,.05) 0,rgba(6,8,20,.22) 45%,rgba(6,8,20,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(160,180,250,.2),rgba(160,180,250,0) 70%),linear-gradient(180deg,#111733 0,#0c1126 60%,#080b18 100%);
 }
 @media (prefers-color-scheme: dark){
@@ -75,17 +77,27 @@
   --wd-silver:#7480a8; --wd-ink:#b4c2f4; --wd-btn-a:#8296e0; --wd-btn-b:#5a70c4; --wd-orn:rgba(180,194,244,.2);
   --wd-ring:rgba(159,176,236,.34); --wd-seal:#a456bc;
   --wd-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 3.6c2 0 3.4 1 3.6 3' fill='none' stroke='%23c27ad8' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='2.6' cy='9.4' r='1.6' fill='%23b4bed4'/%3E%3Cpath d='M5.6 6.4v1.4' stroke='%23c27ad8' stroke-width='1'/%3E%3Crect x='8' y='4' width='118' height='4' rx='2' fill='%23e8e0ca' stroke='%239fb0ec' stroke-width='.8'/%3E%3Crect x='10' y='3.6' width='3.4' height='4.8' rx='.8' fill='%23b4bed4'/%3E%3Crect x='119.6' y='3.6' width='3.4' height='4.8' rx='.8' fill='%23b4bed4'/%3E%3Crect x='25' y='3.8' width='2.2' height='4.4' rx='.6' fill='%23c27ad8'/%3E%3Ccircle cx='40' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='52' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='64' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='76' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='88' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Ccircle cx='100' cy='6' r='1.1' fill='%239fb0ec'/%3E%3Cpath d='M14 4.7h104' stroke='%23ffffff' stroke-width='.5' opacity='.7'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/wudu/scene-night.jpg);
+  --scene-img:url(../skins/wudu/scene-night.gif); --scene-still:url(../skins/wudu/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(6,8,20,.05) 0,rgba(6,8,20,.22) 45%,rgba(6,8,20,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(160,180,250,.2),rgba(160,180,250,0) 70%),linear-gradient(180deg,#111733 0,#0c1126 60%,#080b18 100%);
   }
 }
 
 /* ---------- 组件细节 ---------- */
 [data-skin="wudu"] ::selection{background:rgba(60,79,154,.28)}
-[data-skin="wudu"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="wudu"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="wudu"]{--scene-img:url(../skins/wudu/scene-day.jpg)}
+  :root[data-skin="wudu"][data-theme="dark"]{--scene-img:url(../skins/wudu/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="wudu"]:not([data-theme="light"]){--scene-img:url(../skins/wudu/scene-night.jpg)}
+}
 
 /* 标题 */
 [data-skin="wudu"] .top h2,[data-skin="wudu"] #auth h1,[data-skin="wudu"] .me-head .name,

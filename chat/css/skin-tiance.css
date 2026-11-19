@@ -23,10 +23,11 @@
   --tc-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='2' y='4.8' width='4' height='2.4' rx='1' fill='%23a8a8ae'/%3E%3Crect x='6' y='5.3' width='92' height='1.4' rx='.7' fill='%234a3228'/%3E%3Cpath d='M96 6c2-5 6-5.6 9-4.6-2.2.8-3 2.4-3.4 4.6.4 2.2 1.2 3.8 3.4 4.6-3 1-7 .4-9-4.6z' fill='%23c0302a'/%3E%3Cpath d='M100 6c3-3.4 7-4.6 11-4-2.6 1-4 2.4-4.6 4 .6 1.6 2 3 4.6 4-4 .6-8-.6-11-4z' fill='%23c0302a' opacity='.78'/%3E%3Crect x='108' y='4.7' width='4' height='2.6' rx='.6' fill='%23b8893a'/%3E%3Cpath d='M112 6c4-3.6 12-3.8 19.5 0-7.5 3.8-15.5 3.6-19.5 0z' fill='%23a8a8ae'/%3E%3Cpath d='M114 6h15' stroke='%23ffffff' stroke-width='.6'/%3E%3C/svg%3E");
   --tc-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
   --r-card:16px; --r-panel:20px;
-  --scene-img:url(../skins/tiance/scene-day.jpg);
+  --scene-img:url(../skins/tiance/scene-day.gif); --scene-still:url(../skins/tiance/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(244,236,232,.06) 0,rgba(244,236,232,.18) 45%,rgba(244,236,232,.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(255,248,244,.95),rgba(255,248,244,0) 60%),linear-gradient(180deg,#f1e8e3 0,#e6dad4 50%,#d8c9c2 100%);
 }
 
@@ -50,10 +51,11 @@
   --tc-silver:#9a7a42; --tc-ink:#f09289; --tc-btn-a:#ec8178; --tc-btn-b:#c04a42; --tc-orn:rgba(240,146,137,.2);
   --tc-ring:rgba(233,119,110,.34); --tc-seal:#d4473d;
   --tc-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='2' y='4.8' width='4' height='2.4' rx='1' fill='%23c4c4cc'/%3E%3Crect x='6' y='5.3' width='92' height='1.4' rx='.7' fill='%238a6a58'/%3E%3Cpath d='M96 6c2-5 6-5.6 9-4.6-2.2.8-3 2.4-3.4 4.6.4 2.2 1.2 3.8 3.4 4.6-3 1-7 .4-9-4.6z' fill='%23e0453d'/%3E%3Cpath d='M100 6c3-3.4 7-4.6 11-4-2.6 1-4 2.4-4.6 4 .6 1.6 2 3 4.6 4-4 .6-8-.6-11-4z' fill='%23e0453d' opacity='.78'/%3E%3Crect x='108' y='4.7' width='4' height='2.6' rx='.6' fill='%23d0a24e'/%3E%3Cpath d='M112 6c4-3.6 12-3.8 19.5 0-7.5 3.8-15.5 3.6-19.5 0z' fill='%23c4c4cc'/%3E%3Cpath d='M114 6h15' stroke='%23ffffff' stroke-width='.6'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/tiance/scene-night.jpg);
+  --scene-img:url(../skins/tiance/scene-night.gif); --scene-still:url(../skins/tiance/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(10,6,6,.05) 0,rgba(10,6,6,.22) 45%,rgba(10,6,6,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(255,170,120,.2),rgba(255,170,120,0) 70%),linear-gradient(180deg,#1d1213 0,#150d0e 60%,#0e0809 100%);
 }
 @media (prefers-color-scheme: dark){
@@ -76,17 +78,27 @@
   --tc-silver:#9a7a42; --tc-ink:#f09289; --tc-btn-a:#ec8178; --tc-btn-b:#c04a42; --tc-orn:rgba(240,146,137,.2);
   --tc-ring:rgba(233,119,110,.34); --tc-seal:#d4473d;
   --tc-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='2' y='4.8' width='4' height='2.4' rx='1' fill='%23c4c4cc'/%3E%3Crect x='6' y='5.3' width='92' height='1.4' rx='.7' fill='%238a6a58'/%3E%3Cpath d='M96 6c2-5 6-5.6 9-4.6-2.2.8-3 2.4-3.4 4.6.4 2.2 1.2 3.8 3.4 4.6-3 1-7 .4-9-4.6z' fill='%23e0453d'/%3E%3Cpath d='M100 6c3-3.4 7-4.6 11-4-2.6 1-4 2.4-4.6 4 .6 1.6 2 3 4.6 4-4 .6-8-.6-11-4z' fill='%23e0453d' opacity='.78'/%3E%3Crect x='108' y='4.7' width='4' height='2.6' rx='.6' fill='%23d0a24e'/%3E%3Cpath d='M112 6c4-3.6 12-3.8 19.5 0-7.5 3.8-15.5 3.6-19.5 0z' fill='%23c4c4cc'/%3E%3Cpath d='M114 6h15' stroke='%23ffffff' stroke-width='.6'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/tiance/scene-night.jpg);
+  --scene-img:url(../skins/tiance/scene-night.gif); --scene-still:url(../skins/tiance/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(10,6,6,.05) 0,rgba(10,6,6,.22) 45%,rgba(10,6,6,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(255,170,120,.2),rgba(255,170,120,0) 70%),linear-gradient(180deg,#1d1213 0,#150d0e 60%,#0e0809 100%);
   }
 }
 
 /* ---------- 组件细节 ---------- */
 [data-skin="tiance"] ::selection{background:rgba(168,50,45,.28)}
-[data-skin="tiance"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="tiance"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="tiance"]{--scene-img:url(../skins/tiance/scene-day.jpg)}
+  :root[data-skin="tiance"][data-theme="dark"]{--scene-img:url(../skins/tiance/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="tiance"]:not([data-theme="light"]){--scene-img:url(../skins/tiance/scene-night.jpg)}
+}
 
 /* 标题 */
 [data-skin="tiance"] .top h2,[data-skin="tiance"] #auth h1,[data-skin="tiance"] .me-head .name,

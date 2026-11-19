@@ -23,10 +23,11 @@
   --wh-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='4' cy='6' r='2' fill='%23c23a58'/%3E%3Crect x='5' y='5' width='86' height='2' rx='1' fill='%237a5a3a'/%3E%3Crect x='28' y='4.6' width='2.6' height='2.8' rx='.5' fill='%23c23a58'/%3E%3Crect x='62' y='4.6' width='2.6' height='2.8' rx='.5' fill='%23c23a58'/%3E%3Crect x='91' y='4.2' width='8' height='3.6' rx='1' fill='%236d4b8f'/%3E%3Cpath d='M91 5.2h8M91 6.8h8' stroke='%23e6d4f6' stroke-width='.5'/%3E%3Cpath d='M99 4.2c9-1.4 20-.4 32 1.8-12 2.2-23 3.2-32 1.8z' fill='%232a2230'/%3E%3Cpath d='M99 4.6c9-.6 18 0 26 1.4' fill='none' stroke='%23e6d4f6' stroke-width='.5'/%3E%3C/svg%3E");
   --wh-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
   --r-card:16px; --r-panel:20px;
-  --scene-img:url(../skins/wanhua/scene-day.jpg);
+  --scene-img:url(../skins/wanhua/scene-day.gif); --scene-still:url(../skins/wanhua/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(240,234,248,.06) 0,rgba(240,234,248,.18) 45%,rgba(240,234,248,.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(252,248,255,.95),rgba(252,248,255,0) 60%),linear-gradient(180deg,#efe9f6 0,#e4dced 50%,#d6cce4 100%);
 }
 
@@ -50,10 +51,11 @@
   --wh-silver:#8470a4; --wh-ink:#cdb4ee; --wh-btn-a:#a98ad4; --wh-btn-b:#7e5fae; --wh-orn:rgba(205,180,238,.2);
   --wh-ring:rgba(185,154,224,.34); --wh-seal:#d04466;
   --wh-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='4' cy='6' r='2' fill='%23e0587a'/%3E%3Crect x='5' y='5' width='86' height='2' rx='1' fill='%23b08a5e'/%3E%3Crect x='28' y='4.6' width='2.6' height='2.8' rx='.5' fill='%23e0587a'/%3E%3Crect x='62' y='4.6' width='2.6' height='2.8' rx='.5' fill='%23e0587a'/%3E%3Crect x='91' y='4.2' width='8' height='3.6' rx='1' fill='%23b99ae0'/%3E%3Cpath d='M91 5.2h8M91 6.8h8' stroke='%23f4eafc' stroke-width='.5'/%3E%3Cpath d='M99 4.2c9-1.4 20-.4 32 1.8-12 2.2-23 3.2-32 1.8z' fill='%23e8def4'/%3E%3Cpath d='M99 4.6c9-.6 18 0 26 1.4' fill='none' stroke='%23f4eafc' stroke-width='.5'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/wanhua/scene-night.jpg);
+  --scene-img:url(../skins/wanhua/scene-night.gif); --scene-still:url(../skins/wanhua/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(8,5,16,.05) 0,rgba(8,5,16,.22) 45%,rgba(8,5,16,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(200,170,250,.2),rgba(200,170,250,0) 70%),linear-gradient(180deg,#191128 0,#120c20 60%,#0b0714 100%);
 }
 @media (prefers-color-scheme: dark){
@@ -76,17 +78,27 @@
   --wh-silver:#8470a4; --wh-ink:#cdb4ee; --wh-btn-a:#a98ad4; --wh-btn-b:#7e5fae; --wh-orn:rgba(205,180,238,.2);
   --wh-ring:rgba(185,154,224,.34); --wh-seal:#d04466;
   --wh-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='4' cy='6' r='2' fill='%23e0587a'/%3E%3Crect x='5' y='5' width='86' height='2' rx='1' fill='%23b08a5e'/%3E%3Crect x='28' y='4.6' width='2.6' height='2.8' rx='.5' fill='%23e0587a'/%3E%3Crect x='62' y='4.6' width='2.6' height='2.8' rx='.5' fill='%23e0587a'/%3E%3Crect x='91' y='4.2' width='8' height='3.6' rx='1' fill='%23b99ae0'/%3E%3Cpath d='M91 5.2h8M91 6.8h8' stroke='%23f4eafc' stroke-width='.5'/%3E%3Cpath d='M99 4.2c9-1.4 20-.4 32 1.8-12 2.2-23 3.2-32 1.8z' fill='%23e8def4'/%3E%3Cpath d='M99 4.6c9-.6 18 0 26 1.4' fill='none' stroke='%23f4eafc' stroke-width='.5'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/wanhua/scene-night.jpg);
+  --scene-img:url(../skins/wanhua/scene-night.gif); --scene-still:url(../skins/wanhua/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(8,5,16,.05) 0,rgba(8,5,16,.22) 45%,rgba(8,5,16,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(200,170,250,.2),rgba(200,170,250,0) 70%),linear-gradient(180deg,#191128 0,#120c20 60%,#0b0714 100%);
   }
 }
 
 /* ---------- 组件细节 ---------- */
 [data-skin="wanhua"] ::selection{background:rgba(109,75,143,.28)}
-[data-skin="wanhua"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="wanhua"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="wanhua"]{--scene-img:url(../skins/wanhua/scene-day.jpg)}
+  :root[data-skin="wanhua"][data-theme="dark"]{--scene-img:url(../skins/wanhua/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="wanhua"]:not([data-theme="light"]){--scene-img:url(../skins/wanhua/scene-night.jpg)}
+}
 
 /* 标题 */
 [data-skin="wanhua"] .top h2,[data-skin="wanhua"] #auth h1,[data-skin="wanhua"] .me-head .name,

@@ -23,10 +23,11 @@
   --qx-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 8.6c3-5.6 6-5.6 9-2.6s6 2.6 9-.6' fill='none' stroke='%23d0507a' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M2 3.4c3 5 6 5 9 2.4s6-2.2 9 .8' fill='none' stroke='%23e888a8' stroke-width='1' stroke-linecap='round' opacity='.85'/%3E%3Ccircle cx='23' cy='6' r='2' fill='%23b08a4e'/%3E%3Crect x='25' y='5.1' width='14' height='1.8' rx='.9' fill='%234a7f72'/%3E%3Crect x='39' y='2' width='2.8' height='8' rx='1.1' fill='%23b08a4e'/%3E%3Cpath d='M42 4.6h70l18 1.4-18 1.4H42z' fill='%23b5c0c8'/%3E%3Cpath d='M42 6h86' stroke='%23ffffff' stroke-width='.55'/%3E%3C/svg%3E");
   --qx-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
   --r-card:16px; --r-panel:20px;
-  --scene-img:url(../skins/qixiu/scene-day.jpg);
+  --scene-img:url(../skins/qixiu/scene-day.gif); --scene-still:url(../skins/qixiu/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(252,238,243,.06) 0,rgba(252,238,243,.18) 45%,rgba(252,238,243,.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(255,248,250,.95),rgba(255,248,250,0) 60%),linear-gradient(180deg,#faedf1 0,#f0dfe5 50%,#e4cdd6 100%);
 }
 
@@ -50,10 +51,11 @@
   --qx-silver:#6fae9c; --qx-ink:#f6b4cb; --qx-btn-a:#f4b0c8; --qx-btn-b:#d4709a; --qx-orn:rgba(246,180,203,.2);
   --qx-ring:rgba(240,160,188,.34); --qx-seal:#d84f78;
   --qx-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 8.6c3-5.6 6-5.6 9-2.6s6 2.6 9-.6' fill='none' stroke='%23f06a96' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M2 3.4c3 5 6 5 9 2.4s6-2.2 9 .8' fill='none' stroke='%23f4a8c4' stroke-width='1' stroke-linecap='round' opacity='.85'/%3E%3Ccircle cx='23' cy='6' r='2' fill='%23d8b070'/%3E%3Crect x='25' y='5.1' width='14' height='1.8' rx='.9' fill='%237fc8b2'/%3E%3Crect x='39' y='2' width='2.8' height='8' rx='1.1' fill='%23d8b070'/%3E%3Cpath d='M42 4.6h70l18 1.4-18 1.4H42z' fill='%23c8d2da'/%3E%3Cpath d='M42 6h86' stroke='%23ffffff' stroke-width='.55'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/qixiu/scene-night.jpg);
+  --scene-img:url(../skins/qixiu/scene-night.gif); --scene-still:url(../skins/qixiu/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(14,6,12,.05) 0,rgba(14,6,12,.22) 45%,rgba(14,6,12,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(255,200,150,.2),rgba(255,200,150,0) 70%),linear-gradient(180deg,#25142a 0,#1a0f1c 60%,#110912 100%);
 }
 @media (prefers-color-scheme: dark){
@@ -76,17 +78,27 @@
   --qx-silver:#6fae9c; --qx-ink:#f6b4cb; --qx-btn-a:#f4b0c8; --qx-btn-b:#d4709a; --qx-orn:rgba(246,180,203,.2);
   --qx-ring:rgba(240,160,188,.34); --qx-seal:#d84f78;
   --qx-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 8.6c3-5.6 6-5.6 9-2.6s6 2.6 9-.6' fill='none' stroke='%23f06a96' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M2 3.4c3 5 6 5 9 2.4s6-2.2 9 .8' fill='none' stroke='%23f4a8c4' stroke-width='1' stroke-linecap='round' opacity='.85'/%3E%3Ccircle cx='23' cy='6' r='2' fill='%23d8b070'/%3E%3Crect x='25' y='5.1' width='14' height='1.8' rx='.9' fill='%237fc8b2'/%3E%3Crect x='39' y='2' width='2.8' height='8' rx='1.1' fill='%23d8b070'/%3E%3Cpath d='M42 4.6h70l18 1.4-18 1.4H42z' fill='%23c8d2da'/%3E%3Cpath d='M42 6h86' stroke='%23ffffff' stroke-width='.55'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/qixiu/scene-night.jpg);
+  --scene-img:url(../skins/qixiu/scene-night.gif); --scene-still:url(../skins/qixiu/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(14,6,12,.05) 0,rgba(14,6,12,.22) 45%,rgba(14,6,12,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(255,200,150,.2),rgba(255,200,150,0) 70%),linear-gradient(180deg,#25142a 0,#1a0f1c 60%,#110912 100%);
   }
 }
 
 /* ---------- 组件细节 ---------- */
 [data-skin="qixiu"] ::selection{background:rgba(196,86,122,.28)}
-[data-skin="qixiu"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="qixiu"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="qixiu"]{--scene-img:url(../skins/qixiu/scene-day.jpg)}
+  :root[data-skin="qixiu"][data-theme="dark"]{--scene-img:url(../skins/qixiu/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="qixiu"]:not([data-theme="light"]){--scene-img:url(../skins/qixiu/scene-night.jpg)}
+}
 
 /* 标题 */
 [data-skin="qixiu"] .top h2,[data-skin="qixiu"] #auth h1,[data-skin="qixiu"] .me-head .name,

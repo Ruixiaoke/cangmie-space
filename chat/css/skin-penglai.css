@@ -23,10 +23,11 @@
   --pl-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M1 6H9' stroke='%238a6a50' stroke-width='1.2' stroke-linecap='round'/%3E%3Cpath d='M9 6Q16 1.2 44 1.8Q70 2.6 80 5.6L80 6.4Q70 9.4 44 10.2Q16 10.8 9 6Z' fill='%232c6f9e'/%3E%3Cpath d='M12 6Q40 4.4 80 6M16 4.2Q44 3.4 76 5.2M16 7.8Q44 8.6 76 6.8' fill='none' stroke='%23cfe6f6' stroke-width='.5' opacity='.8'/%3E%3Crect x='58' y='1.8' width='3' height='8.4' rx='1' fill='%23e0584e'/%3E%3Cpath d='M80 6H121' stroke='%238a6a50' stroke-width='1.3' stroke-linecap='round'/%3E%3Cpath d='M121 6H126a3.2 3.2 0 0 1 0 6' fill='none' stroke='%237a5a40' stroke-width='1.6' stroke-linecap='round' transform='translate(0 -3)'/%3E%3C/svg%3E");
   --pl-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
   --r-card:16px; --r-panel:20px;
-  --scene-img:url(../skins/penglai/scene-day.jpg);
+  --scene-img:url(../skins/penglai/scene-day.gif); --scene-still:url(../skins/penglai/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(238,246,252,.06) 0,rgba(238,246,252,.18) 45%,rgba(238,246,252,.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
     linear-gradient(180deg,#eef5fb 0,#dfecf6 50%,#cfe0ee 100%);
 }
@@ -51,10 +52,11 @@
   --pl-sil:#6f93b0; --pl-ink:#9bcff2; --pl-btn-a:#7ec0ec; --pl-btn-b:#5499cc; --pl-orn:rgba(155,207,242,.2);
   --pl-ring:rgba(126,192,236,.3); --pl-seal:#f0766a;
   --pl-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M1 6H9' stroke='%23b49a82' stroke-width='1.2' stroke-linecap='round'/%3E%3Cpath d='M9 6Q16 1.2 44 1.8Q70 2.6 80 5.6L80 6.4Q70 9.4 44 10.2Q16 10.8 9 6Z' fill='%235499cc'/%3E%3Cpath d='M12 6Q40 4.4 80 6M16 4.2Q44 3.4 76 5.2M16 7.8Q44 8.6 76 6.8' fill='none' stroke='%23d4ebfa' stroke-width='.5' opacity='.8'/%3E%3Crect x='58' y='1.8' width='3' height='8.4' rx='1' fill='%23f0766a'/%3E%3Cpath d='M80 6H121' stroke='%23b49a82' stroke-width='1.3' stroke-linecap='round'/%3E%3Cpath d='M121 6H126a3.2 3.2 0 0 1 0 6' fill='none' stroke='%23c4a88c' stroke-width='1.6' stroke-linecap='round' transform='translate(0 -3)'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/penglai/scene-night.jpg);
+  --scene-img:url(../skins/penglai/scene-night.gif); --scene-still:url(../skins/penglai/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(4,12,24,.05) 0,rgba(4,12,24,.22) 45%,rgba(4,12,24,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(150,200,240,.22),rgba(150,200,240,0) 70%),
     linear-gradient(180deg,#0e1c2c 0,#0a1522 60%,#060d17 100%);
 }
@@ -78,10 +80,11 @@
   --pl-sil:#6f93b0; --pl-ink:#9bcff2; --pl-btn-a:#7ec0ec; --pl-btn-b:#5499cc; --pl-orn:rgba(155,207,242,.2);
   --pl-ring:rgba(126,192,236,.3); --pl-seal:#f0766a;
   --pl-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M1 6H9' stroke='%23b49a82' stroke-width='1.2' stroke-linecap='round'/%3E%3Cpath d='M9 6Q16 1.2 44 1.8Q70 2.6 80 5.6L80 6.4Q70 9.4 44 10.2Q16 10.8 9 6Z' fill='%235499cc'/%3E%3Cpath d='M12 6Q40 4.4 80 6M16 4.2Q44 3.4 76 5.2M16 7.8Q44 8.6 76 6.8' fill='none' stroke='%23d4ebfa' stroke-width='.5' opacity='.8'/%3E%3Crect x='58' y='1.8' width='3' height='8.4' rx='1' fill='%23f0766a'/%3E%3Cpath d='M80 6H121' stroke='%23b49a82' stroke-width='1.3' stroke-linecap='round'/%3E%3Cpath d='M121 6H126a3.2 3.2 0 0 1 0 6' fill='none' stroke='%23c4a88c' stroke-width='1.6' stroke-linecap='round' transform='translate(0 -3)'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/penglai/scene-night.jpg);
+  --scene-img:url(../skins/penglai/scene-night.gif); --scene-still:url(../skins/penglai/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(4,12,24,.05) 0,rgba(4,12,24,.22) 45%,rgba(4,12,24,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(150,200,240,.22),rgba(150,200,240,0) 70%),
     linear-gradient(180deg,#0e1c2c 0,#0a1522 60%,#060d17 100%);
   }
@@ -90,7 +93,16 @@
 /* ---------- 组件细节 ---------- */
 [data-skin="penglai"] ::selection{background:rgba(44,111,158,.3)}
 [data-skin="penglai"][data-theme="dark"] ::selection{background:rgba(126,192,236,.34)}
-[data-skin="penglai"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="penglai"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="penglai"]{--scene-img:url(../skins/penglai/scene-day.jpg)}
+  :root[data-skin="penglai"][data-theme="dark"]{--scene-img:url(../skins/penglai/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="penglai"]:not([data-theme="light"]){--scene-img:url(../skins/penglai/scene-night.jpg)}
+}
 
 /* 标题 */
 [data-skin="penglai"] .top h2,[data-skin="penglai"] #auth h1,[data-skin="penglai"] .me-head .name,

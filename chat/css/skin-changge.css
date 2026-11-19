@@ -23,10 +23,11 @@
   --cg-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='6' cy='6' r='3' fill='%23245650'/%3E%3Ccircle cx='6' cy='6' r='1' fill='%23eef6f5'/%3E%3Cpath d='M9 6H128' stroke='%232f7a73' stroke-width='1.1' stroke-linecap='round'/%3E%3Cpath d='M9 4.2H128' stroke='%232f7a73' stroke-width='.4' opacity='.55'/%3E%3Cpath d='M9 7.8H128' stroke='%232f7a73' stroke-width='.4' opacity='.55'/%3E%3Crect x='17' y='2' width='2.6' height='8' rx='1' fill='%23245650'/%3E%3Crect x='112' y='2.6' width='2.6' height='6.8' rx='1' fill='%23245650'/%3E%3Ccircle cx='34' cy='10.3' r='.9' fill='%239bbcb8'/%3E%3Ccircle cx='48' cy='10.3' r='.9' fill='%239bbcb8'/%3E%3Ccircle cx='62' cy='10.3' r='.9' fill='%239bbcb8'/%3E%3Ccircle cx='76' cy='10.3' r='.9' fill='%239bbcb8'/%3E%3Ccircle cx='90' cy='10.3' r='.9' fill='%239bbcb8'/%3E%3Cpath d='M128 6c2 0 3-1 3-2.6M128 6c2 0 3 1 3 2.6' fill='none' stroke='%239bbcb8' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E");
   --cg-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
   --r-card:16px; --r-panel:20px;
-  --scene-img:url(../skins/changge/scene-day.jpg);
+  --scene-img:url(../skins/changge/scene-day.gif); --scene-still:url(../skins/changge/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(238,247,246,.06) 0,rgba(238,247,246,.18) 45%,rgba(238,247,246,.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
     linear-gradient(180deg,#eef6f5 0,#dfeceb 50%,#cfe0de 100%);
 }
@@ -51,10 +52,11 @@
   --cg-sil:#6a8c89; --cg-ink:#9ad8cf; --cg-btn-a:#6bbfb5; --cg-btn-b:#4a9990; --cg-orn:rgba(154,216,207,.2);
   --cg-ring:rgba(127,205,195,.3); --cg-seal:#d0525a;
   --cg-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='6' cy='6' r='3' fill='%236a8c89'/%3E%3Ccircle cx='6' cy='6' r='1' fill='%230f1f21'/%3E%3Cpath d='M9 6H128' stroke='%237fcdc3' stroke-width='1.1' stroke-linecap='round'/%3E%3Cpath d='M9 4.2H128' stroke='%237fcdc3' stroke-width='.4' opacity='.55'/%3E%3Cpath d='M9 7.8H128' stroke='%237fcdc3' stroke-width='.4' opacity='.55'/%3E%3Crect x='17' y='2' width='2.6' height='8' rx='1' fill='%236a8c89'/%3E%3Crect x='112' y='2.6' width='2.6' height='6.8' rx='1' fill='%236a8c89'/%3E%3Ccircle cx='34' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='48' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='62' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='76' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='90' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Cpath d='M128 6c2 0 3-1 3-2.6M128 6c2 0 3 1 3 2.6' fill='none' stroke='%239ad8cf' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/changge/scene-night.jpg);
+  --scene-img:url(../skins/changge/scene-night.gif); --scene-still:url(../skins/changge/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(6,14,16,.05) 0,rgba(6,14,16,.22) 45%,rgba(6,14,16,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(150,220,214,.22),rgba(150,220,214,0) 70%),
     linear-gradient(180deg,#0f1f21 0,#0b1819 60%,#081012 100%);
 }
@@ -78,10 +80,11 @@
   --cg-sil:#6a8c89; --cg-ink:#9ad8cf; --cg-btn-a:#6bbfb5; --cg-btn-b:#4a9990; --cg-orn:rgba(154,216,207,.2);
   --cg-ring:rgba(127,205,195,.3); --cg-seal:#d0525a;
   --cg-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='6' cy='6' r='3' fill='%236a8c89'/%3E%3Ccircle cx='6' cy='6' r='1' fill='%230f1f21'/%3E%3Cpath d='M9 6H128' stroke='%237fcdc3' stroke-width='1.1' stroke-linecap='round'/%3E%3Cpath d='M9 4.2H128' stroke='%237fcdc3' stroke-width='.4' opacity='.55'/%3E%3Cpath d='M9 7.8H128' stroke='%237fcdc3' stroke-width='.4' opacity='.55'/%3E%3Crect x='17' y='2' width='2.6' height='8' rx='1' fill='%236a8c89'/%3E%3Crect x='112' y='2.6' width='2.6' height='6.8' rx='1' fill='%236a8c89'/%3E%3Ccircle cx='34' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='48' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='62' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='76' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Ccircle cx='90' cy='10.3' r='.9' fill='%239ad8cf'/%3E%3Cpath d='M128 6c2 0 3-1 3-2.6M128 6c2 0 3 1 3 2.6' fill='none' stroke='%239ad8cf' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/changge/scene-night.jpg);
+  --scene-img:url(../skins/changge/scene-night.gif); --scene-still:url(../skins/changge/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(6,14,16,.05) 0,rgba(6,14,16,.22) 45%,rgba(6,14,16,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(150,220,214,.22),rgba(150,220,214,0) 70%),
     linear-gradient(180deg,#0f1f21 0,#0b1819 60%,#081012 100%);
   }
@@ -90,7 +93,16 @@
 /* ---------- 组件细节 ---------- */
 [data-skin="changge"] ::selection{background:rgba(47,122,115,.3)}
 [data-skin="changge"][data-theme="dark"] ::selection{background:rgba(127,205,195,.34)}
-[data-skin="changge"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="changge"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="changge"]{--scene-img:url(../skins/changge/scene-day.jpg)}
+  :root[data-skin="changge"][data-theme="dark"]{--scene-img:url(../skins/changge/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="changge"]:not([data-theme="light"]){--scene-img:url(../skins/changge/scene-night.jpg)}
+}
 
 /* 标题 */
 [data-skin="changge"] .top h2,[data-skin="changge"] #auth h1,[data-skin="changge"] .me-head .name,
