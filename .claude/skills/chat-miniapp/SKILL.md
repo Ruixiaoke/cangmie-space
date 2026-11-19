@@ -128,3 +128,9 @@ putGame：updated_at 更旧的不覆盖新的 → 刷新所有卡片 → 如果�
    - 物理类游戏的确定性：同一输入在两次独立模拟里结果逐位相同。
 4. 审过后直接 push 并 `gh pr create`（不用问），多个 PR 有依赖时写明合并顺序。合并由用户来做。合并后看部署工作流（前端 Pages、后端迁移和 Edge Function）是否成功，再清理 worktree 和本地分支。
 5. 汇报里写清楚没测到的部分：真机、真实实时同步、推送、两台设备对打。
+
+## 斗地主（群聊里的三人游戏，`scope: 'group'`）
+
+- 前端 `miniapps/ddz.js`（缓存、卡片、实时、开桌）+ `ddz-view.js`（牌桌界面和日志回放）+ `ddz-token.js`（`[斗地主]#id` 识别，群聊里才是卡片，私聊里是普通文字）+ `ddz-rules.js`（规则引擎，浏览器和服务器共用，`supabase/functions/ddz/gen-rules.py` 复制成 `rules.gen.js`）。
+- 后端：大厅在 SQL（`ddz_open / ddz_sit / ddz_stand / ddz_set_bot`），叫分 / 出牌 / 开始 / 超时托管 / 结算在 Edge Function `ddz`（`game.ts` 可测，`ddz_commit` 原子写）。手牌在 `ddz_state`（无任何用户权限）里，每个真人只能读 `ddz_hands` 里自己的那行；`ddz_games.pub` 里别人的手牌只有张数。
+- 测试：`supabase/tests/doudizhu_test.sql`、`supabase/functions/ddz/game_test.ts`；Playwright 的假 Supabase 可以把 `game.ts` 用 `deno bundle` 打包后在页面里跑真实的服务器逻辑。

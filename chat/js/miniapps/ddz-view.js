@@ -107,7 +107,7 @@ export function createTable(box, host) {
   var T = { g: null, D: null, queue: [], tm: 0, ui: 0, sel: {}, hintI: -1, hintKey: '', busy: false, sheet: false, sheetRound: -1, sheetHidden: false, tickV: -1, tickAt: 0, fixV: -1, fxTm: 0, dead: false, lastSig: '', handSig: '' };
   var root = h('div', { class: 'ddz' });
   box.appendChild(root);
-  var bannerEl = null;
+  var fxLayer = h('div', { class: 'ddz-fxlayer', 'aria-hidden': 'true' }); // 特效层：render 重画牌桌时不清掉它
 
   function mySeat() { var x = T.g; return x && S.me ? x.seats.indexOf(S.me.id) : -1; }
   function seated() { return mySeat() >= 0; }
@@ -183,10 +183,8 @@ export function createTable(box, host) {
     else go();
   }
   function banner(text, cls) {
-    if (bannerEl && bannerEl.parentNode) bannerEl.parentNode.removeChild(bannerEl);
-    bannerEl = h('div', { class: 'ddz-banner ' + (cls || ''), text: text });
-    root.appendChild(bannerEl);
-    var b = bannerEl;
+    var b = h('div', { class: 'ddz-banner ' + (cls || ''), text: text });
+    fxLayer.appendChild(b);
     setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 1900);
   }
   function playFx(kind) {
@@ -196,7 +194,7 @@ export function createTable(box, host) {
     var wrap = h('div', { class: 'ddz-fx ' + kind, 'aria-hidden': 'true' });
     wrap.appendChild(img('ddz/fx-' + name + '.png', 'ddz-fx-img', label));
     wrap.appendChild(h('span', { class: 'ddz-fx-t', text: label }));
-    root.appendChild(wrap);
+    fxLayer.appendChild(wrap);
     setTimeout(function () { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); }, 1300);
   }
 
@@ -222,7 +220,6 @@ export function createTable(box, host) {
     clear(root);
     root.classList.toggle('lobby', !x || x.status === 'waiting' || x.status === 'closed');
     if (!x) { root.appendChild(h('div', { class: 'ddz-loading', text: '载入中…' })); return; }
-    if (bannerEl) bannerEl = null;
     if (x.status === 'waiting' || x.status === 'closed') renderLobby();
     else if (T.D) renderTable();
     else root.appendChild(h('div', { class: 'ddz-loading', text: '载入中…' }));
@@ -232,6 +229,7 @@ export function createTable(box, host) {
       again.addEventListener('click', function () { T.sheet = true; T.sheetHidden = false; render(); });
       root.appendChild(again);
     }
+    root.appendChild(fxLayer);
     updateUi();
   }
 
@@ -309,9 +307,10 @@ export function createTable(box, host) {
 
     var bar = h('div', { class: 'ddz-bar' });
     var hand = shownHand();
-    if (seated()) bar.appendChild(seatBox(m));
-    else bar.appendChild(h('div', { class: 'ddz-watch', text: '旁观中' }));
+    bar.classList.toggle('spec', !seated());
+    bar.appendChild(seatBox(vs));
     var acts = h('div', { class: 'ddz-acts' });
+    if (!seated()) acts.appendChild(h('span', { class: 'ddz-watch', text: '旁观中' }));
     bar.appendChild(acts);
     root.appendChild(bar);
 
@@ -476,7 +475,7 @@ export function createTable(box, host) {
     lb.appendChild(h('div', { class: 'ddz-sub', text: x.status === 'closed' ? '回到聊天，再开一桌吧' : '三人一桌，坐满就能开始' }));
     var sc = host.scores();
     var m = mySeat(), filled = 0;
-    for (var s = 0; s < 3; s++) {
+    [0, 1, 2].forEach(function (s) {
       if (x.seats[s] || x.bots[s]) filled++;
       var row = h('div', { class: 'ddz-lrow' + (x.seats[s] || x.bots[s] ? ' on' : '') });
       row.appendChild(h('div', { class: 'ddz-lav' }, x.seats[s] || x.bots[s] ? avatarOfSeat(s, 48) : h('span', { class: 'ddz-empty', text: String(s + 1) })));
@@ -496,7 +495,7 @@ export function createTable(box, host) {
       }
       row.appendChild(ops);
       lb.appendChild(row);
-    }
+    });
     if (x.status === 'waiting') {
       if (m >= 0) {
         var st = lbtn(filled === 3 ? '开始' : '还差 ' + (3 - filled) + ' 个人', 'btn ddz-start', function () { host.start(); });

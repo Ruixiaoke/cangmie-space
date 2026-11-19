@@ -24,7 +24,7 @@
 .ddz-card.back img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .ddz-card.back.nofb{background:repeating-linear-gradient(45deg,#2c62c9 0 4px,#244fa3 4px 8px)}
 .ddz-card.mini{width:14px;height:20px;border-radius:3px}
-.ddz-card.small{width:26px;height:36px;border-radius:4px;font-size:11px}
+.ddz-card.small{width:22px;height:31px;border-radius:4px;font-size:10px}
 .ddz-card.pc{width:30px;height:42px;font-size:13px}
 .ddz-card.hc{width:var(--cw);height:calc(var(--cw) * 1.4);font-size:calc(var(--cw) * .3);border-radius:calc(var(--cw) * .1)}
 
@@ -51,7 +51,7 @@
 .ddz-ct{display:flex;align-items:center;gap:4px;margin-top:3px;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 .ddz-tag{position:absolute;top:-2px;left:-2px;padding:0 6px;border-radius:8px;background:#d4572a;color:#fff;font-size:11px;line-height:1.6}
 .ddz-info{position:absolute;left:50%;top:8px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:5px}
-.ddz-bottom{display:flex;gap:4px}
+.ddz-bottom{display:flex;gap:3px}
 .ddz-mult{padding:2px 12px;border-radius:999px;background:rgba(0,0,0,.5);font-size:13px;font-weight:600;white-space:nowrap}
 
 /* 出牌区 */
@@ -74,6 +74,7 @@
 .ddz-bar .ddz-nm{max-width:64px;font-size:11px}
 .ddz-bar .ddz-ct{display:none}
 .ddz-bar .ddz-role{width:20px;height:20px;right:-6px}
+.ddz-bar.spec .ddz-ct{display:flex}
 .ddz-watch{padding:6px 14px;border-radius:999px;background:rgba(0,0,0,.5);font-size:var(--fs-sm)}
 .ddz-acts{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:8px}
 .ddz-acts .btn{flex:1;max-width:96px;min-width:60px;min-height:44px;padding:6px 8px}
@@ -91,6 +92,7 @@
 .ddz-reopen{position:absolute;right:12px;bottom:12px;z-index:4;min-height:44px}
 
 /* 特效 */
+.ddz-fxlayer{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
 .ddz-banner{position:absolute;left:50%;top:36%;z-index:6;transform:translate(-50%,-50%);font-size:60px;font-weight:800;letter-spacing:.1em;color:#ffd34d;text-shadow:0 3px 0 #b3472a,0 6px 18px rgba(0,0,0,.6);pointer-events:none;animation:ddz-banner 1.9s var(--ease) both}
 @keyframes ddz-banner{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}30%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.05)}}
 .ddz-fx{position:absolute;left:50%;top:38%;z-index:4;width:150px;height:150px;margin:-75px 0 0 -75px;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -115,11 +117,11 @@
 .ddz-lav{flex:none;width:48px;height:48px;display:flex;align-items:center;justify-content:center}
 .ddz-lav .avatar{width:48px!important;height:48px!important}
 .ddz-empty{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:2px dashed var(--t3);color:var(--t3);font-weight:600}
-.ddz-lnm{flex:1;min-width:72px;display:flex;flex-direction:column;line-height:1.35}
+.ddz-lnm{flex:1;min-width:40px;display:flex;flex-direction:column;line-height:1.35}
 .ddz-lnm b{font-size:var(--fs-md);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ddz-lsub{font-size:var(--fs-xs);color:var(--t3)}
 .ddz-lops{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
-.ddz-lops .btn{min-height:44px}
+.ddz-lops .btn{min-height:44px;padding:6px 12px}
 .ddz-start{width:100%;margin-top:4px}
 
 /* 结算 */
