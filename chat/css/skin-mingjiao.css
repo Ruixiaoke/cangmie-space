@@ -22,10 +22,11 @@
   --mj-ring:rgba(181,55,31,.26); --mj-seal:#8f1f14;
   --mj-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='3.5' cy='6' r='1.8' fill='%238f1f14'/%3E%3Crect x='5' y='4.9' width='20' height='2.4' rx='1.1' fill='%236e3a22'/%3E%3Cpath d='M9 4.7v2.8M13 4.7v2.8M17 4.7v2.8M21 4.7v2.8' stroke='%23d1a63c' stroke-width='.7'/%3E%3Cpath d='M25 1.6q2.2 1 2.2 2.4v4q0 1.4-2.2 2.4q1.2-1.6 1.2-4.4q0-2.8-1.2-4.4z' fill='%23d1a63c'/%3E%3Cpath d='M27 3.4C58 2 100 1.6 130.5 10.4C102 6.6 60 7.2 27 8z' fill='%23b8c0c8'/%3E%3Cpath d='M28 4.2C60 2.8 100 2.6 126 8.4' stroke='%23fbfcfd' stroke-width='.6' fill='none'/%3E%3C/svg%3E");
   --r-card:16px; --r-panel:20px;
-  --scene-img:url(../skins/mingjiao/scene-day.jpg);
+  --scene-img:url(../skins/mingjiao/scene-day.gif); --scene-still:url(../skins/mingjiao/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(252,240,226,.06) 0,rgba(252,240,226,.18) 45%,rgba(240,224,210,.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(255,244,220,.95),rgba(255,244,220,0) 60%),
     linear-gradient(180deg,#faf1e8 0,#f0e2d4 55%,#e6d2c0 100%);
 }
@@ -50,10 +51,11 @@
   --mj-silver:#a88a4a; --mj-ink:#f6aa8c; --mj-btn-a:#e0704c; --mj-btn-b:#b8502e; --mj-orn:rgba(246,170,140,.22);
   --mj-ring:rgba(240,144,110,.3); --mj-seal:#d0452f;
   --mj-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='3.5' cy='6' r='1.8' fill='%23e0452f'/%3E%3Crect x='5' y='4.9' width='20' height='2.4' rx='1.1' fill='%23a8744a'/%3E%3Cpath d='M9 4.7v2.8M13 4.7v2.8M17 4.7v2.8M21 4.7v2.8' stroke='%23e3b85a' stroke-width='.7'/%3E%3Cpath d='M25 1.6q2.2 1 2.2 2.4v4q0 1.4-2.2 2.4q1.2-1.6 1.2-4.4q0-2.8-1.2-4.4z' fill='%23e3b85a'/%3E%3Cpath d='M27 3.4C58 2 100 1.6 130.5 10.4C102 6.6 60 7.2 27 8z' fill='%23aab2ba'/%3E%3Cpath d='M28 4.2C60 2.8 100 2.6 126 8.4' stroke='%23f0f4f8' stroke-width='.6' fill='none'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/mingjiao/scene-night.jpg);
+  --scene-img:url(../skins/mingjiao/scene-night.gif); --scene-still:url(../skins/mingjiao/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(14,8,12,.05) 0,rgba(14,8,12,.22) 45%,rgba(14,8,12,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(240,150,90,.2),rgba(240,150,90,0) 70%),
     linear-gradient(180deg,#1c0e0c 0,#140a09 55%,#0c0605 100%);
 }
@@ -77,10 +79,11 @@
   --mj-silver:#a88a4a; --mj-ink:#f6aa8c; --mj-btn-a:#e0704c; --mj-btn-b:#b8502e; --mj-orn:rgba(246,170,140,.22);
   --mj-ring:rgba(240,144,110,.3); --mj-seal:#d0452f;
   --mj-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Ccircle cx='3.5' cy='6' r='1.8' fill='%23e0452f'/%3E%3Crect x='5' y='4.9' width='20' height='2.4' rx='1.1' fill='%23a8744a'/%3E%3Cpath d='M9 4.7v2.8M13 4.7v2.8M17 4.7v2.8M21 4.7v2.8' stroke='%23e3b85a' stroke-width='.7'/%3E%3Cpath d='M25 1.6q2.2 1 2.2 2.4v4q0 1.4-2.2 2.4q1.2-1.6 1.2-4.4q0-2.8-1.2-4.4z' fill='%23e3b85a'/%3E%3Cpath d='M27 3.4C58 2 100 1.6 130.5 10.4C102 6.6 60 7.2 27 8z' fill='%23aab2ba'/%3E%3Cpath d='M28 4.2C60 2.8 100 2.6 126 8.4' stroke='%23f0f4f8' stroke-width='.6' fill='none'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/mingjiao/scene-night.jpg);
+  --scene-img:url(../skins/mingjiao/scene-night.gif); --scene-still:url(../skins/mingjiao/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(14,8,12,.05) 0,rgba(14,8,12,.22) 45%,rgba(14,8,12,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(240,150,90,.2),rgba(240,150,90,0) 70%),
     linear-gradient(180deg,#1c0e0c 0,#140a09 55%,#0c0605 100%);
   }
@@ -88,7 +91,16 @@
 
 /* ---------- 组件细节 ---------- */
 [data-skin="mingjiao"] ::selection{background:color-mix(in srgb,var(--pink) 30%,transparent)}
-[data-skin="mingjiao"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="mingjiao"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="mingjiao"]{--scene-img:url(../skins/mingjiao/scene-day.jpg)}
+  :root[data-skin="mingjiao"][data-theme="dark"]{--scene-img:url(../skins/mingjiao/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="mingjiao"]:not([data-theme="light"]){--scene-img:url(../skins/mingjiao/scene-night.jpg)}
+}
 
 /* 标题：略加字距 */
 [data-skin="mingjiao"] .top h2,[data-skin="mingjiao"] #auth h1,[data-skin="mingjiao"] .me-head .name,

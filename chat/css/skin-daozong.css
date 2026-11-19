@@ -21,10 +21,11 @@
   --dz-silver:#9fb2c8; --dz-ink:#26476b; --dz-btn-a:#3a6a9c; --dz-btn-b:#26476b; --dz-orn:rgba(38,71,107,.2);
   --dz-ring:rgba(38,71,107,.26); --dz-seal:#c0392b;
   --dz-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c-.2-2 1.4-3.2 3.4-3M2 6c-.2 2 1.4 3.2 3.4 3' fill='none' stroke='%23c0392b' stroke-width='1.3' stroke-linecap='round'/%3E%3Crect x='5' y='4.6' width='20' height='2.8' rx='1.2' fill='%231f2f45'/%3E%3Cpath d='M9 4.8l2 1.2-2 1.2M14 4.8l2 1.2-2 1.2M19 4.8l2 1.2-2 1.2' fill='none' stroke='%237f93ad' stroke-width='.7'/%3E%3Cellipse cx='27' cy='6' rx='2.6' ry='4.4' fill='%23b8903a'/%3E%3Cpath d='M29.6 4.2H125l6 1.2-.2 1.8-4.6.8H29.6z' fill='%23c3cfdc'/%3E%3Cpath d='M29.6 4.2H125l6 1.2' fill='none' stroke='%238798ae' stroke-width='.8'/%3E%3Cpath d='M31 7.1c12-.9 30 .6 60-.2 14 0 24-.4 34-.5' fill='none' stroke='%23ffffff' stroke-width='.7'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/daozong/scene-day.jpg);
+  --scene-img:url(../skins/daozong/scene-day.gif); --scene-still:url(../skins/daozong/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(238,244,251,0.06) 0,rgba(238,244,251,0.18) 45%,rgba(238,244,251,0.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
     linear-gradient(180deg,#edf3f9 0,#e0e9f3 50%,#d2deec 100%);
   --dz-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
@@ -51,10 +52,11 @@
   --dz-silver:#6a809c; --dz-ink:#a3c6ee; --dz-btn-a:#6ea3dc; --dz-btn-b:#4a80bb; --dz-orn:rgba(163,198,238,.2);
   --dz-ring:rgba(127,176,230,.3); --dz-seal:#d0443a;
   --dz-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c-.2-2 1.4-3.2 3.4-3M2 6c-.2 2 1.4 3.2 3.4 3' fill='none' stroke='%23d0443a' stroke-width='1.3' stroke-linecap='round'/%3E%3Crect x='5' y='4.6' width='20' height='2.8' rx='1.2' fill='%235f7899'/%3E%3Cpath d='M9 4.8l2 1.2-2 1.2M14 4.8l2 1.2-2 1.2M19 4.8l2 1.2-2 1.2' fill='none' stroke='%23a3b6cf' stroke-width='.7'/%3E%3Cellipse cx='27' cy='6' rx='2.6' ry='4.4' fill='%23d2aa55'/%3E%3Cpath d='M29.6 4.2H125l6 1.2-.2 1.8-4.6.8H29.6z' fill='%238499b3'/%3E%3Cpath d='M29.6 4.2H125l6 1.2' fill='none' stroke='%236a809c' stroke-width='.8'/%3E%3Cpath d='M31 7.1c12-.9 30 .6 60-.2 14 0 24-.4 34-.5' fill='none' stroke='%23d6e2f2' stroke-width='.7'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/daozong/scene-night.jpg);
+  --scene-img:url(../skins/daozong/scene-night.gif); --scene-still:url(../skins/daozong/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(4,10,20,0.05) 0,rgba(4,10,20,0.22) 45%,rgba(4,10,20,0.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(180,210,250,.22),rgba(180,210,250,0) 70%),
     linear-gradient(180deg,#0d1a2c 0,#0a1524 60%,#060d18 100%);
 }
@@ -78,10 +80,11 @@
   --dz-silver:#6a809c; --dz-ink:#a3c6ee; --dz-btn-a:#6ea3dc; --dz-btn-b:#4a80bb; --dz-orn:rgba(163,198,238,.2);
   --dz-ring:rgba(127,176,230,.3); --dz-seal:#d0443a;
   --dz-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c-.2-2 1.4-3.2 3.4-3M2 6c-.2 2 1.4 3.2 3.4 3' fill='none' stroke='%23d0443a' stroke-width='1.3' stroke-linecap='round'/%3E%3Crect x='5' y='4.6' width='20' height='2.8' rx='1.2' fill='%235f7899'/%3E%3Cpath d='M9 4.8l2 1.2-2 1.2M14 4.8l2 1.2-2 1.2M19 4.8l2 1.2-2 1.2' fill='none' stroke='%23a3b6cf' stroke-width='.7'/%3E%3Cellipse cx='27' cy='6' rx='2.6' ry='4.4' fill='%23d2aa55'/%3E%3Cpath d='M29.6 4.2H125l6 1.2-.2 1.8-4.6.8H29.6z' fill='%238499b3'/%3E%3Cpath d='M29.6 4.2H125l6 1.2' fill='none' stroke='%236a809c' stroke-width='.8'/%3E%3Cpath d='M31 7.1c12-.9 30 .6 60-.2 14 0 24-.4 34-.5' fill='none' stroke='%23d6e2f2' stroke-width='.7'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/daozong/scene-night.jpg);
+  --scene-img:url(../skins/daozong/scene-night.gif); --scene-still:url(../skins/daozong/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(4,10,20,0.05) 0,rgba(4,10,20,0.22) 45%,rgba(4,10,20,0.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(180,210,250,.22),rgba(180,210,250,0) 70%),
     linear-gradient(180deg,#0d1a2c 0,#0a1524 60%,#060d18 100%);
   }
@@ -90,7 +93,16 @@
 /* ---------- 组件细节 ---------- */
 [data-skin="daozong"] ::selection{background:rgba(38,71,107,.3)}
 :root[data-skin="daozong"][data-theme="dark"] ::selection{background:rgba(127,176,230,.35)}
-[data-skin="daozong"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="daozong"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="daozong"]{--scene-img:url(../skins/daozong/scene-day.jpg)}
+  :root[data-skin="daozong"][data-theme="dark"]{--scene-img:url(../skins/daozong/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="daozong"]:not([data-theme="light"]){--scene-img:url(../skins/daozong/scene-night.jpg)}
+}
 
 /* 标题 */
 [data-skin="daozong"] .top h2,[data-skin="daozong"] #auth h1,[data-skin="daozong"] .me-head .name,

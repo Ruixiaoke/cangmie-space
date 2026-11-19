@@ -22,10 +22,11 @@
   --cy2-ring:rgba(61,68,80,.28); --cy2-seal:#b3262d;
   --cy2-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6l3-2.2v4.4z' fill='%23b3262d'/%3E%3Crect x='4' y='4.6' width='32' height='2.8' rx='1.3' fill='%233d4450'/%3E%3Cpath d='M8 4.6l2 2.8' stroke='%238a93a2' stroke-width='.7'/%3E%3Cpath d='M12 4.6l2 2.8' stroke='%238a93a2' stroke-width='.7'/%3E%3Cpath d='M16 4.6l2 2.8' stroke='%238a93a2' stroke-width='.7'/%3E%3Cpath d='M20 4.6l2 2.8' stroke='%238a93a2' stroke-width='.7'/%3E%3Cpath d='M24 4.6l2 2.8' stroke='%238a93a2' stroke-width='.7'/%3E%3Cpath d='M28 4.6l2 2.8' stroke='%238a93a2' stroke-width='.7'/%3E%3Crect x='33' y='3.8' width='4' height='4.4' rx='.8' fill='%236b7482'/%3E%3Cpath d='M37 3.6H124l6.5 2.4-1.5 2.4H37z' fill='%23aeb7c4'/%3E%3Cpath d='M38 8.1H128' stroke='%236f7a89' stroke-width='.7'/%3E%3Cpath d='M38 4.5H122' stroke='%23f4f7fa' stroke-width='.7'/%3E%3Cpath d='M38 5.8h80' stroke='%236f7a89' stroke-width='.4' stroke-dasharray='6 3'/%3E%3C/svg%3E");
   --r-card:16px; --r-panel:20px;
-  --scene-img:url(../skins/cangyun/scene-day.jpg);
+  --scene-img:url(../skins/cangyun/scene-day.gif); --scene-still:url(../skins/cangyun/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(236,239,244,.06) 0,rgba(236,239,244,.18) 45%,rgba(218,223,231,.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
     linear-gradient(180deg,#eef0f4 0,#e2e6ec 55%,#d4d9e2 100%);
 }
@@ -50,10 +51,11 @@
   --cy2-silver:#6f7a8c; --cy2-ink:#c0c9d8; --cy2-btn-a:#8f9bb0; --cy2-btn-b:#6c788e; --cy2-orn:rgba(192,201,216,.2);
   --cy2-ring:rgba(170,180,196,.3); --cy2-seal:#cc3a42;
   --cy2-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6l3-2.2v4.4z' fill='%23cc3a42'/%3E%3Crect x='4' y='4.6' width='32' height='2.8' rx='1.3' fill='%236c788e'/%3E%3Cpath d='M8 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M12 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M16 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M20 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M24 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M28 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Crect x='33' y='3.8' width='4' height='4.4' rx='.8' fill='%238f9bb0'/%3E%3Cpath d='M37 3.6H124l6.5 2.4-1.5 2.4H37z' fill='%23a6b0be'/%3E%3Cpath d='M38 8.1H128' stroke='%235f6a7a' stroke-width='.7'/%3E%3Cpath d='M38 4.5H122' stroke='%23eef2f8' stroke-width='.7'/%3E%3Cpath d='M38 5.8h80' stroke='%235f6a7a' stroke-width='.4' stroke-dasharray='6 3'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/cangyun/scene-night.jpg);
+  --scene-img:url(../skins/cangyun/scene-night.gif); --scene-still:url(../skins/cangyun/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(8,10,16,.05) 0,rgba(8,10,16,.22) 45%,rgba(8,10,16,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(240,150,90,.2),rgba(240,150,90,0) 70%),
     linear-gradient(180deg,#121720 0,#0d1118 55%,#080a0f 100%);
 }
@@ -77,10 +79,11 @@
   --cy2-silver:#6f7a8c; --cy2-ink:#c0c9d8; --cy2-btn-a:#8f9bb0; --cy2-btn-b:#6c788e; --cy2-orn:rgba(192,201,216,.2);
   --cy2-ring:rgba(170,180,196,.3); --cy2-seal:#cc3a42;
   --cy2-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6l3-2.2v4.4z' fill='%23cc3a42'/%3E%3Crect x='4' y='4.6' width='32' height='2.8' rx='1.3' fill='%236c788e'/%3E%3Cpath d='M8 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M12 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M16 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M20 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M24 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Cpath d='M28 4.6l2 2.8' stroke='%23aab4c4' stroke-width='.7'/%3E%3Crect x='33' y='3.8' width='4' height='4.4' rx='.8' fill='%238f9bb0'/%3E%3Cpath d='M37 3.6H124l6.5 2.4-1.5 2.4H37z' fill='%23a6b0be'/%3E%3Cpath d='M38 8.1H128' stroke='%235f6a7a' stroke-width='.7'/%3E%3Cpath d='M38 4.5H122' stroke='%23eef2f8' stroke-width='.7'/%3E%3Cpath d='M38 5.8h80' stroke='%235f6a7a' stroke-width='.4' stroke-dasharray='6 3'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/cangyun/scene-night.jpg);
+  --scene-img:url(../skins/cangyun/scene-night.gif); --scene-still:url(../skins/cangyun/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(8,10,16,.05) 0,rgba(8,10,16,.22) 45%,rgba(8,10,16,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(240,150,90,.2),rgba(240,150,90,0) 70%),
     linear-gradient(180deg,#121720 0,#0d1118 55%,#080a0f 100%);
   }
@@ -88,7 +91,16 @@
 
 /* ---------- 组件细节 ---------- */
 [data-skin="cangyun"] ::selection{background:color-mix(in srgb,var(--pink) 30%,transparent)}
-[data-skin="cangyun"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="cangyun"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="cangyun"]{--scene-img:url(../skins/cangyun/scene-day.jpg)}
+  :root[data-skin="cangyun"][data-theme="dark"]{--scene-img:url(../skins/cangyun/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="cangyun"]:not([data-theme="light"]){--scene-img:url(../skins/cangyun/scene-night.jpg)}
+}
 
 /* 标题：略加字距 */
 [data-skin="cangyun"] .top h2,[data-skin="cangyun"] #auth h1,[data-skin="cangyun"] .me-head .name,

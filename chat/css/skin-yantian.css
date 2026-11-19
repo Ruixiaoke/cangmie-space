@@ -23,10 +23,11 @@
   --yt-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M13 6C17 1 22 11 27 6' fill='none' stroke='%23b0393a' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='7' cy='6' r='5.2' fill='%23b8923a'/%3E%3Crect x='4.6' y='3.6' width='4.8' height='4.8' fill='%23f3f1fa'/%3E%3Ccircle cx='7' cy='6' r='4.4' fill='none' stroke='%238a6a1e' stroke-width='.5'/%3E%3Crect x='27' y='4.4' width='94' height='3.2' rx='1.4' fill='%23c9b57a'/%3E%3Crect x='52' y='4.2' width='1.4' height='3.6' fill='%238a7440'/%3E%3Crect x='84' y='4.2' width='1.4' height='3.6' fill='%238a7440'/%3E%3Cpath d='M30 6H48' stroke='%23f4ebc8' stroke-width='.6'/%3E%3Cpath d='M124 1.6h7M124 6h2.8M128.2 6h2.8M124 10.4h7' stroke='%23b8923a' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
   --yt-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
   --r-card:16px; --r-panel:20px;
-  --scene-img:url(../skins/yantian/scene-day.jpg);
+  --scene-img:url(../skins/yantian/scene-day.gif); --scene-still:url(../skins/yantian/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(242,240,250,.06) 0,rgba(242,240,250,.18) 45%,rgba(242,240,250,.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
     linear-gradient(180deg,#f3f1fa 0,#e6e2f2 50%,#d6d0e8 100%);
 }
@@ -51,10 +52,11 @@
   --yt-sil:#8478b0; --yt-ink:#c8baf4; --yt-btn-a:#a898e8; --yt-btn-b:#7e6cc4; --yt-orn:rgba(200,186,244,.2);
   --yt-ring:rgba(180,162,238,.3); --yt-seal:#c9a24a;
   --yt-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M13 6C17 1 22 11 27 6' fill='none' stroke='%23e0707a' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='7' cy='6' r='5.2' fill='%23e0c070'/%3E%3Crect x='4.6' y='3.6' width='4.8' height='4.8' fill='%23120e26'/%3E%3Ccircle cx='7' cy='6' r='4.4' fill='none' stroke='%23fff0b8' stroke-width='.5'/%3E%3Crect x='27' y='4.4' width='94' height='3.2' rx='1.4' fill='%23b8a878'/%3E%3Crect x='52' y='4.2' width='1.4' height='3.6' fill='%23e8dcae'/%3E%3Crect x='84' y='4.2' width='1.4' height='3.6' fill='%23e8dcae'/%3E%3Cpath d='M30 6H48' stroke='%23f4ecc8' stroke-width='.6'/%3E%3Cpath d='M124 1.6h7M124 6h2.8M128.2 6h2.8M124 10.4h7' stroke='%23e0c070' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/yantian/scene-night.jpg);
+  --scene-img:url(../skins/yantian/scene-night.gif); --scene-still:url(../skins/yantian/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(6,4,16,.05) 0,rgba(6,4,16,.22) 45%,rgba(6,4,16,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(180,170,250,.22),rgba(180,170,250,0) 70%),
     linear-gradient(180deg,#120e26 0,#0d0a1c 60%,#080614 100%);
 }
@@ -78,10 +80,11 @@
   --yt-sil:#8478b0; --yt-ink:#c8baf4; --yt-btn-a:#a898e8; --yt-btn-b:#7e6cc4; --yt-orn:rgba(200,186,244,.2);
   --yt-ring:rgba(180,162,238,.3); --yt-seal:#c9a24a;
   --yt-line:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M13 6C17 1 22 11 27 6' fill='none' stroke='%23e0707a' stroke-width='1' stroke-linecap='round'/%3E%3Ccircle cx='7' cy='6' r='5.2' fill='%23e0c070'/%3E%3Crect x='4.6' y='3.6' width='4.8' height='4.8' fill='%23120e26'/%3E%3Ccircle cx='7' cy='6' r='4.4' fill='none' stroke='%23fff0b8' stroke-width='.5'/%3E%3Crect x='27' y='4.4' width='94' height='3.2' rx='1.4' fill='%23b8a878'/%3E%3Crect x='52' y='4.2' width='1.4' height='3.6' fill='%23e8dcae'/%3E%3Crect x='84' y='4.2' width='1.4' height='3.6' fill='%23e8dcae'/%3E%3Cpath d='M30 6H48' stroke='%23f4ecc8' stroke-width='.6'/%3E%3Cpath d='M124 1.6h7M124 6h2.8M128.2 6h2.8M124 10.4h7' stroke='%23e0c070' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/yantian/scene-night.jpg);
+  --scene-img:url(../skins/yantian/scene-night.gif); --scene-still:url(../skins/yantian/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(6,4,16,.05) 0,rgba(6,4,16,.22) 45%,rgba(6,4,16,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(180,170,250,.22),rgba(180,170,250,0) 70%),
     linear-gradient(180deg,#120e26 0,#0d0a1c 60%,#080614 100%);
   }
@@ -90,7 +93,16 @@
 /* ---------- 组件细节 ---------- */
 [data-skin="yantian"] ::selection{background:rgba(74,58,122,.28)}
 [data-skin="yantian"][data-theme="dark"] ::selection{background:rgba(180,162,238,.34)}
-[data-skin="yantian"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="yantian"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="yantian"]{--scene-img:url(../skins/yantian/scene-day.jpg)}
+  :root[data-skin="yantian"][data-theme="dark"]{--scene-img:url(../skins/yantian/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="yantian"]:not([data-theme="light"]){--scene-img:url(../skins/yantian/scene-night.jpg)}
+}
 
 /* 标题 */
 [data-skin="yantian"] .top h2,[data-skin="yantian"] #auth h1,[data-skin="yantian"] .me-head .name,

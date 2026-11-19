@@ -28,7 +28,7 @@ description: 聊天应用的整套外观皮肤（纯阳 chunyang 这类：换场
 | `chat/js/mascot.js` 的 `SKIN_MASCOT` | 可选：皮肤 id → 固定用哪个吉祥物（`CHARS` 的下标；纯阳是 1）。不写就照常随机 |
 | `chat/js/views/me.js` | 皮肤选择器（色块网格），读 `SKINS` 自动生成，不用改 |
 | `chat/css/skins.css` | 所有整套外观皮肤共用的修正（`:root[data-skin]` 前缀）：登录页和「我的」页压在场景上的文字加柔光、登录页返回链接加玻璃底、页名前徽记加细描边、皮肤选择器网格。某个问题在所有皮肤上都有，就改这里，不要每个皮肤各改一遍 |
-| `.claude/skills/app-skin/tools/` | 截图脚本 `shots.mjs`、假数据 `fake-sb.js`、预览页生成 `build-preview.py` |
+| `.claude/skills/app-skin/tools/` | 截图脚本 `shots.mjs`、假数据 `fake-sb.js`、预览页生成 `build-preview.py` / `build-gallery.py`、场景动画 `animate-scene.py` 和各皮肤的动画设定 `scene-anim.json` |
 
 ## 规则
 
@@ -118,6 +118,16 @@ description: 聊天应用的整套外观皮肤（纯阳 chunyang 这类：换场
 | `emblem.png`（徽记） | 256×256 透明 PNG，主体约 80%，四角 alpha 为 0，≤ 60KB；要在 22px 下认得出。主体别用纯白（七秀的白色短剑在浅色顶栏上消失过，后来靠 `skins.css` 的描边才显出来） |
 
 提示里写清：这是哪个门派 / 主题、配色、风格（纯阳是「水墨加水粉、清雅、不卡通」），参考 `chat/sling/bg-day.jpg`、`bg-night.jpg` 的柔和程度，但不要照抄它们的暖色。生成后自己看每一张（`gpt-assets` 第 4 节），纹样要放在深色底上看线条是否干净。
+
+### 4b. 动态背景（循环 GIF）
+
+所有整套外观皮肤的场景都是循环 GIF：`scene-day.gif`、`scene-night.gif` 叠在同名的静态 jpg 上面。
+
+- **做法**：用 `tools/animate-scene.py`，在 GPT 生成的静态场景上叠加粒子、雾带和晚上的灯火起伏。底图一个像素都不改，所有运动都是循环的整数倍，首尾无缝。不要让生图模型重画每一帧，帧和帧对不上会闪。（OpenAI Images 2.6 号称能直接出 GIF，但我们这边的 Codex 生图接口试过没有这个输出。以后有了可以再试，验收标准不变。）
+- **设定**：`tools/scene-anim.json` 里每个皮肤一项，`day` / `night` 各写粒子、雾带和灯火（字段说明在 `animate-scene.py` 开头）。粒子种类：`snow` 雪、`petal` 花瓣、`leaf` 落叶、`ember` 往上飘的火星、`firefly` 萤火虫、`sparkle` 星光闪烁、`dust` 横飘的尘沙。照场景选：纯阳、苍云、凌雪阁、药宗下雪；七秀、万花、段氏落花瓣；少林、霸刀、天策落叶；明教、霸刀晚上飘火星；晚上的湖边、林子放萤火虫；海上、星空用星光。晚上的灯火位置由脚本从夜景图里自动找暖色亮点，不用手填。
+- **生成**：`python3 .claude/skills/app-skin/tools/animate-scene.py chat/skins/<id> .claude/skills/app-skin/tools/scene-anim.json <id>`（可以只跑 `day` 或 `night`）。几个皮肤可以并行跑。输出 512×768、44 帧 × 90 ms、无限循环，不限体积（一般 0.6 到 2.5MB：和上一帧相同的像素存成透明，只记变化）。
+- **验收**：脚本最后打印「相邻帧平均变化」和「首尾接缝」。变化低于 0.3 基本看不出在动（纯阳第一版只有 0.01），要加大粒子、提高对比度：浅色粒子落在浅色场景上会消失，换深一点的颜色或换粒子种类；接缝要和相邻帧差不多。还要亲眼看：取一帧放大看粒子，再在 app 里截图看文字是否清楚。
+- **样式**：`--scene-img` 写 gif，新增 `--scene-still` 写 jpg，`--scene-bg` 里 `var(--scene-img)` 后面加一层 `var(--scene-still)`，`#shell` 的 `background-size` 多一个 `cover`；再加 `prefers-reduced-motion: reduce` 时把 `--scene-img` 换回 jpg（白天、`data-theme="dark"`、跟随系统三处）。照 `skin-chunyang.css` 末尾抄。
 
 ### 5. 注册
 

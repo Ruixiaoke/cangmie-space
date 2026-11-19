@@ -21,10 +21,11 @@
   --wx-silver:#c4a468; --wx-ink:#8a2a3c; --wx-btn-a:#c04a5e; --wx-btn-b:#a8384b; --wx-orn:rgba(168,56,75,.22);
   --wx-ring:rgba(168,56,75,.26); --wx-seal:#8f2a3a;
   --wx-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='4' y='1' width='124' height='2.4' rx='1.2' fill='%237a5a3a'/%3E%3Crect x='63' y='0' width='6' height='5.2' rx='1.2' fill='%23a8384b'/%3E%3Ccircle cx='66' cy='2.6' r='.9' fill='%23c8a04a'/%3E%3Cpath d='M8 3.4V10M26 3.4V9M46 3.4V10.4M66 5.2V11M86 3.4V10.4M106 3.4V9M124 3.4V10' stroke='%236d8794' stroke-width='.7'/%3E%3Ccircle cx='8' cy='10.4' r='1' fill='%23c8a04a'/%3E%3Ccircle cx='46' cy='10.6' r='1' fill='%23c8a04a'/%3E%3Ccircle cx='66' cy='11' r='1' fill='%23c8a04a'/%3E%3Ccircle cx='86' cy='10.6' r='1' fill='%23c8a04a'/%3E%3Ccircle cx='124' cy='10.4' r='1' fill='%23c8a04a'/%3E%3Ccircle cx='26' cy='9.4' r='.8' fill='%23a8384b'/%3E%3Ccircle cx='106' cy='9.4' r='.8' fill='%23a8384b'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/wuxiang/scene-day.jpg);
+  --scene-img:url(../skins/wuxiang/scene-day.gif); --scene-still:url(../skins/wuxiang/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(250,242,242,0.06) 0,rgba(250,242,242,0.18) 45%,rgba(250,242,242,0.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
     linear-gradient(180deg,#f8f0f0 0,#eee2e2 50%,#e2d3d4 100%);
   --wx-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
@@ -51,10 +52,11 @@
   --wx-silver:#9a7d4c; --wx-ink:#f0a8b4; --wx-btn-a:#d86e82; --wx-btn-b:#b04a5e; --wx-orn:rgba(228,190,120,.24);
   --wx-ring:rgba(228,138,154,.3); --wx-seal:#c8485c;
   --wx-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='4' y='1' width='124' height='2.4' rx='1.2' fill='%23c8a06a'/%3E%3Crect x='63' y='0' width='6' height='5.2' rx='1.2' fill='%23d86e82'/%3E%3Ccircle cx='66' cy='2.6' r='.9' fill='%23e0bb66'/%3E%3Cpath d='M8 3.4V10M26 3.4V9M46 3.4V10.4M66 5.2V11M86 3.4V10.4M106 3.4V9M124 3.4V10' stroke='%238fa8b4' stroke-width='.7'/%3E%3Ccircle cx='8' cy='10.4' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='46' cy='10.6' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='66' cy='11' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='86' cy='10.6' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='124' cy='10.4' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='26' cy='9.4' r='.8' fill='%23e48a9a'/%3E%3Ccircle cx='106' cy='9.4' r='.8' fill='%23e48a9a'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/wuxiang/scene-night.jpg);
+  --scene-img:url(../skins/wuxiang/scene-night.gif); --scene-still:url(../skins/wuxiang/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(12,6,8,0.05) 0,rgba(12,6,8,0.22) 45%,rgba(12,6,8,0.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(250,190,170,.18),rgba(250,190,170,0) 70%),
     linear-gradient(180deg,#1c1014 0,#160c10 60%,#0e0709 100%);
 }
@@ -78,10 +80,11 @@
   --wx-silver:#9a7d4c; --wx-ink:#f0a8b4; --wx-btn-a:#d86e82; --wx-btn-b:#b04a5e; --wx-orn:rgba(228,190,120,.24);
   --wx-ring:rgba(228,138,154,.3); --wx-seal:#c8485c;
   --wx-blade:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Crect x='4' y='1' width='124' height='2.4' rx='1.2' fill='%23c8a06a'/%3E%3Crect x='63' y='0' width='6' height='5.2' rx='1.2' fill='%23d86e82'/%3E%3Ccircle cx='66' cy='2.6' r='.9' fill='%23e0bb66'/%3E%3Cpath d='M8 3.4V10M26 3.4V9M46 3.4V10.4M66 5.2V11M86 3.4V10.4M106 3.4V9M124 3.4V10' stroke='%238fa8b4' stroke-width='.7'/%3E%3Ccircle cx='8' cy='10.4' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='46' cy='10.6' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='66' cy='11' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='86' cy='10.6' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='124' cy='10.4' r='1' fill='%23e0bb66'/%3E%3Ccircle cx='26' cy='9.4' r='.8' fill='%23e48a9a'/%3E%3Ccircle cx='106' cy='9.4' r='.8' fill='%23e48a9a'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/wuxiang/scene-night.jpg);
+  --scene-img:url(../skins/wuxiang/scene-night.gif); --scene-still:url(../skins/wuxiang/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(12,6,8,0.05) 0,rgba(12,6,8,0.22) 45%,rgba(12,6,8,0.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(250,190,170,.18),rgba(250,190,170,0) 70%),
     linear-gradient(180deg,#1c1014 0,#160c10 60%,#0e0709 100%);
   }
@@ -90,7 +93,16 @@
 /* ---------- 组件细节 ---------- */
 [data-skin="wuxiang"] ::selection{background:rgba(168,56,75,.28)}
 :root[data-skin="wuxiang"][data-theme="dark"] ::selection{background:rgba(228,138,154,.35)}
-[data-skin="wuxiang"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="wuxiang"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="wuxiang"]{--scene-img:url(../skins/wuxiang/scene-day.jpg)}
+  :root[data-skin="wuxiang"][data-theme="dark"]{--scene-img:url(../skins/wuxiang/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="wuxiang"]:not([data-theme="light"]){--scene-img:url(../skins/wuxiang/scene-night.jpg)}
+}
 
 /* 标题 */
 [data-skin="wuxiang"] .top h2,[data-skin="wuxiang"] #auth h1,[data-skin="wuxiang"] .me-head .name,

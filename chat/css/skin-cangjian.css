@@ -23,10 +23,11 @@
   --cj-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c2-3 5-3.4 7-1.6M2 6c2 3 5 3.4 7 1.6' fill='none' stroke='%23c0392b' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='10.5' cy='6' r='2' fill='%23c99a1f'/%3E%3Crect x='12' y='4.8' width='15' height='2.4' rx='1.1' fill='%237a5a2a'/%3E%3Cpath d='M15 4.6v2.8M19 4.6v2.8M23 4.6v2.8' stroke='%23c99a1f' stroke-width='.7'/%3E%3Cpath d='M27 .8h4l.8 5.2-.8 5.2h-4z' fill='%23c99a1f'/%3E%3Cpath d='M31.8 2.6H126l4 1.2v4.4l-4 1.2H31.8z' fill='%23aab4b8'/%3E%3Cpath d='M33 4.2H126' stroke='%23f2f6f7' stroke-width='.7'/%3E%3Cpath d='M33 7.4H124' stroke='%237e8a90' stroke-width='.7'/%3E%3C/svg%3E");
   --cj-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
   --r-card:16px; --r-panel:20px;
-  --scene-img:url(../skins/cangjian/scene-day.jpg);
+  --scene-img:url(../skins/cangjian/scene-day.gif); --scene-still:url(../skins/cangjian/scene-day.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(252,247,232,.06) 0,rgba(252,247,232,.18) 45%,rgba(236,228,204,.42) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(120% 60% at 80% -6%,rgba(255,250,230,.95),rgba(255,250,230,0) 60%),
     linear-gradient(180deg,#f8f3e4 0,#efe7d0 55%,#e4dabc 100%);
 }
@@ -51,10 +52,11 @@
   --cj-silver:#8d7c4a; --cj-ink:#ecce7a; --cj-btn-a:#d9ad3c; --cj-btn-b:#b08a22; --cj-orn:rgba(236,206,122,.22);
   --cj-ring:rgba(227,188,82,.3); --cj-seal:#d0523f;
   --cj-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c2-3 5-3.4 7-1.6M2 6c2 3 5 3.4 7 1.6' fill='none' stroke='%23d0523f' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='10.5' cy='6' r='2' fill='%23e3bc52'/%3E%3Crect x='12' y='4.8' width='15' height='2.4' rx='1.1' fill='%23a8845a'/%3E%3Cpath d='M15 4.6v2.8M19 4.6v2.8M23 4.6v2.8' stroke='%23e3bc52' stroke-width='.7'/%3E%3Cpath d='M27 .8h4l.8 5.2-.8 5.2h-4z' fill='%23e3bc52'/%3E%3Cpath d='M31.8 2.6H126l4 1.2v4.4l-4 1.2H31.8z' fill='%238a949a'/%3E%3Cpath d='M33 4.2H126' stroke='%23d8e2e6' stroke-width='.7'/%3E%3Cpath d='M33 7.4H124' stroke='%235f6a70' stroke-width='.7'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/cangjian/scene-night.jpg);
+  --scene-img:url(../skins/cangjian/scene-night.gif); --scene-still:url(../skins/cangjian/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(10,12,10,.05) 0,rgba(10,12,10,.22) 45%,rgba(10,12,10,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(240,200,110,.2),rgba(240,200,110,0) 70%),
     linear-gradient(180deg,#17160d 0,#100f09 55%,#0a0906 100%);
 }
@@ -78,10 +80,11 @@
   --cj-silver:#8d7c4a; --cj-ink:#ecce7a; --cj-btn-a:#d9ad3c; --cj-btn-b:#b08a22; --cj-orn:rgba(236,206,122,.22);
   --cj-ring:rgba(227,188,82,.3); --cj-seal:#d0523f;
   --cj-weapon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c2-3 5-3.4 7-1.6M2 6c2 3 5 3.4 7 1.6' fill='none' stroke='%23d0523f' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='10.5' cy='6' r='2' fill='%23e3bc52'/%3E%3Crect x='12' y='4.8' width='15' height='2.4' rx='1.1' fill='%23a8845a'/%3E%3Cpath d='M15 4.6v2.8M19 4.6v2.8M23 4.6v2.8' stroke='%23e3bc52' stroke-width='.7'/%3E%3Cpath d='M27 .8h4l.8 5.2-.8 5.2h-4z' fill='%23e3bc52'/%3E%3Cpath d='M31.8 2.6H126l4 1.2v4.4l-4 1.2H31.8z' fill='%238a949a'/%3E%3Cpath d='M33 4.2H126' stroke='%23d8e2e6' stroke-width='.7'/%3E%3Cpath d='M33 7.4H124' stroke='%235f6a70' stroke-width='.7'/%3E%3C/svg%3E");
-  --scene-img:url(../skins/cangjian/scene-night.jpg);
+  --scene-img:url(../skins/cangjian/scene-night.gif); --scene-still:url(../skins/cangjian/scene-night.jpg);
   --scene-bg:
     linear-gradient(180deg,rgba(10,12,10,.05) 0,rgba(10,12,10,.22) 45%,rgba(10,12,10,.5) 100%),
     var(--scene-img),
+    var(--scene-still),
     radial-gradient(80% 40% at 78% 8%,rgba(240,200,110,.2),rgba(240,200,110,0) 70%),
     linear-gradient(180deg,#17160d 0,#100f09 55%,#0a0906 100%);
   }
@@ -89,7 +92,16 @@
 
 /* ---------- 组件细节 ---------- */
 [data-skin="cangjian"] ::selection{background:color-mix(in srgb,var(--pink) 30%,transparent)}
-[data-skin="cangjian"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+/* 场景是循环动图，下面垫同一张静态图：动图没加载出来时照样有背景 */
+[data-skin="cangjian"] #shell{background-size:cover,cover,cover,auto,auto;background-position:center top}
+/* 系统开了「减少动态效果」：只用静态图 */
+@media (prefers-reduced-motion: reduce){
+  :root[data-skin="cangjian"]{--scene-img:url(../skins/cangjian/scene-day.jpg)}
+  :root[data-skin="cangjian"][data-theme="dark"]{--scene-img:url(../skins/cangjian/scene-night.jpg)}
+}
+@media (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="cangjian"]:not([data-theme="light"]){--scene-img:url(../skins/cangjian/scene-night.jpg)}
+}
 
 /* 标题：像山庄的匾额 */
 [data-skin="cangjian"] .top h2,[data-skin="cangjian"] #auth h1,[data-skin="cangjian"] .me-head .name,
