@@ -99,6 +99,13 @@ function pick(id, force) {
     LB.tabs[k].classList.toggle('on', k === id);
     LB.tabs[k].setAttribute('aria-selected', k === id ? 'true' : 'false');
   });
+  // 标签多了会横向滚动：选中的那个滚进可见范围（只动标签栏，不动整页）
+  var tab = LB.tabs[id], bar = tab && tab.parentNode;
+  if (bar && bar.scrollWidth > bar.clientWidth) {
+    var l = tab.getBoundingClientRect().left - bar.getBoundingClientRect().left + bar.scrollLeft, r = l + tab.offsetWidth;
+    if (l < bar.scrollLeft) bar.scrollLeft = l - 4;
+    else if (r > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = r - bar.clientWidth + 4;
+  }
   LB.note.textContent = g.note;
   LB.seg.hidden = !(g.points || g.scoped);
   LB.segs.group.hidden = LB.gid == null;
