@@ -9,6 +9,7 @@ on:
       - "supabase/config.toml"
       - "chat/js/miniapps/ddz-rules.js"
       - "chat/js/miniapps/mahjong-rules.js"
+      - "chat/js/miniapps/fxq-rules.js"
       - "agent/*.md"
       - "agent/gen-persona.py"
       - ".github/workflows/backend.yml"
@@ -123,3 +124,12 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
         run: supabase functions deploy mahjong --remote="$SUPABASE_PROJECT_REF" --yes
+      # 飞行棋：规则引擎 chat/js/miniapps/fxq-rules.js 是唯一真相来源，部署前重新生成 rules.gen.js
+      - name: Generate FXQ rules module
+        run: python3 supabase/functions/fxq/gen-rules.py
+
+      - name: Deploy fxq
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: supabase functions deploy fxq --remote="$SUPABASE_PROJECT_REF" --yes

@@ -1,5 +1,6 @@
 // games.ts（榴莲看小游戏）的测试：假数据库按真实的「这一对好友」过滤规则求值，所以能验证不会碰别的对局
-import { ddzRecord, gameHint, gameRecord, gameStatus, poolHelper, poolTargets8, slLayoutA, STATUS_MAX_CHARS, tttWinningCells } from "./games.ts";
+import { ddzRecord, fxqRecord, fxqStatus, gameHint, gameRecord, gameStatus, groupGameHint, poolHelper, poolTargets8, slLayoutA, STATUS_MAX_CHARS, tttWinningCells } from "./games.ts";
+import * as FXR from "../fxq/rules.gen.js";
 import { buildUserInput, runJob, systemInstructions, TOOL_SPECS } from "./agent.ts";
 
 const ME = "11111111-1111-1111-1111-111111111111";
@@ -116,7 +117,7 @@ Deno.test("context hint: active games only, relative to the asker, empty when no
   });
   const h = await gameHint(db, ME, PEER, names);
   if (h !== "进行中的小游戏：井字棋（轮到小明）、8球台球（2:1，轮到你）") throw new Error(h);
-  if (db.queries.length !== 4) throw new Error("one query per table (ttt, sling, pool, mahjong)");
+  if (db.queries.length !== 5) throw new Error("one query per table (ttt, sling, pool, mahjong, fxq)");
   if (await gameHint(fakeAdmin({ ttt_games: [ttt(4, ME, OTHER, "x........", ME)] }), ME, PEER, names) !== "") throw new Error("must be empty");
 });
 
@@ -345,4 +346,79 @@ Deno.test("game_leaderboard mahjong: DM pair + overall, group ranking only this 
   if (o.ranking.join("|") !== "1. 阿杰 +9分，2胜/3局|2. 小红(提问人) -4分，1胜/3局") throw new Error(JSON.stringify(o));
   const specs = JSON.stringify(TOOL_SPECS);
   if (!specs.includes('"mahjong"')) throw new Error("tools must mention mahjong");
+});
+
+// ---------- 飞行棋 ----------
+// deno-lint-ignore no-explicit-any
+const FXM = FXR as any;
+function fxGame(o: Row): Row {
+  const seats = (o.seats ?? [ME, PEER, null, null]) as (string | null)[];
+  const bots = (o.bots ?? [false, false, false, false]) as boolean[];
+  const st = FXM.newGame({ seats: [0, 1, 2, 3].map((i) => !!seats[i] || !!bots[i]), first: (o.turn ?? 0) as number });
+  for (const [s, p] of Object.entries((o.planes ?? {}) as Record<string, number[]>)) st.planes[s] = p;
+  if (o.roll) st.roll = o.roll;
+  const lo = ME < PEER ? ME : PEER, hi = ME < PEER ? PEER : ME;
+  return { id: 1, group_id: null, dm_lo: lo, dm_hi: hi, status: "playing", seats, bots, auto: [false, false, false, false], round: 1, version: 3, pub: { ...st, log: o.log ?? [] }, ...(o.row as Row ?? {}) };
+}
+
+Deno.test("fxq hint: DM and group, whose turn, only this pair / this group", async () => {
+  const db = fakeAdmin({ fxq_games: [fxGame({ turn: 1 }), { ...fxGame({}), id: 2, dm_lo: OTHER, dm_hi: PEER }, { ...fxGame({ turn: 0 }), id: 3, group_id: 7, dm_lo: null, dm_hi: null, seats: [ME, PEER, null, null] }] });
+  let h = await gameHint(db, ME, PEER, names);
+  if (h !== "进行中的小游戏：飞行棋（轮到小明）") throw new Error(h);
+  h = await groupGameHint(db, 7, ME, names);
+  if (h !== "进行中的小游戏：飞行棋（轮到你）") throw new Error(h);
+  if (await groupGameHint(db, 8, ME, names) !== "") throw new Error("other group must be empty");
+  if (await gameHint(fakeAdmin({ fxq_games: [{ ...fxGame({}), status: "over" }] }), ME, PEER, names) !== "") throw new Error("finished tables are not announced");
+});
+
+Deno.test("game_status fxq: every plane by nickname, asker marked, legal moves and a suggestion for the mover", async () => {
+  const log = [{ s: 1, k: "roll", seat: 0, v: 3 }];
+  const db = fakeAdmin({ fxq_games: [fxGame({ turn: 0, roll: 3, planes: { 0: [15, 30, -1, -1], 1: [5, 5, 40, -1] }, log })] });
+  const o = j(await fxqStatus(db, ME, { peer: PEER }, names, { game: "fxq" }));
+  if (o.game !== "fxq" || o.players.length !== 2) throw new Error(JSON.stringify(o));
+  if (o.players[0].who !== "小红(提问人)" || o.players[1].who !== "小明" || o.players[0].color !== "红") throw new Error(JSON.stringify(o.players));
+  if (o.players[0].planes.join() !== "环15,环30,机库,机库" || o.players[1].planes.join() !== "环5,环5,环40,机库") throw new Error(JSON.stringify(o.players));
+  if (!o.turn.includes("小红") || o.last_roll !== "小红(提问人) 掷到 3") throw new Error(JSON.stringify(o));
+  // 红 r15 走 3 -> 18：撞黄环5 的两架（环格 18）
+  const m = o.mover.legal[0];
+  if (o.mover.roll !== 3 || o.mover.legal.length !== 2 || m.plane !== 1 || !String(m.effect).includes("撞回 小明 的飞机")) throw new Error(JSON.stringify(o.mover));
+  if (!o.suggestion.includes("第 1 架")) throw new Error(o.suggestion);
+  if (o.mover.legal.some((x: Row) => "plane_id" in x) || JSON.stringify(o).length > STATUS_MAX_CHARS) throw new Error("size");
+  // 还没掷
+  const o2 = j(await fxqStatus(fakeAdmin({ fxq_games: [fxGame({ turn: 1 })] }), ME, { peer: PEER }, names, { game: "fxq" }));
+  if (o2.mover !== "还没掷骰子，等 Ta 掷") throw new Error(JSON.stringify(o2));
+  // 结束
+  const over = fxGame({ planes: { 0: [52, 52, 52, 52], 1: [10, -1, -1, -1] } });
+  over.status = "over"; Object.assign(over.pub as Row, { phase: "over", winner: 0, rank: [0, 1] });
+  const o3 = j(await fxqStatus(fakeAdmin({ fxq_games: [over] }), ME, { peer: PEER }, names, { game: "fxq" }));
+  if (o3.winner !== "小红(提问人)" || o3.ranking.length !== 2) throw new Error(JSON.stringify(o3));
+});
+
+Deno.test("game_status fxq: another pair's / group's id is rejected, bad ids too; groups work with a group scope", async () => {
+  const db = fakeAdmin({ fxq_games: [{ ...fxGame({}), id: 9, dm_lo: OTHER, dm_hi: PEER }, { ...fxGame({ turn: 0 }), id: 5, group_id: 7, dm_lo: null, dm_hi: null }] });
+  if (j(await fxqStatus(db, ME, { peer: PEER }, names, { game: "fxq", id: 9 })).error !== "game_not_found") throw new Error("foreign pair");
+  if (j(await fxqStatus(db, ME, { group: 8 }, names, { game: "fxq", id: 5 })).error !== "game_not_found") throw new Error("foreign group");
+  if (j(await fxqStatus(db, ME, { peer: PEER }, names, { game: "fxq", id: -1 })).error !== "bad_id") throw new Error("bad id");
+  if (j(await fxqStatus(db, ME, { group: 7 }, names, { game: "fxq" })).id !== 5) throw new Error("group table");
+  if (j(await fxqStatus(fakeAdmin({ fxq_games: [] }), ME, { peer: PEER }, names, { game: "fxq" })).error !== "no_game") throw new Error("none");
+  for (const q of db.queries) if (q.table === "fxq_games" && !q.eq.some(([c]) => c === "group_id" || c === "dm_lo")) throw new Error("every query must be scoped to the pair or group");
+});
+
+Deno.test("game_leaderboard fxq: DM pair + overall totals, group ranking only this group's members", async () => {
+  const lo = ME < PEER ? ME : PEER, hi = ME < PEER ? PEER : ME;
+  const db = fakeAdmin({ fxq_scores: [
+    { id: 1, dm_lo: lo, dm_hi: hi, user_id: ME, wins: 3, games: 5 },
+    { id: 2, dm_lo: lo, dm_hi: hi, user_id: PEER, wins: 2, games: 5 },
+    { id: 3, group_id: 7, user_id: ME, wins: 1, games: 3 },
+    { id: 4, group_id: 7, user_id: OTHER, wins: 2, games: 3 },
+    { id: 5, group_id: 8, user_id: PEER, wins: 6, games: 9 },
+  ] });
+  let o = j(await gameRecord(db, ME, PEER, names, { game: "fxq" }));
+  if (o.together["小红(提问人)"] !== "3胜/5局" || o.together["小明"] !== "2胜/5局") throw new Error(JSON.stringify(o));
+  if (o.overall["小红(提问人)"] !== "4胜/8局" || o.overall["小明"] !== "8胜/14局") throw new Error(JSON.stringify(o));
+  const gnames = { [ME]: "小红", [OTHER]: "阿杰" };
+  o = j(await fxqRecord(db, ME, { group: 7 }, gnames));
+  if (o.scope !== "本群" || o.ranking.join("|") !== "1. 阿杰 2胜/3局|2. 小红(提问人) 1胜/3局") throw new Error(JSON.stringify(o));
+  o = j(await fxqRecord(db, ME, { group: 99 }, gnames));
+  if (o.ranking !== "这个群还没人打过飞行棋") throw new Error(JSON.stringify(o));
 });

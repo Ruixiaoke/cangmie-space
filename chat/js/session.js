@@ -7,6 +7,7 @@ import { errText } from './errors.js';
 import { closeApp } from './miniapps/host.js';
 import { ddzReset } from './miniapps/ddz.js';
 import { mjReset } from './miniapps/mahjong.js';
+import { fxqReset } from './miniapps/fxq.js';
 import { lbReset } from './miniapps/leaderboard.js';
 import { poolReset } from './miniapps/pool.js';
 import { slReset } from './miniapps/sling.js';
@@ -56,7 +57,7 @@ export async function logout() {
   showAuth();
 }
 export function resetState() {
-  S.me = null; S.convs = []; S.groups = []; S.friendships = []; S.profiles = new Map(); S.chat = null; setSearchState(null); resetQuoteUi(); tttReset(); slReset(); poolReset(); ddzReset(); mjReset();
+  S.me = null; S.convs = []; S.groups = []; S.friendships = []; S.profiles = new Map(); S.chat = null; setSearchState(null); resetQuoteUi(); tttReset(); slReset(); poolReset(); ddzReset(); mjReset(); fxqReset();
   document.title = '藏咩空间';
   try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) { /* 忽略 */ }
 }

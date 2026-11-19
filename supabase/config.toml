@@ -439,3 +439,8 @@ verify_jwt = true
 [functions.mahjong]
 enabled = true
 verify_jwt = true
+
+# 飞行棋牌局函数：必须带登录用户的 JWT
+[functions.fxq]
+enabled = true
+verify_jwt = true

@@ -4,6 +4,7 @@ import { fxDryer, fxFeed, fxFlower, fxHammer, fxKiss, fxNight, fxPat, fxPepper, 
 import { poolName, poolOf } from '../miniapps/pool.js';
 import { ddzOf } from '../miniapps/ddz-token.js';
 import { mjOf } from '../miniapps/mahjong-token.js';
+import { fxqOf } from '../miniapps/fxq-token.js';
 import { slOf } from '../miniapps/sling.js';
 import { tttOf } from '../miniapps/ttt.js';
 
@@ -32,4 +33,4 @@ export function fxParse(body) {
 }
 export function fxOf(body) { var p = fxParse(body); return p ? p.fx : null; }
 // 消息列表里的预览：定向特效不显示后面的 #id / @id
-export function previewOf(body) { if (ddzOf(body) != null) return '斗地主'; if (mjOf(body) != null) return '麻将'; if (tttOf(body) != null) return '井字棋'; if (slOf(body) != null) return '弹弓大战'; if (poolOf(body) != null) return poolName(body); var p = fxParse(body); return p ? p.tok : body; }
+export function previewOf(body) { if (ddzOf(body) != null) return '斗地主'; if (mjOf(body) != null) return '麻将'; if (fxqOf(body) != null) return '飞行棋'; if (tttOf(body) != null) return '井字棋'; if (slOf(body) != null) return '弹弓大战'; if (poolOf(body) != null) return poolName(body); var p = fxParse(body); return p ? p.tok : body; }
