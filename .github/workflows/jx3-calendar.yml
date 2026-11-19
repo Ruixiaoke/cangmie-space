@@ -1,0 +1,34 @@
+name: Sync JX3 daily calendar
+
+# 每天北京时间 7:10 和 8:40 各跑一次（游戏日常 7 点刷新；第二次兜底 GitHub 定时任务的延迟和第三方接口的抽风）
+on:
+  schedule:
+    - cron: "10 23 * * *"
+    - cron: "40 0 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: jx3-calendar
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install psycopg
+        run: pip install "psycopg[binary]>=3.2,<3.3"
+
+      - name: Fetch calendar and save to Supabase
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python3 .github/scripts/jx3_calendar_sync.py

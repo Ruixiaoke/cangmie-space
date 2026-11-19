@@ -321,7 +321,7 @@ async function runTool(deps: Deps, job: Job, names: Names, name: string, rawArgs
       // deno-lint-ignore no-explicit-any
       return JSON.stringify({ results: (data ?? []).map((r: any) => ({ at: stamp(r.created_at), from: r.author ? agentName(r.author) : names[r.sender_id] ?? "?", text: r.body })) });
     }
-    if (name === "jx3_info") return await jx3Info(deps.fetchFn, args);
+    if (name === "jx3_info") return await jx3Info(deps.fetchFn, args, Date.now(), deps.admin);
     if (name === "game_leaderboard" && args.game === "ddz") return await ddzRecord(deps.admin, job.asker, gid != null ? { group: gid } : { peer: job.peer }, names);
     if ((name === "game_status" || name === "game_leaderboard") && (gid != null || job.peer == null)) return JSON.stringify({ error: "not_available_in_group" });
     if (name === "game_status") return await gameStatus(deps.admin, job.asker, job.peer as string, names, args);
