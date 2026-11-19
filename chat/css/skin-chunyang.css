@@ -1,0 +1,167 @@
+/* 皮肤：纯阳（华山雪、道袍青、银灰、朱砂印）。<html data-skin="chunyang"> 时生效，白天 / 晚上 / 自动都有。
+   只换外观，不换聊天页的底色（--chat-bg 不动，那是聊天壁纸）。
+   做法：先整套覆盖 tokens.css 的设计变量（所有组件都跟着变），再给几个关键组件加纯阳的细节：
+   宋体标题、太极页眉、祥云纹面板角、道袍青按钮、剑形时间线、朱砂角标。 */
+
+/* ---------- 设计变量：白天（雪霁） ---------- */
+:root[data-skin="chunyang"]{
+  --t1:#1f2a37; --t2:#47566a; --t3:#627288;
+  --pink:#3b6a9c; --on-pink:#fff; --pink-text:#2c5b8a; --red-text:#b0373a; --ok:#2b6c58; --badge:#c4473f;
+  --hair:rgba(40,64,96,.14); --rim:rgba(255,255,255,.72);
+  --hi:rgba(255,255,255,.95); --lo:rgba(40,64,96,.14); --side:rgba(255,255,255,.4);
+  --g-bar:rgba(244,248,253,.62); --g-card:rgba(247,250,254,.64); --g-chip:rgba(255,255,255,.6); --g-solid:#f1f5fa;
+  --field-bg:rgba(255,255,255,.52);
+  --sh-1:0 1px 2px rgba(18,32,52,.08),0 4px 14px rgba(18,32,52,.07);
+  --sh-2:0 2px 4px rgba(18,32,52,.08),0 12px 32px rgba(18,32,52,.13);
+  --sh-0:0 1px 1px rgba(18,32,52,.10);
+  --page:#dfe7f0; --stage-bg:rgba(232,240,248,.82);
+  --toast-bg:rgba(24,36,52,.92); --toast-fg:#eef4fb;
+  --mascot-bg-av:#eef3f9;
+  --bub-peer:rgba(250,252,255,.82); --bub-own:rgba(198,221,243,.9); --bub-fx:rgba(226,232,250,.92); --bub-fail:rgba(250,214,214,.9);
+  --chat-bub-peer:#eef2f7; --chat-bub-bd:rgba(31,42,55,.08);
+  --bub-bd:rgba(255,255,255,.8); --bub-hi:rgba(255,255,255,.95); --bub-lo:rgba(40,64,96,.12); --bub-sheen:rgba(255,255,255,.6);
+  --cy-silver:#9fb0c4; --cy-ink:#2f4f73; --cy-btn-a:#4a7db3; --cy-btn-b:#335f8d; --cy-orn:rgba(59,106,156,.2);
+  --cy-ring:rgba(59,106,156,.24); --cy-seal:#c4473f;
+  --cy-sword:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c3-3.4 7-3.6 9-1.6M2 6c3 3.4 7 3.6 9 1.6' fill='none' stroke='%23c4473f' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='6' r='1.8' fill='%23c4473f'/%3E%3Crect x='14' y='4.6' width='16' height='2.8' rx='1.2' fill='%232f4f73'/%3E%3Cpath d='M30 1.6h3.2l1.6 4.4-1.6 4.4H30z' fill='%233b6a9c'/%3E%3Cpath d='M35 4.4h86l9 1.6-9 1.6H35z' fill='%23b9c6d6'/%3E%3Cpath d='M35 6h94' stroke='%23ffffff' stroke-width='.6'/%3E%3C/svg%3E");
+  --cy-serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --r-card:16px; --r-panel:20px;
+  --scene-img:url(../skins/chunyang/scene-day.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(240,245,251,.06) 0,rgba(240,245,251,.18) 45%,rgba(236,242,249,.42) 100%),
+    var(--scene-img),
+    radial-gradient(120% 60% at 80% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 60%),
+    linear-gradient(180deg,#eef3f9 0,#e3ebf4 50%,#d6e0ec 100%);
+}
+
+/* ---------- 设计变量：晚上（月下华山） ---------- */
+:root[data-skin="chunyang"][data-theme="dark"]{
+  --t1:#e8eef6; --t2:#b4c2d3; --t3:#8e9db2;
+  --pink:#8fb6e0; --on-pink:#0f1d2e; --pink-text:#a9c8ea; --red-text:#ff9d9d; --ok:#8fd6bd; --badge:#d0525a;
+  --hair:rgba(200,220,245,.12); --rim:rgba(200,220,245,.16);
+  --hi:rgba(210,228,250,.22); --lo:rgba(0,0,0,.4); --side:rgba(200,220,245,.07);
+  --g-bar:rgba(16,26,42,.62); --g-card:rgba(22,34,54,.58); --g-chip:rgba(200,220,245,.1); --g-solid:#16223a;
+  --field-bg:rgba(6,12,22,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0b111b; --stage-bg:rgba(14,22,34,.84);
+  --toast-bg:rgba(40,56,80,.96); --toast-fg:#eef4fb;
+  --mascot-bg:#e8eef6; --mascot-bg-av:#e8eef6;
+  --bub-peer:rgba(38,54,78,.84); --bub-own:rgba(52,90,136,.86); --bub-fx:rgba(58,68,108,.86); --bub-fail:rgba(120,44,52,.88);
+  --chat-bub-peer:rgba(42,56,78,.88); --chat-bub-bd:rgba(200,220,245,.14);
+  --bub-bd:rgba(200,220,245,.16); --bub-hi:rgba(210,228,250,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(210,228,250,.12);
+  --cy-silver:#6f8299; --cy-ink:#a9c8ea; --cy-btn-a:#7ea9d8; --cy-btn-b:#5f8cbf; --cy-orn:rgba(169,200,234,.2);
+  --cy-ring:rgba(143,182,224,.3); --cy-seal:#d0525a;
+  --cy-sword:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c3-3.4 7-3.6 9-1.6M2 6c3 3.4 7 3.6 9 1.6' fill='none' stroke='%23d0525a' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='6' r='1.8' fill='%23d0525a'/%3E%3Crect x='14' y='4.6' width='16' height='2.8' rx='1.2' fill='%235f7899'/%3E%3Cpath d='M30 1.6h3.2l1.6 4.4-1.6 4.4H30z' fill='%238fb6e0'/%3E%3Cpath d='M35 4.4h86l9 1.6-9 1.6H35z' fill='%237f93ad'/%3E%3Cpath d='M35 6h94' stroke='%23c9d8ea' stroke-width='.6'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/chunyang/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(8,14,24,.05) 0,rgba(8,14,24,.22) 45%,rgba(8,14,24,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(170,200,240,.22),rgba(170,200,240,0) 70%),
+    linear-gradient(180deg,#121c2e 0,#0f1828 60%,#0a111c 100%);
+}
+@media (prefers-color-scheme: dark){
+  :root[data-skin="chunyang"]:not([data-theme="light"]){
+  --t1:#e8eef6; --t2:#b4c2d3; --t3:#8e9db2;
+  --pink:#8fb6e0; --on-pink:#0f1d2e; --pink-text:#a9c8ea; --red-text:#ff9d9d; --ok:#8fd6bd; --badge:#d0525a;
+  --hair:rgba(200,220,245,.12); --rim:rgba(200,220,245,.16);
+  --hi:rgba(210,228,250,.22); --lo:rgba(0,0,0,.4); --side:rgba(200,220,245,.07);
+  --g-bar:rgba(16,26,42,.62); --g-card:rgba(22,34,54,.58); --g-chip:rgba(200,220,245,.1); --g-solid:#16223a;
+  --field-bg:rgba(6,12,22,.4);
+  --sh-1:0 1px 2px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.28);
+  --sh-2:0 2px 6px rgba(0,0,0,.45),0 14px 36px rgba(0,0,0,.42);
+  --sh-0:0 1px 1px rgba(0,0,0,.4);
+  --page:#0b111b; --stage-bg:rgba(14,22,34,.84);
+  --toast-bg:rgba(40,56,80,.96); --toast-fg:#eef4fb;
+  --mascot-bg:#e8eef6; --mascot-bg-av:#e8eef6;
+  --bub-peer:rgba(38,54,78,.84); --bub-own:rgba(52,90,136,.86); --bub-fx:rgba(58,68,108,.86); --bub-fail:rgba(120,44,52,.88);
+  --chat-bub-peer:rgba(42,56,78,.88); --chat-bub-bd:rgba(200,220,245,.14);
+  --bub-bd:rgba(200,220,245,.16); --bub-hi:rgba(210,228,250,.26); --bub-lo:rgba(0,0,0,.32); --bub-sheen:rgba(210,228,250,.12);
+  --cy-silver:#6f8299; --cy-ink:#a9c8ea; --cy-btn-a:#7ea9d8; --cy-btn-b:#5f8cbf; --cy-orn:rgba(169,200,234,.2);
+  --cy-ring:rgba(143,182,224,.3); --cy-seal:#d0525a;
+  --cy-sword:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 12'%3E%3Cpath d='M2 6c3-3.4 7-3.6 9-1.6M2 6c3 3.4 7 3.6 9 1.6' fill='none' stroke='%23d0525a' stroke-width='1.4' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='6' r='1.8' fill='%23d0525a'/%3E%3Crect x='14' y='4.6' width='16' height='2.8' rx='1.2' fill='%235f7899'/%3E%3Cpath d='M30 1.6h3.2l1.6 4.4-1.6 4.4H30z' fill='%238fb6e0'/%3E%3Cpath d='M35 4.4h86l9 1.6-9 1.6H35z' fill='%237f93ad'/%3E%3Cpath d='M35 6h94' stroke='%23c9d8ea' stroke-width='.6'/%3E%3C/svg%3E");
+  --scene-img:url(../skins/chunyang/scene-night.jpg);
+  --scene-bg:
+    linear-gradient(180deg,rgba(8,14,24,.05) 0,rgba(8,14,24,.22) 45%,rgba(8,14,24,.5) 100%),
+    var(--scene-img),
+    radial-gradient(80% 40% at 78% 8%,rgba(170,200,240,.22),rgba(170,200,240,0) 70%),
+    linear-gradient(180deg,#121c2e 0,#0f1828 60%,#0a111c 100%);
+  }
+}
+
+/* ---------- 组件细节 ---------- */
+[data-skin="chunyang"] ::selection{background:rgba(59,106,156,.3)}
+[data-skin="chunyang"] #shell{background-size:cover,cover,auto,auto;background-position:center top}
+
+/* 标题用宋体，略加字距，像道观的匾额 */
+[data-skin="chunyang"] .top h2,[data-skin="chunyang"] #auth h1,[data-skin="chunyang"] .me-head .name,
+[data-skin="chunyang"] .panel h3,[data-skin="chunyang"] .section-title,[data-skin="chunyang"] #chat .who b{
+  font-family:var(--cy-serif);letter-spacing:.06em;
+}
+[data-skin="chunyang"] .top h2,[data-skin="chunyang"] #auth h1{font-weight:700}
+[data-skin="chunyang"] .panel h3,[data-skin="chunyang"] .section-title{color:var(--cy-ink)}
+
+/* 顶栏：页名前一枚太极，下沿一道银线 */
+[data-skin="chunyang"] .top{border-bottom-color:transparent;position:relative}
+[data-skin="chunyang"] .top::after{
+  content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--cy-silver) 18%,var(--cy-silver) 82%,transparent);opacity:.7;
+}
+[data-skin="chunyang"] .view>.top h2{display:flex;align-items:center;gap:8px}
+[data-skin="chunyang"] .view>.top h2::before{
+  content:"";flex:none;width:22px;height:22px;
+  background:url(../skins/chunyang/taiji.png) center/contain no-repeat;
+}
+
+/* 面板和卡片：右上角一抹祥云纹（遮罩取形，颜色跟主题走） */
+[data-skin="chunyang"] .panel{position:relative;overflow:hidden}
+[data-skin="chunyang"] .panel::after{
+  content:"";position:absolute;top:6px;right:-28px;width:168px;height:28px;pointer-events:none;
+  background:var(--cy-orn);
+  -webkit-mask:url(../skins/chunyang/cloud.png) center/contain no-repeat;mask:url(../skins/chunyang/cloud.png) center/contain no-repeat;
+}
+[data-skin="chunyang"] .panel>*{position:relative;z-index:1}
+
+/* 主按钮：道袍青，上缘一道银光 */
+[data-skin="chunyang"] .btn:not(.ghost):not(.danger){
+  background-color:var(--cy-btn-b);
+  background-image:linear-gradient(180deg,var(--cy-btn-a),var(--cy-btn-b));
+  border-color:rgba(255,255,255,.28);letter-spacing:.04em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -1px 0 rgba(0,0,0,.18),0 1px 2px rgba(18,32,52,.18),0 4px 10px rgba(18,32,52,.14);
+}
+@media (hover:hover){ [data-skin="chunyang"] .btn:not(.ghost):not(.danger):hover:not(:disabled){background-image:linear-gradient(180deg,color-mix(in srgb,var(--cy-btn-a) 88%,#fff),var(--cy-btn-b))} }
+[data-skin="chunyang"] .seg button.on{background-image:linear-gradient(180deg,var(--cy-btn-a),var(--cy-btn-b));color:var(--on-pink)}
+[data-skin="chunyang"] .field:focus{box-shadow:inset 0 1px 3px rgba(18,32,52,.14),0 0 0 3px var(--cy-ring)}
+[data-skin="chunyang"] .toggle[aria-checked="true"]{background-image:linear-gradient(180deg,var(--cy-btn-a),var(--cy-btn-b))}
+
+/* 底部标签栏：选中的一格是一枚浅青的玉牌，上沿一点银 */
+[data-skin="chunyang"] #tabbar button.on{
+  color:var(--cy-ink);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 16%,transparent),color-mix(in srgb,var(--pink) 6%,transparent));
+}
+[data-skin="chunyang"] #tabbar button.on::before{
+  content:"";position:absolute;top:3px;left:50%;width:18px;height:2px;margin-left:-9px;border-radius:1px;background:var(--pink);
+}
+
+/* 角标：朱砂印，方一点 */
+[data-skin="chunyang"] .badge{background:var(--cy-seal);border-radius:6px}
+
+/* 时间分隔线：一柄横放的剑（剑穗朱砂、剑柄青黛、剑格道袍青、剑身银白），代替默认的饼干棒 */
+[data-skin="chunyang"] .stamp::after{
+  width:132px;height:12px;border-radius:0;box-shadow:none;background:var(--cy-sword) center/contain no-repeat;
+}
+
+/* 对方气泡在聊天页里：细一点的青灰边；自己的气泡：淡青 */
+[data-skin="chunyang"] .row.own .bubble{background-image:linear-gradient(var(--bub-sheen),rgba(255,255,255,0) 46%)}
+
+/* 登录页：吉祥物下方一道祥云 */
+[data-skin="chunyang"] #auth .sub{position:relative;padding-bottom:14px}
+[data-skin="chunyang"] #auth .sub::after{
+  content:"";position:absolute;left:50%;bottom:0;width:132px;height:12px;margin-left:-66px;background:var(--cy-orn);
+  -webkit-mask:url(../skins/chunyang/cloud.png) center/contain no-repeat;mask:url(../skins/chunyang/cloud.png) center/contain no-repeat;
+}
+
+/* 遮罩不支持时不画祥云（不会出现色块） */
+@supports not ((mask:url(x.png)) or (-webkit-mask:url(x.png))){
+  [data-skin="chunyang"] .panel::after,[data-skin="chunyang"] #auth .sub::after{display:none}
+}

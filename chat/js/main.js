@@ -8,14 +8,15 @@ import { buildPlusPanel } from './plus.js';
 import { stopRealtime } from './realtime.js';
 import { enterApp, resetState } from './session.js';
 import { S, cfg, sb, setCfg, setSb } from './state.js';
-import { applyTheme, themeMode, watchSystemTheme } from './theme.js';
+import { applySkinLook } from './skins/index.js';
+import { watchSystemTheme } from './theme.js';
 import { setMascot } from './mascot.js';
 import { $ } from './utils.js';
 import { fitViewport } from './viewport.js';
 
 // ===== 启动 =====
 export async function boot() {
-  applyTheme(themeMode());
+  applySkinLook(); // 皮肤（data-skin）和外观（data-theme、浏览器顶栏颜色）
   watchSystemTheme();
   setMascot($('bootHero'), 'normal');
   setMascot($('unconfHero'), 'normal');
