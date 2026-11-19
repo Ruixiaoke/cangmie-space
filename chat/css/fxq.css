@@ -133,3 +133,4 @@
 .fxq-sheet-ops .btn{flex:1;min-height:48px;padding-left:6px;padding-right:6px;white-space:nowrap}
 .fxq-peek{align-self:center;min-height:44px;padding:0 18px;background:none;border:0;color:var(--t3);font-size:var(--fs-sm)}
 .fxq-reopen{position:absolute;right:14px;bottom:100px;z-index:3}
+.fxq-die[hidden]{display:none}

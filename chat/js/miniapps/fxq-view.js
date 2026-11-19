@@ -372,6 +372,7 @@ export function createTable(box, host) {
     var die = els.die, face = T.rolling ? D.face : D.die, who = T.rolling ? D.rollSeat : D.turn;
     die.className = 'fxq-die c' + (who === undefined || who === null ? 0 : who) + (T.rolling ? ' rolling' : '') + (myTurn() && (D.roll === null || D.roll === undefined) ? ' ready' : '');
     Array.prototype.forEach.call(die.children, function (p, k) { p.classList.toggle('on', !!face && PIPS[face].indexOf(k) >= 0); });
+    die.hidden = over;
     die.disabled = !(myTurn() && (D.roll === null || D.roll === undefined) && !T.busy);
     // 飞机高亮
     var mv = movable();
