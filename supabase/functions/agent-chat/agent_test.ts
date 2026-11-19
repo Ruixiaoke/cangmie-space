@@ -316,7 +316,7 @@ Deno.test("request body carries the token-saving fields", async () => {
   const b = bodies[0] as { temperature: number; max_output_tokens: number; reasoning: { effort: string }; prompt_cache_key: string; tools: { type: string; search_context_size?: string }[] };
   if (b.max_output_tokens !== 1500 || MAX_OUTPUT_TOKENS !== 1500) throw new Error("max_output_tokens");
   if (b.reasoning?.effort !== "low") throw new Error("reasoning");
-  if (b.temperature !== 1.5 || TEMPERATURE !== 1.5) throw new Error("temperature");
+  if (b.temperature !== 1.2 || TEMPERATURE !== 1.2) throw new Error("temperature");
   if (!b.prompt_cache_key) throw new Error("prompt_cache_key");
   if (b.tools.find((t) => t.type === "web_search")?.search_context_size !== "low" || SEARCH_CONTEXT_SIZE !== "low") throw new Error("search_context_size");
 });
