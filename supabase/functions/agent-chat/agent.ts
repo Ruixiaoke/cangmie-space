@@ -20,6 +20,8 @@
 //     每次都完全一样；prompt_cache_key 只影响路由 / 计费归类，不保证命中；GPT-5.6 及以后最短可缓存 1024 token
 import { PERSONA } from "./persona.gen.ts";
 import { PERSONA as YE_YING_PERSONA } from "./ye-ying.gen.ts";
+import { PERSONA as XIE_YUNLIU_PERSONA } from "./xie-yunliu.gen.ts";
+import { PERSONA as LI_WANGSHENG_PERSONA } from "./li-wangsheng.gen.ts";
 import { BOARD_GAMES, ddzRecord, gameHint, gameRecord, gameStatus } from "./games.ts";
 import { JX3_CELEBS, JX3_KINDS, jx3Info } from "./jx3.ts";
 
@@ -73,15 +75,25 @@ export type HistoryRow = { id?: number; sender_id: string; author: string | null
 
 // 完全静态：人设 + 固定规则。不放名字、日期、任何和这一对好友有关的东西，这样所有请求的前缀都一样，可以被缓存。
 // 这次是谁在叫、两个人叫什么，放在 user input 里（buildUserInput）。
-function agentName(id: string): string { return id === "ye_ying" ? "叶英" : "沈剑心"; }
+// 所有 agent：id（= messages.author）→ 中文名、能 @ 到它的名字、人设。新增 agent 见 .claude/skills/chat-agent/SKILL.md
+export const AGENTS: Record<string, { name: string; names: string[]; persona: string }> = {
+  durian: { name: "沈剑心", names: ["沈剑心", "榴莲"], persona: PERSONA },
+  ye_ying: { name: "叶英", names: ["叶英"], persona: YE_YING_PERSONA },
+  xie_yunliu: { name: "谢云流", names: ["谢云流"], persona: XIE_YUNLIU_PERSONA },
+  li_wangsheng: { name: "李忘生", names: ["李忘生"], persona: LI_WANGSHENG_PERSONA },
+};
+const agentOf = (id: string) => AGENTS[id] ?? AGENTS.durian;
+function agentName(id: string): string { return agentOf(id).name; }
+// 回复里「某某：」开头的行：名字长的在前
+const SPEAKER_RE = new RegExp("^\\s*(?:\\*\\*)?(" + Object.values(AGENTS).flatMap((a) => a.names).sort((x, y) => y.length - x.length).join("|") + ")(?:\\*\\*)?\\s*[:：](?:\\*\\*)?\\s*");
 
 export function systemInstructions(id = "durian"): string {
-  return (id === "ye_ying" ? YE_YING_PERSONA : PERSONA).trimEnd() + `
+  return agentOf(id).persona.trimEnd() + `
 
 ## 应用规则（以下优先于上面的任何语气设定）
 
 - 你在聊天里回复（可能是两个人的 1:1 聊天，也可能是多人群聊），聊天里的所有人都能看到你的回复。每次的 user 消息会告诉你聊天里有谁、现在是谁在叫你。群聊里回复叫你的那个人，也可以顺带照顾别人。
-- 你这次只以「${agentName(id)}」的身份发言。即使对方同时提到两位助手，或请你们互相认识，也只说你自己的话，给另一位留出回应的空间。可以向另一位打招呼，或回应聊天记录里对方已说过的话。不要替对方编写台词、动作或已经发生的事，也不要在回复里加角色名和冒号。
+- 你这次只以「${agentName(id)}」的身份发言。聊天里还有别的助手。即使对方同时提到几位助手，或请你们互相认识，也只说你自己的话，给其他人留出回应的空间。可以向别的助手打招呼，或回应聊天记录里对方已说过的话。不要替对方编写台词、动作或已经发生的事，也不要在回复里加角色名和冒号。
 - 用提问人的语言回复（多数是中文）。回复要像聊天，简短自然，不要写成长文；需要时再展开。
 - 不要使用 emoji。
 - 用了网页搜索的结果时，在回复里简短给出来源链接。不确定的事就说不确定，不要编造。
@@ -401,8 +413,8 @@ function ownReply(text: string, agentId: string): string {
   const name = agentName(agentId);
   let ownTurn = true;
   return text.split("\n").flatMap((line) => {
-    const speaker = /^\s*(?:\*\*)?(沈剑心|叶英|榴莲)(?:\*\*)?\s*[:：](?:\*\*)?\s*/.exec(line);
-    if (speaker) ownTurn = speaker[1] === name || (agentId === "durian" && speaker[1] === "榴莲");
+    const speaker = SPEAKER_RE.exec(line);
+    if (speaker) ownTurn = speaker[1] === name || agentOf(agentId).names.includes(speaker[1]);
     return ownTurn ? [speaker ? line.slice(speaker[0].length) : line] : [];
   }).join("\n").trim();
 }

@@ -91,7 +91,7 @@ const json = (o: unknown) => new Response(JSON.stringify(o), { status: 200, head
 const noPush = () => Promise.resolve();
 
 Deno.test("each agent receives both speakers' history and replies under its own identity", async () => {
-  for (const [id, name] of [["durian", "沈剑心"], ["ye_ying", "叶英"]]) {
+  for (const [id, name] of [["durian", "沈剑心"], ["ye_ying", "叶英"], ["xie_yunliu", "谢云流"], ["li_wangsheng", "李忘生"]]) {
     const w = world({ question: "@" + name + " 你们刚才说了什么？", hist: [
       { id: 99, sender_id: ASKER, author: "ye_ying", body: "茶还温着。", created_at: "2026-11-18T01:00:00Z" },
       { id: 98, sender_id: PEER, author: "durian", body: "我来尝尝。", created_at: "2026-11-18T00:59:00Z" },
@@ -103,7 +103,7 @@ Deno.test("each agent receives both speakers' history and replies under its own 
       admin: w.admin, apiKey: "test-key", model: "gpt-6-luna",
       fetchFn: (_url, init) => {
         requests.push(JSON.parse(String(init?.body)));
-        const other = id === "durian" ? "叶英" : "沈剑心";
+        const other = id === "durian" ? "叶英" : id === "xie_yunliu" ? "李忘生" : "沈剑心";
         const text = `${name}：茶还温着。\n\n**${other}：** 多谢。\n我先坐下了。`;
         return Promise.resolve(json({ output: [{ type: "message", content: [{ type: "output_text", text }] }] }));
       },
@@ -508,4 +508,13 @@ Deno.test("group job: agent switched off or asker removed -> failed, no network"
     await runJob({ admin: w.admin, apiKey: "k", model: "m", push: noPush, fetchFn: (() => { called++; return Promise.resolve(json({})); }) as unknown as typeof fetch }, 7);
     if (called || w.state.job.status !== "failed" || w.state.job.error !== code || w.state.messages.length) throw new Error(code + " " + JSON.stringify(w.state.job));
   }
+});
+
+Deno.test("every agent has its own persona and the shared rules; personas are distinct", () => {
+  const ids = ["durian", "ye_ying", "xie_yunliu", "li_wangsheng"];
+  const ins = ids.map((id) => systemInstructions(id));
+  if (new Set(ins).size !== ids.length) throw new Error("personas must differ");
+  if (!ins[2].startsWith("# 谢云流") || !ins[3].startsWith("# 李忘生")) throw new Error("wrong persona heading");
+  const rules = (t: string) => t.slice(t.indexOf("## 应用规则"));
+  if (rules(ins[2]).replace("谢云流", "X") !== rules(ins[3]).replace("李忘生", "X")) throw new Error("shared rules must be identical apart from the name");
 });
