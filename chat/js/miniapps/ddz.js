@@ -1,6 +1,8 @@
-// 斗地主小程序（群聊里的三人牌局）：缓存、聊天卡片、实时同步、开桌；界面在 ddz-view.js，规则在 ddz-rules.js
+// 斗地主小程序（群聊和私聊里的三人 / 四人牌局）：缓存、聊天卡片、实时同步、开桌；界面在 ddz-view.js，规则在 ddz-rules.js
 //
-// 后端：supabase/migrations/20261203000000_doudizhu.sql（表 + 大厅 RPC）、supabase/functions/ddz（叫分 / 出牌 / 超时托管 / 机器人 / 结算）。
+// 后端：supabase/migrations/20261203000000_doudizhu.sql + 20261204000000_ddz_4p_dm.sql（表 + 大厅 RPC：群里 ddz_open，私聊 ddz_open_dm）、
+// supabase/functions/ddz（叫分 / 出牌 / 开始（补机器人）/ 超时托管 / 机器人 / 结算）。
+// 桌子属于一个群（group_id）或者一对好友（dm_lo / dm_hi），累计积分缓存按 scoreKey 分开。
 // 手牌是秘密：自己的手牌只能从 ddz_hands（RLS 只给本人）或 ddz 函数的返回里拿；ddz_games.pub 里别人的手牌只有张数。
 
 import { errText } from '../errors.js';
@@ -10,21 +12,24 @@ import { ddzOf } from './ddz-token.js';
 import { firePush } from '../notify.js';
 import { S, nameOf, profileOf, sb } from '../state.js';
 import { clear, h, isVisible, toast } from '../utils.js';
+import { convOf, peerFromConv } from '../views/chats.js';
 
 // ===== 斗地主 =====
 var DZ = { games: {}, hands: {}, scores: {}, want: [], pend: {}, tm: 0, handPend: {}, scPend: {} };
 export function ddzReset() { DZ.games = {}; DZ.hands = {}; DZ.scores = {}; DZ.want = []; DZ.pend = {}; DZ.handPend = {}; DZ.scPend = {}; }
-// 只有群聊里才把邀请消息当卡片（私聊里它就是普通文字）
+// 群聊和私聊里都把邀请消息当卡片
 export function ddzKind(body) {
-  var id = S.chat && S.chat.gid != null ? ddzOf(body) : null;
+  var id = ddzOf(body);
   return id != null ? { k: 'ddz', id: id } : null;
 }
+// 累计积分按群或按好友对分开存
+function scoreKey(r) { return r.group_id != null ? 'g' + r.group_id : r.dm_lo ? 'd' + r.dm_lo + r.dm_hi : null; }
 
 function statusText(g) {
   if (!g) return g === null ? '牌桌不可用' : '载入中…';
   var n = 0, i;
-  for (i = 0; i < 3; i++) if (g.seats[i] || g.bots[i]) n++;
-  if (g.status === 'waiting') return '等人入座 ' + n + '/3';
+  for (i = 0; i < 4; i++) if (g.seats[i] || g.bots[i]) n++;
+  if (g.status === 'waiting') return n ? '等人入座，已坐 ' + n + ' 个' : '等人入座';
   if (g.status === 'bidding') return '叫分中';
   if (g.status === 'playing') return '对局中';
   if (g.status === 'closed') return '已关闭';
@@ -33,8 +38,8 @@ function statusText(g) {
 }
 function seatNames(g) {
   var out = [];
-  for (var i = 0; i < 3; i++) {
-    if (g.seats[i]) out.push(g.seats[i] === (S.me && S.me.id) ? '我' : nameOf(g.seats[i]));
+  for (var i = 0; i < 4; i++) {
+    if (g.seats[i]) out.push(g.seats[i] === (S.me && S.me.id) ? '我' : ((ddzPerson(g.seats[i]) || {}).nickname || nameOf(g.seats[i])));
     else if (g.bots[i]) out.push(botName(g.bots, i));
   }
   return out;
@@ -107,19 +112,34 @@ function fetchHand(id) {
     if (mine) putHand(id, mine.cards, mine.round);
   }, function () { delete DZ.handPend[id]; });
 }
-function groupOfGame(id) { var g = DZ.games[id]; return g ? g.group_id : (S.chat ? S.chat.gid : null); }
+// 这桌的累计积分键：群桌 g<群 id>，私聊桌 d<lo><hi>；牌桌还没取回来时用当前会话猜（群 id / 我和对方）
+function keyOfGame(id) {
+  var g = DZ.games[id];
+  if (g) return scoreKey(g);
+  var c = S.chat;
+  if (!c || !S.me) return null;
+  if (c.gid != null) return 'g' + c.gid;
+  return c.peer ? 'd' + (S.me.id < c.peer ? S.me.id + c.peer : c.peer + S.me.id) : null;
+}
 function fetchScores(id) {
-  var gid = groupOfGame(id);
-  if (!sb || gid == null || DZ.scPend[gid]) return;
-  DZ.scPend[gid] = 1;
-  sb.from('ddz_scores').select('*').eq('group_id', gid).then(function (r) {
-    delete DZ.scPend[gid];
+  var key = keyOfGame(id), g = DZ.games[id], c = S.chat;
+  if (!sb || key == null || DZ.scPend[key]) return;
+  var q = sb.from('ddz_scores').select('*');
+  if (g ? g.group_id != null : c && c.gid != null) q = q.eq('group_id', g ? g.group_id : c.gid);
+  else {
+    var lo = g ? g.dm_lo : (S.me.id < c.peer ? S.me.id : c.peer), hi = g ? g.dm_hi : (S.me.id < c.peer ? c.peer : S.me.id);
+    q = q.eq('dm_lo', lo).eq('dm_hi', hi);
+  }
+  DZ.scPend[key] = 1;
+  q.then(function (r) {
+    delete DZ.scPend[key];
     (r.data || []).forEach(putScore);
-  }, function () { delete DZ.scPend[gid]; });
+  }, function () { delete DZ.scPend[key]; });
 }
 function putScore(r) {
-  if (!r || r.group_id == null) return;
-  var m = DZ.scores[r.group_id] || (DZ.scores[r.group_id] = {});
+  var key = r ? scoreKey(r) : null;
+  if (!key) return;
+  var m = DZ.scores[key] || (DZ.scores[key] = {});
   m[r.user_id] = r;
   if (APP.cur && APP.cur.id === 'ddz' && TB) TB.setScores();
 }
@@ -169,25 +189,30 @@ function rpc(name, args) {
   }, function (e) { toast(errText(e)); return null; });
 }
 
-// + 面板：开桌（已经有没结束的桌子就直接回到那一桌）
+// + 面板：开桌（已经有没结束的桌子就直接回到那一桌）；群里 ddz_open(群)，私聊里 ddz_open_dm(好友)
 function ddzStartHere() {
   var c = S.chat;
-  if (!c || c.gid == null) return;
+  if (!c) return;
   if (APP.cur && APP.cur.id === 'ddz') return;
-  var gid = c.gid;
-  sb.rpc('ddz_open', { p_group: gid }).then(function (r) {
+  var gid = c.gid, peer = c.peer;
+  var call = gid != null ? sb.rpc('ddz_open', { p_group: gid }) : sb.rpc('ddz_open_dm', { p_peer: peer });
+  call.then(function (r) {
     if (r.error) return toast(errText(r.error));
     var g = r.data;
     putGame(g);
-    if (g.version === 1 && g.message_id) firePush('message', g.message_id); // 刚建的桌子：让群里其他人收到推送
-    if (S.chat && S.chat.gid === gid) openApp('ddz', { id: g.id });
+    if (g.version === 1 && g.message_id) firePush('message', g.message_id); // 刚建的桌子：让群里 / 对方收到推送
+    if (S.chat && S.chat.gid === gid && S.chat.peer === peer) openApp('ddz', { id: g.id });
   }, function (e) { toast(errText(e)); });
+}
+function ddzPerson(uid) {
+  if (S.me && uid === S.me.id) return S.me;
+  return profileOf(uid) || (convOf(uid) ? peerFromConv(convOf(uid)) : null);
 }
 
 var TB = null; // 当前打开的牌桌界面
 export var ddzV = {
   id: 'ddz',
-  scope: 'group',
+  scope: 'any', // 私聊和群聊里都能开
   label: '斗地主',
   img: 'ddz/icon-ddz.png',
   strip: 'hidden',
@@ -196,9 +221,10 @@ export var ddzV = {
   mount: function (box, params) {
     var id = params.id;
     TB = createTable(box, {
-      person: function (uid) { return S.me && uid === S.me.id ? S.me : profileOf(uid); },
+      dm: !S.chat || S.chat.gid == null,
+      person: ddzPerson,
       hand: function () { return DZ.hands[id] || null; },
-      scores: function () { return DZ.scores[groupOfGame(id)] || {}; },
+      scores: function () { return DZ.scores[keyOfGame(id)] || {}; },
       refreshHand: function () { fetchHand(id); },
       refreshScores: function () { fetchScores(id); },
       act: function (body) { return call(Object.assign({ game: id }, body)); }, // 错误码交给界面提示（tick 的失败不用提示）

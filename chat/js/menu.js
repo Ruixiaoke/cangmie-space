@@ -26,7 +26,7 @@ function copyText(text) {
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
 }
 function isGroup() { return !!(S.chat && S.chat.gid != null); } // 群里只有斗地主是卡片，其余小游戏邀请是普通文字
-function isCardBody(body) { return isGroup() ? ddzOf(body) != null : tttOf(body) != null || slOf(body) != null || poolOf(body) != null; }
+function isCardBody(body) { return ddzOf(body) != null || (!isGroup() && (tttOf(body) != null || slOf(body) != null || poolOf(body) != null)); }
 var MSG_ACTIONS = [
   { id: 'copy', label: '复制', icon: 'i-copy', show: function (m) { return !!m.author && m.author !== 'system' || !m.author && !fxOf(m.body) && !isCardBody(m.body); }, run: function (m) { copyText(m.body); } },
   // 引用：自己和对方已发出的消息都能引用（发送中的还没有 id，不显示）

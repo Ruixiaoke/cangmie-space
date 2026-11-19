@@ -1,5 +1,9 @@
 // 斗地主牌桌的服务器逻辑：规则引擎（rules.gen.js）+ 超时托管 + 机器人 + 结算
 //
+// 桌子有 4 个座位槽。开始时：先数坐了几个（真人 + 机器人），不够 3 个就往空位补机器人补到 3 个；
+// 3 个 = 三人局，4 个 = 四人局；座位按顺序压紧（0..n-1），引擎看到的座位 = 座位槽。再来一局保持同样的座位和人数。
+// 桌子属于一个群（group_id）或者一对好友（dm_lo / dm_hi）；私聊桌的权限是「这两个人且还是 accepted 好友」，对局结束不写系统提示行。
+//
 // 和 HTTP / 鉴权 / 数据库细节分开：数据库、时钟、随机数、推送全部从参数传入，方便本地用假的实现测试（和 agent-chat/agent.ts 一样）。
 // 服务器是唯一的裁判：完整状态（含三家手牌）只存在 ddz_state（只有 service role 能读）；
 // 每个真人自己的手牌写进 ddz_hands（RLS：只有本人能读），旁观者只能看到 ddz_games.pub（别人的手牌只有张数）。
@@ -18,7 +22,9 @@ export const MAX_AUTO_STEPS = 400; // 机器人 / 托管连续出牌的次数上
 
 export type GameRow = {
   id: number;
-  group_id: number;
+  group_id: number | null;
+  dm_lo: string | null;
+  dm_hi: string | null;
   created_by: string | null;
   message_id: number | null;
   status: "waiting" | "bidding" | "playing" | "over" | "closed";
@@ -37,7 +43,7 @@ export type StateDoc = { g: Json; misses: number[]; first: number };
 export type Commit = {
   game: number;
   version: number;
-  patch: { status: string; pub: Json; auto: boolean[]; round: number; deadline: string | null };
+  patch: { status: string; pub: Json; auto: boolean[]; round: number; deadline: string | null; seats?: (string | null)[]; bots?: boolean[] };
   state: StateDoc;
   hands: { seat: number; user_id: string; round: number; cards: number[] }[];
   scores: { user_id: string; delta: number; win: boolean }[];
@@ -47,13 +53,14 @@ export type Commit = {
 export interface Store {
   getGame(id: number): Promise<GameRow | null>;
   getState(id: number): Promise<StateDoc | null>;
-  isMember(group: number, user: string): Promise<boolean>;
+  // 群桌：user 是群成员；私聊桌：user 是这对好友之一且好友关系还在
+  canAccess(row: GameRow, user: string): Promise<boolean>;
   names(ids: string[]): Promise<Record<string, string>>;
   groupName(group: number): Promise<string>;
-  // 原子提交：version 对不上返回 false；这个群已经有另一张没结束的桌子抛 Error("table_exists")
+  // 原子提交：version 对不上返回 false；这个群 / 这对好友已经有另一张没结束的桌子抛 Error("table_exists")
   commit(c: Commit): Promise<boolean>;
 }
-export type PushPayload = { title: string; body: string; tag: string; group?: number };
+export type PushPayload = { title: string; body: string; tag: string; group?: number; peer?: string };
 export type Deps = {
   store: Store;
   now: () => number;
@@ -86,8 +93,10 @@ function fail(status: number, error: string): Result {
   return { status, body: { error } };
 }
 
-function isMachine(row: GameRow, auto: boolean[], seat: number): boolean {
-  return !!row.bots[seat] || !!auto[seat] || !row.seats[seat];
+type Seating = { seats: (string | null)[]; bots: boolean[] };
+
+function isMachine(t: Seating, auto: boolean[], seat: number): boolean {
+  return !!t.bots[seat] || !!auto[seat] || !t.seats[seat];
 }
 
 export function botName(bots: boolean[], seat: number): string {
@@ -101,7 +110,7 @@ function winLine(g: Json, seatName: (i: number) => string): string {
   const times = g.multiplier + " 倍";
   const tail = g.spring ? "，春天" : "";
   if (g.winner === "landlord") return `斗地主：地主 ${seatName(L)} 赢了，${times}${tail}`;
-  const farmers = [0, 1, 2].filter((i) => i !== L).map(seatName).join("、");
+  const farmers = (g.hands as unknown[]).map((_, i) => i).filter((i) => i !== L).map(seatName).join("、");
   return `斗地主：农民 ${farmers} 赢了，${times}${tail}`;
 }
 
@@ -119,7 +128,7 @@ export async function handle(deps: Deps, uid: string, body: Json): Promise<Resul
   for (let attempt = 0; attempt < 2; attempt++) {
     const row = await deps.store.getGame(gameId);
     if (!row) return fail(404, "table_not_found");
-    if (!(await deps.store.isMember(row.group_id, uid))) return fail(403, "not_group_member");
+    if (!(await deps.store.canAccess(row, uid))) return fail(403, row.group_id != null ? "not_group_member" : "not_friends");
     if (attempt === 0 && body.version !== undefined && body.version !== row.version) return fail(409, "conflict");
 
     const out = await step(deps, uid, row, body);
@@ -143,7 +152,7 @@ export async function handle(deps: Deps, uid: string, body: Json): Promise<Resul
         ok: true,
         seat: out.seat,
         hand: out.hand,
-        game: { id: row.id, status: c.patch.status, pub: c.patch.pub, auto: c.patch.auto, round: c.patch.round, deadline: c.patch.deadline, version: row.version + 1 },
+        game: { id: row.id, status: c.patch.status, pub: c.patch.pub, seats: c.patch.seats ?? row.seats, bots: c.patch.bots ?? row.bots, auto: c.patch.auto, round: c.patch.round, deadline: c.patch.deadline, version: row.version + 1 },
       },
     };
   }
@@ -154,7 +163,8 @@ type Step = { error: string; status: number } | { commit: Commit; seat: number; 
 
 async function step(deps: Deps, uid: string, row: GameRow, body: Json): Promise<Step> {
   const action = body.action as string;
-  const seatOf = row.seats.indexOf(uid);
+  let seat4: Seating = { seats: row.seats, bots: row.bots };
+  let seatOf = row.seats.indexOf(uid);
   const live = row.status === "bidding" || row.status === "playing";
   const rng = deps.rng();
   const now = deps.now();
@@ -164,18 +174,36 @@ async function step(deps: Deps, uid: string, row: GameRow, body: Json): Promise<
   let misses: number[];
   let first: number;
   let fresh = false; // 新开一局（start / rematch）
+  let patchSeats = false; // 开始时座位压紧 / 补了机器人：这次提交要把新座位写回桌子
+  let players = 3;
   const err = (status: number, error: string): Step => ({ error, status });
 
   if (action === "start" || action === "rematch") {
     if (action === "start" ? row.status !== "waiting" : row.status !== "over") return err(400, "bad_phase");
     if (seatOf < 0) return err(403, "not_seated");
-    for (let i = 0; i < 3; i++) if (!row.seats[i] && !row.bots[i]) return err(400, "not_full");
     if (!row.seats.some((s) => !!s)) return err(400, "no_human");
+    const seats = row.seats.slice();
+    const bots = row.bots.slice();
+    let filled = 0;
+    for (let i = 0; i < 4; i++) if (seats[i] || bots[i]) filled++;
+    if (action === "start") {
+      // 人不够 3 个：往空座位补机器人，补到 3 个
+      for (let i = 0; i < 4 && filled < 3; i++) if (!seats[i] && !bots[i]) { bots[i] = true; filled++; }
+      // 座位压紧：0..filled-1 就是出牌顺序（空座位排到最后）
+      const order: number[] = [];
+      for (let i = 0; i < 4; i++) if (seats[i] || bots[i]) order.push(i);
+      seat4 = { seats: [0, 1, 2, 3].map((i) => (i < order.length ? seats[order[i]] : null)), bots: [0, 1, 2, 3].map((i) => (i < order.length ? !!bots[order[i]] : false)) };
+      patchSeats = true;
+    }
+    if (filled !== 3 && filled !== 4) return err(400, "not_full");
+    for (let i = 0; i < 4; i++) if (i >= filled && (seat4.seats[i] || seat4.bots[i])) return err(400, "not_full"); // 重来时座位必须是连续的
+    seatOf = seat4.seats.indexOf(uid);
+    players = filled;
     const prev = action === "rematch" ? await deps.store.getState(row.id) : null;
-    first = prev ? (prev.first + 1) % 3 : Math.floor(rng() * 3);
-    g = newGame({ rng, firstSeat: first });
-    misses = [0, 0, 0];
-    auto[0] = auto[1] = auto[2] = false;
+    first = prev ? (prev.first + 1) % players : Math.floor(rng() * players);
+    g = newGame({ rng, firstSeat: first, players });
+    misses = new Array(players).fill(0);
+    auto.fill(false);
     fresh = true;
   } else {
     if (!live) return err(400, "bad_phase");
@@ -188,7 +216,7 @@ async function step(deps: Deps, uid: string, row: GameRow, body: Json): Promise<
     if (action === "tick") {
       const due = row.deadline ? Date.parse(row.deadline) + TICK_GRACE_MS : NaN;
       const seat = g.turn as number;
-      const machineTurn = isMachine(row, auto, seat);
+      const machineTurn = isMachine(seat4, auto, seat);
       if (!machineTurn && !(Number.isFinite(due) && now >= due)) return err(409, "too_early");
       if (!machineTurn) {
         // 超时：用机器人替他出这一手；连续超时 MISS_LIMIT 次就一直托管，直到他自己操作
@@ -216,7 +244,7 @@ async function step(deps: Deps, uid: string, row: GameRow, body: Json): Promise<
   }
 
   // 机器人和托管的座位立刻连着出牌，直到轮到一个真人（或者结束）
-  for (let n = 0; g.phase !== "over" && isMachine(row, auto, g.turn) && n < MAX_AUTO_STEPS; n++) {
+  for (let n = 0; g.phase !== "over" && isMachine(seat4, auto, g.turn) && n < MAX_AUTO_STEPS; n++) {
     const seat = g.turn as number;
     const r = apply(g, seat, botAction(g, seat), rng);
     if (!r.ok) return err(500, "auto_failed");
@@ -235,8 +263,8 @@ async function step(deps: Deps, uid: string, row: GameRow, body: Json): Promise<
   const pub = { ...publicView(g, null), v: DDZ_RULES_VERSION, round, first, finalHands: over ? g.hands : null };
 
   const hands: Commit["hands"] = [];
-  for (let i = 0; i < 3; i++) {
-    const u = row.seats[i];
+  for (let i = 0; i < g.hands.length; i++) {
+    const u = seat4.seats[i];
     if (!u) continue;
     if (fresh || !before || JSON.stringify(before.hands[i]) !== JSON.stringify(g.hands[i])) hands.push({ seat: i, user_id: u, round, cards: g.hands[i] });
   }
@@ -246,15 +274,16 @@ async function step(deps: Deps, uid: string, row: GameRow, body: Json): Promise<
   let actor: string | null = null;
   if (over) {
     const L = g.landlord as number;
-    for (let i = 0; i < 3; i++) {
-      const u = row.seats[i];
+    for (let i = 0; i < g.hands.length; i++) {
+      const u = seat4.seats[i];
       if (!u) continue;
       scores.push({ user_id: u, delta: g.scores[i], win: (g.winner === "landlord") === (i === L) });
     }
-    const humans = row.seats.filter((s): s is string => !!s);
+    const humans = seat4.seats.filter((s): s is string => !!s);
     const nm = await deps.store.names(humans);
-    const seatName = (i: number) => (row.seats[i] ? (nm[row.seats[i] as string] ?? "好友") : botName(row.bots, i));
-    line = winLine(g, seatName);
+    const seatName = (i: number) => (seat4.seats[i] ? (nm[seat4.seats[i] as string] ?? "好友") : botName(seat4.bots, i));
+    // 系统提示行只在群里写：私聊里没有系统作者
+    line = row.group_id != null ? winLine(g, seatName) : null;
     actor = seatOf >= 0 ? uid : humans[0] ?? null;
     if (!actor) { line = null; scores = []; }
   }
@@ -263,7 +292,7 @@ async function step(deps: Deps, uid: string, row: GameRow, body: Json): Promise<
   const commit: Commit = {
     game: row.id,
     version: row.version,
-    patch: { status, pub, auto, round, deadline },
+    patch: patchSeats ? { status, pub, auto, round, deadline, seats: seat4.seats, bots: seat4.bots } : { status, pub, auto, round, deadline },
     state: { g, misses, first },
     hands,
     scores,
@@ -274,10 +303,12 @@ async function step(deps: Deps, uid: string, row: GameRow, body: Json): Promise<
   let push: (() => Promise<unknown>) | null = null;
   const pusher = deps.push;
   if (fresh && pusher) {
-    const to = row.seats.filter((s): s is string => !!s && s !== uid);
+    const to = seat4.seats.filter((s): s is string => !!s && s !== uid);
     push = async () => {
-      const title = await deps.store.groupName(row.group_id);
-      await Promise.allSettled(to.map((u) => pusher(u, { title, body: "斗地主开局了，来看看", tag: "ddz-" + row.id, group: row.group_id })));
+      const gid = row.group_id;
+      const title = gid != null ? await deps.store.groupName(gid) : ((await deps.store.names([uid]))[uid] ?? "好友");
+      const where = gid != null ? { group: gid } : { peer: uid };
+      await Promise.allSettled(to.map((u) => pusher(u, { title, body: "斗地主开局了，来看看", tag: "ddz-" + row.id, ...where })));
     };
   }
   return { commit, seat: seatOf, hand: seatOf >= 0 ? g.hands[seatOf] : null, push };

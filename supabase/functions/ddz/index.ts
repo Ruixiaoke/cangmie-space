@@ -1,4 +1,4 @@
-// 斗地主：群聊里的三人牌局（Supabase Edge Function，Deno）
+// 斗地主：群聊和私聊里的三人 / 四人牌局（Supabase Edge Function，Deno）
 //
 // 前端带着用户自己的 JWT 调用：POST { game, action: "start" | "bid" | "play" | "pass" | "tick" | "auto_off" | "rematch", value?, cards?, version? }
 // 服务器是唯一的裁判（见 game.ts）；大厅操作（开桌 / 入座 / 离座 / 加减机器人）是 SQL 函数（ddz_open 等）。
@@ -39,10 +39,18 @@ Deno.serve(async (req) => {
       if (error) throw new Error("db_error");
       return (data?.state as StateDoc | undefined) ?? null;
     },
-    async isMember(group: number, user: string) {
-      const { data, error } = await admin.from("group_members").select("user_id").eq("group_id", group).eq("user_id", user).maybeSingle();
+    async canAccess(row: GameRow, user: string) {
+      if (row.group_id != null) {
+        const { data, error } = await admin.from("group_members").select("user_id").eq("group_id", row.group_id).eq("user_id", user).maybeSingle();
+        if (error) throw new Error("db_error");
+        return !!data;
+      }
+      // 私聊桌：必须是这对好友之一，且好友关系还在
+      if (!row.dm_lo || !row.dm_hi || (user !== row.dm_lo && user !== row.dm_hi)) return false;
+      const { data, error } = await admin.from("friendships").select("id").eq("status", "accepted")
+        .or(`and(requester_id.eq.${row.dm_lo},addressee_id.eq.${row.dm_hi}),and(requester_id.eq.${row.dm_hi},addressee_id.eq.${row.dm_lo})`).limit(1);
       if (error) throw new Error("db_error");
-      return !!data;
+      return !!data && data.length > 0;
     },
     async names(ids: string[]) {
       const out: Record<string, string> = {};

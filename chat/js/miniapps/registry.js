@@ -5,7 +5,7 @@ import { poolV } from './pool.js';
 import { slV } from './sling.js';
 import { tttV } from './ttt.js';
 
-// 每个小程序有 scope：'dm' = 只在私聊里（双人回合制小游戏），'group' = 只在群聊里（多人游戏，目前只有斗地主）
+// 每个小程序有 scope：'dm' = 只在私聊里（双人回合制小游戏），'group' = 只在群聊里，'any' = 私聊和群聊里都有（目前只有斗地主）
 export function listMiniApps() {
   return [
     tttV,
@@ -15,7 +15,7 @@ export function listMiniApps() {
   ];
 }
 export function appsForScope(scope) {
-  return listMiniApps().filter(function (a) { return a.scope === scope; });
+  return listMiniApps().filter(function (a) { return a.scope === scope || a.scope === 'any'; });
 }
 export function getMiniApp(id) {
   var apps = listMiniApps();

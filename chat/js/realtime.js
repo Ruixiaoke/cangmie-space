@@ -206,10 +206,13 @@ export function startRealtime() {
   ['requester_id', 'addressee_id'].forEach(function (col) {
     ch.on('postgres_changes', { event: '*', schema: 'public', table: 'friendships', filter: col + '=eq.' + me }, onFriendship);
   });
-  // 斗地主（群聊里）：Realtime 对每个订阅者各自套 RLS，ddz_games 只会收到我所在群的桌子；ddz_hands 只有我自己的手牌
-  ch.on('postgres_changes', { event: '*', schema: 'public', table: 'ddz_games', filter: 'group_id=gt.0' }, onDdzGame);
+  // 斗地主（群聊和私聊）：Realtime 对每个订阅者各自套 RLS，ddz_games 只会收到我所在群 / 我和好友的桌子（私聊桌的 group_id 是空的，所以按 id 过滤）；ddz_hands 只有我自己的手牌
+  ch.on('postgres_changes', { event: '*', schema: 'public', table: 'ddz_games', filter: 'id=gt.0' }, onDdzGame);
   ch.on('postgres_changes', { event: '*', schema: 'public', table: 'ddz_hands', filter: 'user_id=eq.' + me }, onDdzHand);
   ch.on('postgres_changes', { event: '*', schema: 'public', table: 'ddz_scores', filter: 'group_id=gt.0' }, onDdzScore);
+  ['dm_lo', 'dm_hi'].forEach(function (col) { // 私聊的累计积分：按好友对（有序的 dm_lo / dm_hi）
+    ch.on('postgres_changes', { event: '*', schema: 'public', table: 'ddz_scores', filter: col + '=eq.' + me }, onDdzScore);
+  });
   ['player_x', 'player_o'].forEach(function (col) {
     ch.on('postgres_changes', { event: '*', schema: 'public', table: 'ttt_games', filter: col + '=eq.' + me }, onTttGame);
   });
@@ -241,6 +244,6 @@ export async function refreshAll() {
   if (S.chat) {
     await fetchLatest(false); markReadIfNeeded(); agentResync();
     if (S.chat && S.chat.gid == null) { tttResync(); slResync(); poolResync(); } // 双人小游戏只在私聊里
-    else if (S.chat) ddzResync(); // 斗地主只在群聊里
+    if (S.chat) ddzResync(); // 斗地主私聊和群聊里都有
   }
 }

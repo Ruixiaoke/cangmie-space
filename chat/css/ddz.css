@@ -26,6 +26,7 @@
 .ddz-card.mini{width:14px;height:20px;border-radius:3px}
 .ddz-card.small{width:22px;height:31px;border-radius:4px;font-size:10px}
 .ddz-card.pc{width:30px;height:42px;font-size:13px}
+.ddz-card.pc.sm{width:26px;height:36px;font-size:11px}
 .ddz-card.hc{width:var(--cw);height:calc(var(--cw) * 1.4);font-size:calc(var(--cw) * .3);border-radius:calc(var(--cw) * .1)}
 
 /* 座位 */
@@ -60,8 +61,11 @@
 .ddz-slot.l{left:8px;top:2px;max-width:calc(50% - 12px)}
 .ddz-slot.r{right:8px;top:2px;max-width:calc(50% - 12px);justify-content:flex-end}
 .ddz-slot.me{left:8px;right:8px;bottom:4px;justify-content:center}
+.ddz-plays-col{display:flex;flex-direction:column;align-items:inherit}
 .ddz-plays-row{display:flex}
 .ddz-plays-row .ddz-card+.ddz-card{margin-left:calc(var(--step) - 30px)}
+.ddz-plays-row.sm .ddz-card+.ddz-card{margin-left:calc(var(--step) - 26px)}
+.ddz-plays-col .ddz-plays-row+.ddz-plays-row{margin-top:-14px}
 .ddz-pill{padding:5px 14px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font-size:14px;white-space:nowrap}
 .ddz-pill.on{background:#d4572a;font-weight:700}
 .ddz-notice{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);padding:6px 14px;border-radius:999px;background:rgba(0,0,0,.6);font-size:var(--fs-sm);white-space:nowrap}
@@ -84,6 +88,9 @@
 .ddz-hand[data-n="0"]{padding:0}
 .ddz-hrow{position:relative;height:calc(var(--cw) * 1.4)}
 .ddz-hrow.r1{margin-top:calc(var(--cw) * -.9)}
+.ddz.p4 .ddz-hrow.r1,.ddz.p4 .ddz-hrow.r2{margin-top:calc(var(--cw) * -.86)}
+.ddz.p4 .ddz-hand.rows3 .ddz-hrow.r1,.ddz.p4 .ddz-hand.rows3 .ddz-hrow.r2{margin-top:calc(var(--cw) * -.95)}
+.ddz.p4 .ddz-hand{padding-top:12px}
 .ddz-hrow .ddz-card{position:absolute;top:0;transition:transform .12s var(--ease),box-shadow .12s var(--ease)}
 .ddz-hrow .ddz-card.sel{transform:translateY(-14px);box-shadow:0 4px 10px rgba(0,0,0,.5),0 0 0 2px #ffd34d,inset 0 0 0 1px rgba(0,0,0,.14)}
 .ddz-hand.loading{flex-direction:row;justify-content:center;padding-bottom:12px;height:84px}
@@ -154,3 +161,41 @@
 .ddz-sheet-ops{display:flex;gap:10px}
 .ddz-sheet-ops .btn{flex:1;min-height:48px}
 .ddz-peek{align-self:center;min-height:44px;padding:0 18px;background:none;border:0;color:var(--t3);font-size:var(--fs-sm)}
+
+/* 四人局：对手在左 / 上 / 右，底牌 8 张叠成一排放在最上面 */
+.ddz-top.p4{flex-direction:column;align-items:center;justify-content:flex-start;padding:10px 0 0;min-height:0;gap:2px}
+.ddz-top.p4 .ddz-info{position:static;transform:none;flex-direction:row;gap:10px;height:34px;align-items:center}
+.ddz-top.p4 .ddz-bottom{gap:0}
+.ddz-top.p4 .ddz-bottom .ddz-card+.ddz-card{margin-left:-14px}
+.ddz.p4 .ddz-bottom .ddz-card.back{width:26px;height:36px}
+.ddz.p4 .ddz-mid{min-height:150px}
+.ddz.p4 .ddz-mid>.ddz-seat{position:absolute;top:38px;width:74px}
+.ddz.p4 .ddz-mid>.ddz-seat.l{left:4px}
+.ddz.p4 .ddz-mid>.ddz-seat.r{right:4px}
+.ddz.p4 .ddz-slot.t{left:8px;right:8px;top:0;justify-content:center}
+.ddz.p4 .ddz-slot.l{left:80px;right:auto;top:40px;max-width:calc(50% - 82px);justify-content:flex-start;align-items:flex-start}
+.ddz.p4 .ddz-slot.r{right:80px;left:auto;top:40px;max-width:calc(50% - 82px);justify-content:flex-end;align-items:flex-start}
+.ddz.p4 .ddz-slot.r .ddz-plays-col{align-items:flex-end}
+.ddz.p4 .ddz-slot.l .ddz-plays-col{align-items:flex-start}
+.ddz.p4 .ddz-slot .ddz-pill{padding:4px 11px;font-size:13px}
+.ddz-top.p4 .ddz-seat .ddz-nm{margin-top:2px}
+
+/* 大厅：4 个座位 */
+.ddz-lrow{min-height:56px;padding:6px 10px}
+.ddz-lrow .ddz-lav,.ddz-lrow .ddz-lav .avatar{width:44px!important;height:44px!important}
+.ddz-lrow .ddz-empty{width:40px;height:40px}
+.ddz-lobby{gap:8px}
+.ddz-start{min-height:48px}
+.ddz-share{text-align:center;font-size:var(--fs-xs);color:var(--t3);margin-top:-6px}
+
+/* 四人局特效 */
+.ddz-fx{--sz:150px;width:var(--sz);height:var(--sz);margin:calc(var(--sz) / -2) 0 0 calc(var(--sz) / -2)}
+.ddz-fx-img{width:var(--sz);height:var(--sz)}
+.ddz-fx.big{--sz:220px}
+.ddz-fx.big .ddz-fx-t{font-size:30px;bottom:-14px}
+.ddz-fx.king .ddz-fx-t{font-size:38px;color:#fff2b0;text-shadow:0 2px 0 #c2381a,0 0 18px #ff7a2a,0 4px 12px rgba(0,0,0,.6)}
+.ddz-flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 38%,rgba(255,236,160,.85),rgba(255,120,40,.35) 45%,transparent 75%);animation:ddz-flash 1.3s ease-out both}
+@keyframes ddz-flash{0%{opacity:0}12%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.ddz-flash{animation:ddz-fade 1.3s both}}
+.ddz.p4 .ddz-rrow{padding:3px 8px}
+.ddz.p4 .ddz-sheet{gap:8px}
