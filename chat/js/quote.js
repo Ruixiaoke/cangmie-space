@@ -8,7 +8,7 @@ import { poolName, poolOf } from './miniapps/pool.js';
 import { slOf } from './miniapps/sling.js';
 import { tttOf } from './miniapps/ttt.js';
 import { agentName } from './agent/info.js';
-import { S, profileOf, sb } from './state.js';
+import { S, convKey, profileOf, sb } from './state.js';
 import { $, cut, h, sleep, toast } from './utils.js';
 import { convOf, peerFromConv } from './views/chats.js';
 
@@ -77,12 +77,12 @@ function fetchQuotes() {
   var c = S.chat; if (!c) return Promise.resolve();
   var ids = (c.qwant || []).splice(0);
   if (!ids.length) return c.qflight || Promise.resolve();
-  var peer = c.peer;
+  var key = convKey(c);
   var run = (async function () {
     var r;
     try { r = await sb.from('messages').select('id,sender_id,receiver_id,body,author').in('id', ids); }
     catch (e) { r = { error: e }; }
-    if (S.chat !== c || c.peer !== peer) return;
+    if (S.chat !== c || convKey(c) !== key) return;
     if (r.error) { ids.forEach(function (id) { delete c.qpend[id]; }); return; }
     var got = {};
     (r.data || []).forEach(function (x) { got[x.id] = x; });
@@ -101,7 +101,8 @@ function renderQuoteBar() {
 }
 export function startQuote(m) {
   var c = S.chat;
-  if (!c || !m || m.id == null || m.sender_id !== c.peer && m.sender_id !== S.me.id) return false;
+  if (!c || !m || m.id == null || m.author === 'system') return false;
+  if (c.gid == null && m.sender_id !== c.peer && m.sender_id !== S.me.id) return false;
   c.quote = { id: m.id, sender_id: m.sender_id, author: m.author || null, text: (m.author ? String(m.body) : quoteText(m.body)).replace(/\s+/g, ' ').slice(0, 200) };
   renderQuoteBar();
   $('input').focus();
@@ -202,7 +203,7 @@ export function bindSwipeQuote() {
   rows.addEventListener('touchstart', function (ev) {
     if (ev.touches.length !== 1) { release(); return; }
     var row = ev.target.closest ? ev.target.closest('.row') : null;
-    if (!row || !row._m || row._m.id == null || !row._line) return;
+    if (!row || !row._m || row._m.id == null || row._m.author === 'system' || !row._line) return;
     row._line.style.transition = '';
     sw = { el: row, x0: ev.touches[0].clientX, y0: ev.touches[0].clientY, lock: false, dead: false, dx: 0 };
   }, { passive: true });

@@ -1,7 +1,7 @@
 // 进入 / 退出
 
 import { setAuthMode, show, showAuth } from './auth.js';
-import { openChat } from './chat/view.js';
+import { openChat, openGroup } from './chat/view.js';
 import { loadAll, loadProfile } from './data.js';
 import { errText } from './errors.js';
 import { closeApp } from './miniapps/host.js';
@@ -38,10 +38,11 @@ export async function enterApp() {
 }
 function routeFromUrl() {
   var q = new URLSearchParams(location.search);
-  var peer = q.get('peer'), tab = q.get('tab');
-  if (peer || tab) { try { history.replaceState(null, '', location.pathname); } catch (e) { /* 忽略 */ } }
+  var peer = q.get('peer'), tab = q.get('tab'), group = q.get('group');
+  if (peer || tab || group) { try { history.replaceState(null, '', location.pathname); } catch (e) { /* 忽略 */ } }
   if (tab === 'friends' || tab === 'me' || tab === 'chats') showTab(tab);
   if (peer && /^[0-9a-f-]{36}$/i.test(peer)) openChat(peer.toLowerCase());
+  else if (group && /^[0-9]{1,15}$/.test(group)) openGroup(Number(group));
 }
 export async function logout() {
   await pushUnsubscribe();
@@ -53,7 +54,7 @@ export async function logout() {
   showAuth();
 }
 export function resetState() {
-  S.me = null; S.convs = []; S.friendships = []; S.profiles = new Map(); S.chat = null; setSearchState(null); resetQuoteUi(); tttReset(); slReset(); poolReset();
+  S.me = null; S.convs = []; S.groups = []; S.friendships = []; S.profiles = new Map(); S.chat = null; setSearchState(null); resetQuoteUi(); tttReset(); slReset(); poolReset();
   document.title = '藏咩空间';
   try { if (navigator.clearAppBadge) navigator.clearAppBadge(); } catch (e) { /* 忽略 */ }
 }

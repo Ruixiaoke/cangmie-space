@@ -37,6 +37,7 @@ description: 聊天页里「小程序」（井字棋、弹弓大战、9球/8球�
 ```js
 export var xxxV = {
   id: 'xxx',            // 唯一 id，也是 APP.cur.id
+  scope: 'dm',          // 'dm' = 只在私聊里出现（双人游戏）；'group' = 只在群聊里出现。+ 面板和 openApp 都按它过滤，没有一个匹配的工具时 + 按钮会藏起来
   label: '名字',         // + 面板上的字
   icon: 'i-grid',       // SVG 符号 id；或用 img: 'xxx/icon.png'（+ 面板优先用 img）
   run: function () {},  // 点 + 面板按钮：一般是调 RPC 开局，成功后 openApp('xxx', { id })
@@ -52,6 +53,12 @@ export var xxxV = {
 - 新增：写 `miniapps/xxx.js`，在 `registry.js` 的 `listMiniApps()` 加一行。+ 面板和宿主自动读到。
 - 宿主只负责层和布局。尺寸从 CSS 变量 `--app-top` / `--app-bot` / `--app-h` 拿；画布类游戏要监听尺寸变化自己重算（参考 `pool.js` 的布局函数）。
 - `unmount` 里任何异常都被宿主吞掉，所以清理要写对，不能靠报错发现。
+
+## 群聊（groups）
+
+群聊复用同一个聊天页：`S.chat = { peer: null, gid }`（私聊是 `{ peer, gid: null }`），`rowInChat(c, row)` / `convKey(c)`（`state.js`）判断一条消息或异步结果属不属于当前会话，别再直接比 `S.chat.peer`。
+表和函数在 `supabase/migrations/20261202000000_group_chat.sql`：`groups`、`group_members`、`messages.group_id`（群消息 `receiver_id` 为空）、`send_group_message(p_group, p_body, p_reply_to)`、`list_groups()` 等；`author = 'system'` 是系统提示行。
+做群里的多人游戏：`scope: 'group'`，成员和权限看 `group_members`（RLS 里用 `my_group_ids()`），邀请消息用 `send_group_message` 发，群里 `gameKind` 不解析（`row.js` 对群聊一律当普通文字），要显示卡片得单独接。
 
 ## 一局游戏的数据流（以井字棋为例）
 

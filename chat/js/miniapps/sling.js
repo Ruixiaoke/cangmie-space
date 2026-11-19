@@ -131,6 +131,7 @@ var SV = null; // 当前打开的这一局的界面状态
 function slPerson(id) { return tttPerson(id); }
 export var slV = {
   id: 'sling',
+  scope: 'dm',
   label: '弹弓大战',
   img: 'sling/icon-slingshot.png',
   run: function () { slStartHere(); },

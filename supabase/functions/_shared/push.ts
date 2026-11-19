@@ -6,7 +6,7 @@ import webpush from "npm:web-push@3.6.7";
 export const ALLOWED_ORIGINS = ["https://ruixiaoke.github.io"];
 const LOCAL_ORIGIN_RE = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 
-export type Payload = { title: string; body: string; tag: string; peer?: string; tab?: string };
+export type Payload = { title: string; body: string; tag: string; peer?: string; group?: number; tab?: string };
 
 export function corsHeaders(req: Request): Record<string, string> {
   const origin = req.headers.get("Origin") ?? "";

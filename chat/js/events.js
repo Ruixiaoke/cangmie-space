@@ -1,9 +1,11 @@
 // 事件绑定
 
 import { setAuthMode, submitAuth } from './auth.js';
-import { closeChat, loadOlder, openChat, scrollToBottom } from './chat/view.js';
+import { closeChat, loadOlder, openChat, openGroup, scrollToBottom } from './chat/view.js';
 import { bindAtPicker } from './agent/picker.js';
 import { autosize } from './composer.js';
+import { openGroupInfo } from './groups/info.js';
+import { openCreateGroup } from './groups/ui.js';
 import { bindLongPress } from './menu.js';
 import { closeApp, layoutApp } from './miniapps/host.js';
 import { closePanels, setPanel } from './plus.js';
@@ -29,6 +31,14 @@ export function bind() {
     if (history.state && history.state.chat) history.back(); else closeChat();
   });
   window.addEventListener('popstate', function () { if (S.chat) closeChat(); });
+  $('newGroupBtn').addEventListener('click', openCreateGroup);
+  // 群聊：点顶栏的头像和名字打开群信息
+  [$('chatAvatar'), document.querySelector('#chat .who')].forEach(function (el) {
+    el.addEventListener('click', function () { if (S.chat && S.chat.gid != null) openGroupInfo(); });
+  });
+  document.querySelector('#chat .who').addEventListener('keydown', function (ev) {
+    if ((ev.key === 'Enter' || ev.key === ' ') && S.chat && S.chat.gid != null) { ev.preventDefault(); openGroupInfo(); }
+  });
   $('emojiBtn').addEventListener('click', function () { setPanel($('emojiPanel').hidden ? 'emoji' : null); });
   $('plusBtn').addEventListener('click', function () { setPanel($('plusPanel').hidden ? 'plus' : null); });
   $('appClose').addEventListener('click', closeApp);
@@ -59,7 +69,8 @@ export function bind() {
     navigator.serviceWorker.addEventListener('message', function (ev) {
       var d = ev.data || {};
       if (d.type !== 'notification-click' || !S.me) return;
-      if (d.peer && /^[0-9a-f-]{36}$/i.test(d.peer)) { showTab('chats'); openChat(d.peer.toLowerCase()); }
+      if (d.group != null && /^[0-9]{1,15}$/.test(String(d.group))) { showTab('chats'); openGroup(Number(d.group)); }
+      else if (d.peer && /^[0-9a-f-]{36}$/i.test(d.peer)) { showTab('chats'); openChat(d.peer.toLowerCase()); }
       else if (d.tab) { if (S.chat) closeChat(); showTab(d.tab); }
     });
   }

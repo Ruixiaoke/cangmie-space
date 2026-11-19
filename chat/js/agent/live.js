@@ -1,7 +1,8 @@
 // 每位助手分别跟踪最近的任务、实时状态和回复。
 import { fetchLatest, nearBottom, scrollToBottom } from '../chat/view.js';
 import { errText } from '../errors.js';
-import { S, sb } from '../state.js';
+import { S, rowInChat, sb } from '../state.js';
+import { enabledAgents, groupOf } from '../groups/data.js';
 import { $, clear, h, toast } from '../utils.js';
 import { AGENTS, agentName, makeAgentAvatar, mentionedAgents } from './info.js';
 
@@ -102,8 +103,10 @@ function setJob(c, job) {
 export function onAgentJob(event) {
   var job = event && event.new, c = S.chat;
   if (!job || !job.id || !S.me || !c) return;
+  // 群里的任务按群归属（整个群的人都看得到「思考中」）；私聊的任务按对方
+  if (job.group_id != null) { if (c.gid === job.group_id) setJob(c, job); return; }
   var peer = job.asker === S.me.id ? job.peer : job.asker;
-  if (c.peer === peer) setJob(c, job);
+  if (c.gid == null && c.peer === peer) setJob(c, job);
 }
 
 export async function agentResync() {
@@ -111,9 +114,10 @@ export async function agentResync() {
   if (!c || !S.me) return;
   var me = S.me.id, peer = c.peer;
   await Promise.allSettled(AGENTS.map(async function (agent) {
-    var r = await sb.from('agent_jobs').select('*').eq('agent_id', agent.id)
-      .or('and(asker.eq.' + me + ',peer.eq.' + peer + '),and(asker.eq.' + peer + ',peer.eq.' + me + ')')
-      .order('id', { ascending: false }).limit(1);
+    var q = sb.from('agent_jobs').select('*').eq('agent_id', agent.id);
+    q = c.gid != null ? q.eq('group_id', c.gid)
+      : q.or('and(asker.eq.' + me + ',peer.eq.' + peer + '),and(asker.eq.' + peer + ',peer.eq.' + me + ')');
+    var r = await q.order('id', { ascending: false }).limit(1);
     if (S.chat === c && !r.error && r.data && r.data[0]) setJob(c, r.data[0]);
   }));
 }
@@ -128,7 +132,7 @@ async function askOne(row, agent, c) {
   var pending = { local: true, status: 'pending', message_id: row.id, agent_id: agent.id, localAt: Date.now() };
   if (c) setJob(c, pending);
   var r;
-  try { r = await sb.rpc('agent_ask', { p_message: row.id, p_agent_id: agent.id }); } catch (e) { r = { error: e }; }
+  try { r = await sb.rpc(row.group_id != null ? 'agent_ask_group' : 'agent_ask', { p_message: row.id, p_agent_id: agent.id }); } catch (e) { r = { error: e }; }
   if (r.error || !r.data) {
     if (S.chat === c && c && c.agentJobs[agent.id] === pending) {
       delete c.agentJobs[agent.id];
@@ -139,11 +143,11 @@ async function askOne(row, agent, c) {
     return;
   }
   var job = r.data;
-  if (S.chat && S.chat.peer === row.receiver_id) setJob(S.chat, job);
+  if (S.chat && rowInChat(S.chat, row)) setJob(S.chat, job);
   var inv;
   try { inv = await sb.functions.invoke('agent-chat', { body: { job: job.id } }); } catch (e) { inv = { error: e }; }
   if (inv && inv.error) {
-    var current = S.chat && S.chat.peer === row.receiver_id && S.chat.agentJobs[agent.id];
+    var current = S.chat && rowInChat(S.chat, row) && S.chat.agentJobs[agent.id];
     if (current && current.id === job.id && current.status === 'pending') {
       setJob(S.chat, Object.assign({}, current, { status: 'failed', error: 'invoke_failed' }));
     }
@@ -153,6 +157,13 @@ async function askOne(row, agent, c) {
 
 export async function askAgent(row) {
   if (!S.me || row.sender_id !== S.me.id) return;
-  var c = S.chat && S.chat.peer === row.receiver_id ? S.chat : null;
-  await Promise.all(mentionedAgents(row.body).map(function (agent) { return askOne(row, agent, c); }));
+  var c = S.chat && rowInChat(S.chat, row) ? S.chat : null;
+  var agents = mentionedAgents(row.body);
+  if (row.group_id != null) {
+    // 群里：助手要先在群设置里打开；没打开的只提示，不去叫（不调用后端）
+    var on = enabledAgents(groupOf(row.group_id));
+    agents.filter(function (a) { return !on.some(function (x) { return x.id === a.id; }); }).forEach(function (a) { toast('先在群设置里打开' + a.name); });
+    agents = agents.filter(function (a) { return on.some(function (x) { return x.id === a.id; }); });
+  }
+  await Promise.all(agents.map(function (agent) { return askOne(row, agent, c); }));
 }

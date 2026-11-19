@@ -10,7 +10,8 @@ import { firePush } from './notify.js';
 import { closePanels } from './plus.js';
 import { clearQuote } from './quote.js';
 import { applyOwnToConv } from './realtime.js';
-import { S, sb } from './state.js';
+import { S, rowInChat, sb } from './state.js';
+import { dropGroup, groupOf } from './groups/data.js';
 import { popCheer } from './mascot.js';
 import { $, lsGet, lsSet, toast } from './utils.js';
 
@@ -29,7 +30,7 @@ export async function sendCurrent() {
 }
 export function sendBody(body) {
   var c = S.chat; if (!c) return;
-  var m = { key: 't' + (++S.tempSeq), seq: S.tempSeq, id: null, sender_id: S.me.id, receiver_id: c.peer, body: body, created_at: new Date().toISOString(), read_at: null, reply_to: c.quote ? c.quote.id : null, status: 'sending' };
+  var m = { key: 't' + (++S.tempSeq), seq: S.tempSeq, id: null, sender_id: S.me.id, receiver_id: c.peer, group_id: c.gid, body: body, created_at: new Date().toISOString(), read_at: null, reply_to: c.quote ? c.quote.id : null, status: 'sending' };
   if (c.quote) clearQuote();
   c.msgs.push(m);
   renderMsgs({ stick: true });
@@ -40,19 +41,21 @@ async function doSend(m) {
   var c = S.chat;
   m.status = 'sending';
   var r;
-  var args = { p_peer: m.receiver_id, p_body: m.body };
+  var isG = m.group_id != null;
+  var args = isG ? { p_group: m.group_id, p_body: m.body } : { p_peer: m.receiver_id, p_body: m.body };
   if (m.reply_to != null) args.p_reply_to = m.reply_to; // 不引用时保持旧的两参数调用
-  try { r = await sb.rpc('send_message', args); }
+  try { r = await sb.rpc(isG ? 'send_group_message' : 'send_message', args); }
   catch (e) { r = { error: e }; }
   if (r.error) {
     m.status = 'failed';
-    if (S.chat && S.chat.peer === m.receiver_id) renderMsgs({ stick: false });
+    if (S.chat && rowInChat(S.chat, m)) renderMsgs({ stick: false });
     if (r.error.message === 'not_friends') toast(ERR_TEXT.not_friends);
-    if (r.error.message === 'invalid_reply') { m.reply_to = null; m.reply_gone = true; toast(ERR_TEXT.invalid_reply); if (S.chat && S.chat.peer === m.receiver_id) renderMsgs({ stick: false }); }
+    if (r.error.message === 'not_group_member') { toast(ERR_TEXT.not_group_member); if (groupOf(m.group_id)) dropGroup(m.group_id, true); }
+    if (r.error.message === 'invalid_reply') { m.reply_to = null; m.reply_gone = true; toast(ERR_TEXT.invalid_reply); if (S.chat && rowInChat(S.chat, m)) renderMsgs({ stick: false }); }
     return;
   }
   var row = r.data;
-  var cc = S.chat && S.chat.peer === m.receiver_id ? S.chat : null;
+  var cc = S.chat && rowInChat(S.chat, m) ? S.chat : null;
   if (cc) {
     if (cc.ids.has(row.id)) {
       // 实时推送比 RPC 返回先到：丢掉乐观的那条

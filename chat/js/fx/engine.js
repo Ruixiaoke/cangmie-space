@@ -45,7 +45,8 @@ function runFx(m, token, replay) {
   return new Promise(function (done) {
     var c = S.chat, fx = fxOf(m.body), p = fxParse(m.body);
     var own = m.sender_id === S.me.id;
-    var other = own ? m.receiver_id : m.sender_id;
+    var grp = m.receiver_id == null; // 群聊：目标是被指定的那条消息的发送者；没指定就是「大家」
+    var other = grp ? m.sender_id : own ? m.receiver_id : m.sender_id;
     var otherP = profileOf(other) || (convOf(other) ? peerFromConv(convOf(other)) : null);
     // 我发的：喷对方的头像；对方发的：喷我的头像
     var target = own ? otherP : S.me;
@@ -54,6 +55,14 @@ function runFx(m, token, replay) {
     var st = $('fxStage');
     clear(st);
     var cap = (own ? fx.own : fx.peer).replace('{n}', nameOf(other));
+    if (grp) {
+      var tm = p.tid != null && c ? c.msgs.find(function (x) { return x.id === p.tid; }) : null;
+      var tuid = tm && tm.sender_id !== m.sender_id ? tm.sender_id : null;
+      var tname = tuid ? (tuid === S.me.id ? '你' : nameOf(tuid)) : '大家';
+      cap = own ? fx.own.replace('{n}', tname === '你' ? '自己' : tname) : fx.peer.replace('你', tname).replace('{n}', nameOf(m.sender_id));
+      target = tuid ? (profileOf(tuid) || S.me) : S.me;
+      otherP = target;
+    }
     if (mode === 'battle') cap = '你和 ' + nameOf(other) + ' 的' + fx.name + '对战';
     var av = null;
     if (mode !== 'battle') { av = makeAvatar(target, 116); st.appendChild(h('div', { class: 'fx-av' }, av)); }
