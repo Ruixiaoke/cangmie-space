@@ -25,6 +25,7 @@ const A = "00000000-0000-0000-0000-00000000000a";
 const B = "00000000-0000-0000-0000-00000000000b";
 const C = "00000000-0000-0000-0000-00000000000c"; // 群成员，旁观
 const X = "00000000-0000-0000-0000-0000000000ff"; // 不在群里
+const D = "00000000-0000-0000-0000-00000000000d"; // 群成员
 
 type Fake = {
   store: Store;
@@ -36,32 +37,36 @@ type Fake = {
   commits: Commit[];
   failCommits: number; // 接下来这么多次 commit 报告版本冲突
   clock: { t: number };
+  unfriended: boolean; // 私聊桌：好友关系已经结束
 };
 
-function fake(seats: (string | null)[], bots: boolean[], status: GameRow["status"] = "waiting"): Fake {
+function fake(seats0: (string | null)[], bots0: boolean[], status: GameRow["status"] = "waiting", dm = false): Fake {
+  const seats = seats0.length === 3 ? [...seats0, null] : seats0;
+  const bots = bots0.length === 3 ? [...bots0, false] : bots0;
   const f: Fake = {
-    games: new Map(), states: new Map(), hands: new Map(), scores: new Map(), lines: [], commits: [], failCommits: 0, clock: { t: Date.parse("2030-01-01T00:00:00Z") },
+    games: new Map(), states: new Map(), hands: new Map(), scores: new Map(), lines: [], commits: [], failCommits: 0, unfriended: false, clock: { t: Date.parse("2030-01-01T00:00:00Z") },
     store: null as unknown as Store,
   };
-  f.games.set(1, { id: 1, group_id: GROUP, created_by: A, message_id: 5, status, seats, bots, auto: [false, false, false], round: 0, pub: {}, deadline: null, version: 3 });
+  const [lo, hi] = A < B ? [A, B] : [B, A];
+  f.games.set(1, { id: 1, group_id: dm ? null : GROUP, dm_lo: dm ? lo : null, dm_hi: dm ? hi : null, created_by: A, message_id: 5, status, seats, bots, auto: [false, false, false, false], round: 0, pub: {}, deadline: null, version: 3 });
   f.store = {
     getGame: (id) => Promise.resolve(f.games.has(id) ? structuredClone(f.games.get(id)!) : null),
     getState: (id) => Promise.resolve(f.states.has(id) ? structuredClone(f.states.get(id)!) : null),
-    isMember: (g, u) => Promise.resolve(g === GROUP && [A, B, C].includes(u)),
+    canAccess: (r, u) => Promise.resolve(r.group_id != null ? r.group_id === GROUP && [A, B, C, D].includes(u) : (f.unfriended ? false : u === r.dm_lo || u === r.dm_hi)),
     names: (ids) => Promise.resolve(Object.fromEntries(ids.map((i) => [i, i === A ? "阿杰" : i === B ? "小明" : "好友"]))),
     groupName: () => Promise.resolve("牌友"),
     commit: (c) => {
       if (f.failCommits > 0) { f.failCommits--; return Promise.resolve(false); }
       const g = f.games.get(c.game)!;
       if (g.version !== c.version) return Promise.resolve(false);
-      f.games.set(c.game, { ...g, status: c.patch.status as GameRow["status"], pub: c.patch.pub, auto: c.patch.auto, round: c.patch.round, deadline: c.patch.deadline, version: g.version + 1 });
+      f.games.set(c.game, { ...g, status: c.patch.status as GameRow["status"], pub: c.patch.pub, auto: c.patch.auto, round: c.patch.round, deadline: c.patch.deadline, version: g.version + 1, ...(c.patch.seats ? { seats: c.patch.seats, bots: c.patch.bots! } : {}) });
       f.states.set(c.game, structuredClone(c.state));
       for (const h of c.hands) f.hands.set(c.game + ":" + h.seat, structuredClone(h));
       for (const s of c.scores) {
         const o = f.scores.get(s.user_id) ?? { delta: 0, games: 0, wins: 0 };
         f.scores.set(s.user_id, { delta: o.delta + s.delta, games: o.games + 1, wins: o.wins + (s.win ? 1 : 0) });
       }
-      if (c.line) f.lines.push({ group: g.group_id, actor: c.actor!, body: c.line });
+      if (c.line) f.lines.push({ group: g.group_id!, actor: c.actor!, body: c.line });
       f.commits.push(c);
       return Promise.resolve(true);
     },
@@ -113,9 +118,7 @@ Deno.test("start: one human + two bots, deals secretly and waits for the human",
 });
 
 Deno.test("start: validation (not full, not seated, not a member, bad phase) and push to other humans only", async () => {
-  let f = fake([A, null, null], [false, true, false]);
-  eq((await call(f, A, { action: "start" })).body, { error: "not_full" });
-  f = fake([A, B, null], [false, false, true]);
+  let f = fake([A, B, null], [false, false, true]);
   eq((await call(f, C, { action: "start" })).body, { error: "not_seated" });
   eq((await call(f, X, { action: "start" })).status, 403);
   eq((await call(f, X, { action: "start" })).body, { error: "not_group_member" });
@@ -232,7 +235,7 @@ Deno.test("tick: rejected before the deadline, auto-plays after it", async () =>
   assert(row(f).version === v + 1 && st(f).g.log.length > log);
   eq(st(f).g.log[log].seat, 0, "the first auto move is for the timed-out seat");
   eq(st(f).misses, [1, 0, 0]);
-  eq(row(f).auto, [false, false, false]);
+  eq(row(f).auto, [false, false, false, false]);
   // 新的截止时间从现在算起（叫分 20 秒，出牌 30 秒）
   const want = st(f).g.phase === "bidding" ? BID_MS : PLAY_MS;
   eq(row(f).deadline, new Date(f.clock.t + want).toISOString());
@@ -278,15 +281,15 @@ Deno.test("auto_off and acting both clear 托管 (direct state)", async () => {
   await call(f, A, { action: "start" }, 31);
   // 手动把 A 设成托管（模拟两次超时之后）
   const g = row(f);
-  g.auto = [true, false, false];
+  g.auto = [true, false, false, false];
   const s = st(f);
   s.misses = [2, 0, 0];
   eq((await call(f, C, { action: "auto_off" })).body, { error: "not_seated" }); // 旁观者不能替别人取消
   eq((await call(f, A, { action: "auto_off" })).status, 200);
-  eq(row(f).auto, [false, false, false]);
+  eq(row(f).auto, [false, false, false, false]);
   eq(st(f).misses, [0, 0, 0]);
   // 已经解除后，再出牌 / 叫分照常（一次真实操作也会清零）
-  g.auto = [true, false, false];
+  g.auto = [true, false, false, false];
   if (st(f).g.turn === 0 || true) {
     // 找到轮到 A 的时刻再操作
     let guard = 0;
@@ -383,10 +386,10 @@ Deno.test("rematch: same seats, new deal, first bidder rotates, hands and auto r
 Deno.test("the loop of bots is bounded and a fully automatic table finishes in one commit", async () => {
   // 一个真人坐着，但已经托管：三家都是机器 -> 一次 start 之后（真人是 auto）整局直接打完
   const f = fake([A, null, null], [false, true, true]);
-  f.games.get(1)!.auto = [false, false, false];
+  f.games.get(1)!.auto = [false, false, false, false];
   eq((await call(f, A, { action: "start" }, 17)).status, 200);
   // 让 A 变成托管，再 tick：整局自己打完
-  f.games.get(1)!.auto = [true, false, false];
+  f.games.get(1)!.auto = [true, false, false, false];
   f.clock.t = Date.parse(row(f).deadline!) + TICK_GRACE_MS + 1;
   const r = await call(f, C, { action: "tick" });
   eq(r.status, 200);
@@ -402,4 +405,184 @@ Deno.test("bot names are numbered by seat order", () => {
 
 Deno.test("hints helper sanity (engine reachable from tests)", () => {
   assert(Array.isArray(hints([0, 1, 2, 3], null)));
+});
+
+// ======================= 4 个座位、自动补机器人、私聊桌 =======================
+const seatsOf = (f: Fake) => ({ seats: row(f).seats, bots: row(f).bots });
+
+Deno.test("start with 1 human and no bots auto-fills 2 bots (3 players)", async () => {
+  const f = fake([A, null, null, null], [false, false, false, false]);
+  const r = await call(f, A, { action: "start" }, 5);
+  eq(r.status, 200);
+  eq(seatsOf(f), { seats: [A, null, null, null], bots: [false, true, true, false] });
+  eq(st(f).g.players, 3);
+  eq(st(f).g.hands.length, 3);
+  eq((r.body.game as { pub: { handCounts: number[] } }).pub.handCounts.length, 3);
+  eq((r.body.game as { bots: boolean[] }).bots, [false, true, true, false]);
+  eq(r.body.seat, 0);
+});
+
+Deno.test("start with 2 humans and 1 bot is a 3-player game; 2 humans and 2 bots is 4-player", async () => {
+  let f = fake([A, B, null, null], [false, false, true, false]);
+  eq((await call(f, A, { action: "start" }, 6)).status, 200);
+  eq(st(f).g.players, 3);
+  eq([...f.hands.keys()].sort(), ["1:0", "1:1"]);
+  // 2 个真人，没有机器人：补 1 个，3 人局
+  f = fake([A, B, null, null], [false, false, false, false]);
+  eq((await call(f, B, { action: "start" }, 6)).status, 200);
+  eq(seatsOf(f), { seats: [A, B, null, null], bots: [false, false, true, false] });
+  eq(st(f).g.players, 3);
+  // 2 个真人 + 2 个机器人：4 人局，108 张牌，25 张一人
+  f = fake([A, B, null, null], [false, false, true, true]);
+  const r = await call(f, A, { action: "start" }, 7);
+  eq(r.status, 200);
+  eq(st(f).g.players, 4);
+  eq(st(f).g.hands.map((h: number[]) => h.length).reduce((a: number, b: number) => a + b, 0) + st(f).g.bottom.length, 108);
+  eq(st(f).g.hands.length, 4);
+  eq((r.body.game as { pub: { handCounts: number[] } }).pub.handCounts.length, 4);
+  eq(f.hands.get("1:0")!.cards.length >= 25, true);
+});
+
+Deno.test("start with 3 humans and 1 bot is 4-player; 3 humans alone is 3-player", async () => {
+  let f = fake([A, B, C, null], [false, false, false, true]);
+  eq((await call(f, A, { action: "start" }, 8)).status, 200);
+  eq(st(f).g.players, 4);
+  eq([...f.hands.keys()].sort(), ["1:0", "1:1", "1:2"]);
+  f = fake([A, B, C, null], [false, false, false, false]);
+  eq((await call(f, A, { action: "start" }, 8)).status, 200);
+  eq(st(f).g.players, 3);
+  eq(seatsOf(f), { seats: [A, B, C, null], bots: [false, false, false, false] });
+  // 4 个真人
+  f = fake([A, B, C, D], [false, false, false, false]);
+  eq((await call(f, D, { action: "start" }, 8)).status, 200);
+  eq(st(f).g.players, 4);
+  eq([...f.hands.keys()].sort(), ["1:0", "1:1", "1:2", "1:3"]);
+});
+
+Deno.test("start compacts seats so the engine sees contiguous seats, hands follow the new seats", async () => {
+  // A 在 3 号位，B 在 1 号位，机器人在 2 号位：压紧成 B, 机器人, A
+  const f = fake([null, B, null, A], [false, false, true, false]);
+  const r = await call(f, A, { action: "start" }, 9);
+  eq(r.status, 200);
+  eq(seatsOf(f), { seats: [B, null, A, null], bots: [false, true, false, false] });
+  eq(r.body.seat, 2);
+  eq(f.hands.get("1:0")!.user_id, B);
+  eq(f.hands.get("1:2")!.user_id, A);
+  eq(st(f).g.players, 3);
+  // 这一局的 pub 里别人的牌只有张数
+  const pub = JSON.stringify(row(f).pub);
+  for (const h of st(f).g.hands) assert(!pub.includes(JSON.stringify(h)));
+  eq(row(f).pub.players, 3);
+});
+
+Deno.test("start with a bot only table (no human) is rejected; a spectator cannot start", async () => {
+  let f = fake([null, null, null, null], [true, true, false, false]);
+  eq((await call(f, A, { action: "start" })).body, { error: "not_seated" });
+  f = fake([A, null, null, null], [false, false, false, false]);
+  eq((await call(f, C, { action: "start" })).body, { error: "not_seated" });
+});
+
+Deno.test("4p: full game with bots ends with 108-card conservation, 4 hands and scores summing to zero", async () => {
+  const f = fake([A, B, null, null], [false, false, true, true]);
+  let r = await call(f, A, { action: "start" }, 10);
+  eq(r.status, 200);
+  let guard = 0;
+  while (row(f).status !== "over" && guard++ < 300) {
+    const g = st(f).g;
+    const seat = g.turn as number;
+    const u = row(f).seats[seat]!;
+    assert(u === A || u === B, "a human must be on turn");
+    const a = botAction(g, seat);
+    const body = a.kind === "bid" ? { action: "bid", value: a.value } : a.kind === "play" ? { action: "play", cards: a.cards } : { action: "pass" };
+    r = await call(f, u, body, 11 + guard);
+    eq(r.status, 200, JSON.stringify(r.body));
+  }
+  eq(row(f).status, "over");
+  const g = st(f).g;
+  eq(g.hands.length, 4);
+  eq(g.hands.flat().length + g.played.flat().length, 108);
+  eq(g.scores.length, 4);
+  eq(g.scores.reduce((a: number, b: number) => a + b, 0), 0);
+  eq(g.scores.map((x: number) => Math.abs(x)).sort((a: number, b: number) => a - b)[3] >= 3, true);
+  // 系统提示行：群里写一条，只有真人的积分
+  eq(f.lines.length, 1);
+  assert(f.lines[0].body.startsWith("斗地主：") && f.lines[0].body.includes(g.multiplier + " 倍"));
+  if (g.winner === "farmers") assert(f.lines[0].body.includes("农民") && f.lines[0].body.split("、").length >= 2);
+  eq([...f.scores.keys()].sort(), [A, B]);
+  eq(row(f).pub.finalHands.length, 4);
+  // 再来一局：同样的座位和人数，先手轮转
+  const before = st(f).first;
+  r = await call(f, B, { action: "rematch" }, 99);
+  eq(r.status, 200);
+  eq(st(f).g.players, 4);
+  eq(st(f).first, (before + 1) % 4);
+  eq(seatsOf(f), { seats: [A, B, null, null], bots: [false, false, true, true] });
+  eq(row(f).round, 2);
+});
+
+Deno.test("DM table: 3p with 1 bot, members only, no system line, scores kept, push goes to the peer by id", async () => {
+  const f = fake([A, B, null, null], [false, false, false, false], "waiting", true);
+  const pushes: { to: string; p: { title: string; peer?: string; group?: number } }[] = [];
+  eq((await call(f, C, { action: "start" })).body, { error: "not_friends" }); // 同群但不是这对好友
+  eq((await call(f, C, { action: "start" })).status, 403);
+  eq((await call(f, X, { action: "bid", value: 1 })).status, 403);
+  const r = await call(f, A, { action: "start" }, 21, (u, p) => { pushes.push({ to: u, p }); return Promise.resolve(); });
+  eq(r.status, 200);
+  eq(st(f).g.players, 3);
+  eq(seatsOf(f), { seats: [A, B, null, null], bots: [false, false, true, false] });
+  eq(pushes.length, 1);
+  eq(pushes[0].to, B);
+  eq(pushes[0].p.peer, A);
+  eq(pushes[0].p.group, undefined);
+  eq(pushes[0].p.title, "阿杰");
+  // 打完：没有系统提示行，但积分写了
+  let guard = 0;
+  while (row(f).status !== "over" && guard++ < 300) {
+    const g = st(f).g;
+    const seat = g.turn as number;
+    const u = row(f).seats[seat]!;
+    const a = botAction(g, seat);
+    const body = a.kind === "bid" ? { action: "bid", value: a.value } : a.kind === "play" ? { action: "play", cards: a.cards } : { action: "pass" };
+    eq((await call(f, u, body, 100 + guard)).status, 200);
+  }
+  eq(row(f).status, "over");
+  eq(f.lines.length, 0);
+  eq([...f.scores.keys()].sort(), [A, B]);
+  // 好友关系结束后谁也不能再操作
+  f.unfriended = true;
+  eq((await call(f, A, { action: "rematch" })).status, 403);
+  eq((await call(f, B, { action: "rematch" })).body, { error: "not_friends" });
+});
+
+Deno.test("DM table: 4p with 2 bots ends cleanly and a non-member cannot tick", async () => {
+  const f = fake([A, B, null, null], [false, false, true, true], "waiting", true);
+  eq((await call(f, A, { action: "start" }, 30)).status, 200);
+  eq(st(f).g.players, 4);
+  f.games.get(1)!.auto = [true, true, true, true];
+  f.clock.t = Date.parse(row(f).deadline!) + TICK_GRACE_MS + 1;
+  eq((await call(f, X, { action: "tick" })).status, 403);
+  const r = await call(f, A, { action: "tick" });
+  eq(r.status, 200);
+  eq(row(f).status, "over");
+  eq(st(f).g.hands.flat().length + st(f).g.played.flat().length, 108);
+  eq(f.lines.length, 0);
+});
+
+Deno.test("existing 3-player live tables (state without players field) keep working", async () => {
+  const f = fake([A, B, null], [false, false, true]);
+  await call(f, A, { action: "start" }, 40);
+  const d = st(f);
+  delete d.g.players; // 升级前存下来的状态没有这个字段
+  delete (row(f).pub as { players?: number }).players;
+  let guard = 0;
+  while (row(f).status !== "over" && guard++ < 300) {
+    const g = st(f).g;
+    const seat = g.turn as number;
+    const u = row(f).seats[seat]!;
+    const a = botAction(g, seat);
+    const body = a.kind === "bid" ? { action: "bid", value: a.value } : a.kind === "play" ? { action: "play", cards: a.cards } : { action: "pass" };
+    eq((await call(f, u, body, 200 + guard)).status, 200);
+  }
+  eq(row(f).status, "over");
+  eq(st(f).g.hands.length, 3);
 });
