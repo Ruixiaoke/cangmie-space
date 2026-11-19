@@ -81,7 +81,7 @@ export function updateRow(el, m, prev) {
   if (el._body !== bsig) {
     el._body = bsig;
     var fx = pf && pf.fx;
-    var gk = agent || sys ? null : grp ? ddzKind(m.body) : gameKind(m.body), gid = gk ? gk.id : null; // 群里只有斗地主是卡片，其余小游戏的邀请消息当普通文字；私聊里斗地主的邀请消息是普通文字
+    var gk = agent || sys ? null : grp ? ddzKind(m.body) : (gameKind(m.body) || ddzKind(m.body)), gid = gk ? gk.id : null; // 群里只有斗地主是卡片，其余小游戏的邀请消息当普通文字；私聊里是井字棋 / 弹弓 / 台球 / 斗地主的卡片
     el._gcid = gid; el._gkind = gk ? gk.k : null; el._gsig = null; // 井字棋卡片：不是文字气泡，不套状态装饰
     el._fxb = !!fx || gid != null;
     el._bubble.classList.toggle('fx', !!fx);

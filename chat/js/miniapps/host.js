@@ -62,7 +62,7 @@ export function layoutApp() {
 export function openApp(id, params) {
   var def = getMiniApp(id);
   if (!def || !S.chat) return false;
-  if (def.scope !== (S.chat.gid != null ? 'group' : 'dm')) return false; // 私聊的小游戏不能在群里开，反过来也一样
+  if (def.scope !== 'any' && def.scope !== (S.chat.gid != null ? 'group' : 'dm')) return false; // 私聊的小游戏不能在群里开，反过来也一样；scope 'any' 两边都能开
   params = params || {};
   if (APP.cur) {
     if (APP.cur.id === id && def.same && def.same(APP.cur.params, params)) return true; // 已经开着：保持

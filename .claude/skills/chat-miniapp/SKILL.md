@@ -37,7 +37,7 @@ description: 聊天页里「小程序」（井字棋、弹弓大战、9球/8球�
 ```js
 export var xxxV = {
   id: 'xxx',            // 唯一 id，也是 APP.cur.id
-  scope: 'dm',          // 'dm' = 只在私聊里出现（双人游戏）；'group' = 只在群聊里出现。+ 面板和 openApp 都按它过滤，没有一个匹配的工具时 + 按钮会藏起来
+  scope: 'dm',          // 'dm' = 只在私聊里出现（双人游戏）；'group' = 只在群聊里出现；'any' = 私聊和群聊都有（斗地主）。+ 面板和 openApp 都按它过滤，没有一个匹配的工具时 + 按钮会藏起来
   label: '名字',         // + 面板上的字
   icon: 'i-grid',       // SVG 符号 id；或用 img: 'xxx/icon.png'（+ 面板优先用 img）
   run: function () {},  // 点 + 面板按钮：一般是调 RPC 开局，成功后 openApp('xxx', { id })
@@ -129,8 +129,12 @@ putGame：updated_at 更旧的不覆盖新的 → 刷新所有卡片 → 如果�
 4. 审过后直接 push 并 `gh pr create`（不用问），多个 PR 有依赖时写明合并顺序。合并由用户来做。合并后看部署工作流（前端 Pages、后端迁移和 Edge Function）是否成功，再清理 worktree 和本地分支。
 5. 汇报里写清楚没测到的部分：真机、真实实时同步、推送、两台设备对打。
 
-## 斗地主（群聊里的三人游戏，`scope: 'group'`）
+## 斗地主（群聊和私聊里的三人 / 四人游戏，`scope: 'any'`）
 
-- 前端 `miniapps/ddz.js`（缓存、卡片、实时、开桌）+ `ddz-view.js`（牌桌界面和日志回放）+ `ddz-token.js`（`[斗地主]#id` 识别，群聊里才是卡片，私聊里是普通文字）+ `ddz-rules.js`（规则引擎，浏览器和服务器共用，`supabase/functions/ddz/gen-rules.py` 复制成 `rules.gen.js`）。
-- 后端：大厅在 SQL（`ddz_open / ddz_sit / ddz_stand / ddz_set_bot`），叫分 / 出牌 / 开始 / 超时托管 / 结算在 Edge Function `ddz`（`game.ts` 可测，`ddz_commit` 原子写）。手牌在 `ddz_state`（无任何用户权限）里，每个真人只能读 `ddz_hands` 里自己的那行；`ddz_games.pub` 里别人的手牌只有张数。
-- 测试：`supabase/tests/doudizhu_test.sql`、`supabase/functions/ddz/game_test.ts`；Playwright 的假 Supabase 可以把 `game.ts` 用 `deno bundle` 打包后在页面里跑真实的服务器逻辑。
+- 前端 `miniapps/ddz.js`（缓存、卡片、实时、开桌）+ `ddz-view.js`（牌桌界面和日志回放）+ `ddz-token.js`（`[斗地主]#id` 识别，群聊和私聊里都是卡片；其他三个游戏的邀请消息在群里还是普通文字）+ `ddz-rules.js`（规则引擎，浏览器和服务器共用，`supabase/functions/ddz/gen-rules.py` 复制成 `rules.gen.js`）。
+- 座位：一桌 4 个座位槽。开始时服务器数一下坐了几个（真人 + 机器人）：不够 3 个就往空位补机器人补到 3 个；3 个是三人局，4 个是四人局（`pub.players`）。座位按顺序压紧（0..n-1 就是出牌顺序），之后引擎座位 = 座位槽；再来一局保持座位和人数。开始按钮的文案要写清楚：「开始（三人局，补 N 个机器人）」「开始（三人局）」「开始（四人局）」。
+- 四人局规则（两副牌 108 张，牌编码 0..107，`base = c % 54`，每人 25 张 + 8 张底牌；没有三带一 / 飞机带单 / 四带二；炸弹 4 到 8 张，张数多的大；天王炸 = 四张王）写在 `ddz-rules.js` 顶部的注释里。`classify / beats / hints` 的可选最后一个参数 `rules`（4 或带 `players` 的状态）决定变体，不传就是三人局。
+- 桌子属于一个群（`group_id`）或一对好友（`dm_lo < dm_hi`，二选一）。私聊桌：`ddz_open_dm(p_peer)` 开桌并给对方发 `[斗地主]#id` 普通私聊消息；权限是这两个人且还是 accepted 好友（`ddz_pair_access`，RLS 和 Edge Function 都按这个）；好友关系结束时触发器关桌。累计积分群里按 `(group_id, user_id)`，私聊按 `(dm_lo, dm_hi, user_id)`（两个部分唯一索引）。私聊里对局结束不写系统提示行（私聊里没有系统作者）。
+- 实时：`ddz_games` 订阅用 `id=gt.0`（私聊桌的 `group_id` 是空的），`ddz_scores` 群用 `group_id=gt.0`、私聊用 `dm_lo` / `dm_hi` 各一条。
+- 后端：大厅在 SQL（`ddz_open / ddz_open_dm / ddz_sit / ddz_stand / ddz_set_bot`），开始（补机器人、压座位）/ 叫分 / 出牌 / 超时托管 / 结算在 Edge Function `ddz`（`game.ts` 可测，`ddz_commit` 原子写，patch 里可选的 `seats / bots` 只在开始时带）。手牌在 `ddz_state`（无任何用户权限）里，每个真人只能读 `ddz_hands` 里自己的那行；`ddz_games.pub` 里别人的手牌只有张数。
+- 测试：`supabase/tests/doudizhu_test.sql`、`supabase/tests/ddz_4p_dm_test.sql`、`supabase/functions/ddz/{rules_test,game_test}.ts`；Playwright 的假 Supabase 可以把 `game.ts` 用 `deno bundle -o x.js game.ts` 打包后在页面里跑真实的服务器逻辑（私聊里的另一个真人用 `__ddzAs(uid, body)` 和机器人动作替他操作；沙箱里不能起 http 服务时，用 `page.route('http://localhost:8765/**')` 直接从工作树读文件）。

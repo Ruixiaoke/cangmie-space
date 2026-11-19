@@ -39,7 +39,7 @@ export var ERR_TEXT = {
   invalid_cue: '白球不能放在这里',
   table_not_found: '找不到这桌斗地主',
   table_not_waiting: '牌局已经开始了',
-  table_exists: '这个群已经有一桌了，先去那一桌吧',
+  table_exists: '已经有一桌了，先去那一桌吧',
   seat_taken: '这个座位已经有人了',
   invalid_seat: '操作无效',
   not_a_bot: '这个座位不是机器人',

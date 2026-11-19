@@ -16,7 +16,7 @@ import { convOf, peerFromConv } from './views/chats.js';
 // ===== 引用回复 =====
 // 入口：startQuote(m)，m 是当前聊天 msgs 里的一条消息（长按菜单的"引用"直接调用它）
 function quoteText(body) {
-  if (S.chat && S.chat.gid != null && ddzOf(body) != null) return '斗地主';
+  if (ddzOf(body) != null) return '斗地主';
   if (tttOf(body) != null) return '井字棋';
   if (slOf(body) != null) return '弹弓大战';
   if (poolOf(body) != null) return poolName(body);

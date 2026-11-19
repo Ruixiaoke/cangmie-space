@@ -1,4 +1,5 @@
 // 斗地主牌桌界面：大厅 / 叫分 / 出牌 / 倒计时 / 特效 / 结算（数据和网络在 ddz.js，规则在 ddz-rules.js）
+// 三人局和四人局（两副牌，pub.players = 4）共用一套界面：四人局对手在左 / 上 / 右，底牌 8 张，手牌最多 33 张（两排，必要时三排）。
 //
 // 服务器给的是「整局的日志」（pub.log）：这里把新增的日志一条一条回放（约 700ms 一条），
 // 自己刚做的那一手立刻显示，机器人和别人的动作逐个出现，所以看得清楚。界面上显示的是回放出来的状态 D，不是服务器的最终状态。
@@ -38,9 +39,10 @@ function botAvatar(size) {
 // 一张牌（CSS 画的牌面）：左上角点数 + 花色，中间大花色；王竖排文字
 export function cardEl(c, cls) {
   var el = h('div', { class: 'ddz-card ' + (cls || '') });
-  if (c >= 52) {
-    el.classList.add('joker', c === 53 ? 'red' : 'black');
-    el.appendChild(h('span', { class: 'jk', text: c === 53 ? '大王' : '小王' }));
+  var base = c % 54; // 两副牌：第二副的牌编码 +54
+  if (base >= 52) {
+    el.classList.add('joker', base === 53 ? 'red' : 'black');
+    el.appendChild(h('span', { class: 'jk', text: base === 53 ? '大王' : '小王' }));
     el.appendChild(h('span', { class: 'jk-s', text: '★' }));
   } else {
     var s = SUITS[suitOf(c)];
@@ -59,45 +61,51 @@ function backEl(cls) {
   return el;
 }
 function nowMs() { return Date.now(); }
+function fill(n, v) { var a = []; for (var i = 0; i < n; i++) a.push(v); return a; }
+var NUM = ['', '', '', '', '', '五', '六', '七', '八'];
 
 function newD(pub) {
-  return { round: pub.round, logLen: 0, last: [null, null, null], lastPlay: null, passCount: 0, counts: [17, 17, 17], landlord: null, bottom: null, turn: pub.first, bid: 0, bombs: 0, phase: 'bidding', notice: '' };
+  var n = pub.players === 4 ? 4 : 3, per = n === 4 ? 25 : 17;
+  return { n: n, per: per, round: pub.round, logLen: 0, last: fill(n, null), lastPlay: null, passCount: 0, counts: fill(n, per), landlord: null, bottom: null, turn: pub.first, bid: 0, bombs: 0, phase: 'bidding', notice: '' };
 }
 // 把一条日志应用到显示状态 D；返回需要播的特效
 function applyEntry(D, e, pub) {
-  var fx = null;
+  var fx = null, n = D.n, rules = { players: n };
   D.logLen++;
   D.notice = '';
   if (e.kind === 'bid') {
     D.last[e.seat] = { t: 'bid', v: e.value };
     if (e.value > 0) D.bid = e.value;
-    D.turn = (e.seat + 1) % 3;
+    D.turn = (e.seat + 1) % n;
   } else if (e.kind === 'landlord') {
     D.landlord = e.seat; D.phase = 'playing'; D.bid = e.value;
-    D.counts[e.seat] += 3;
+    D.counts[e.seat] += n === 4 ? 8 : 3;
     D.bottom = pub.bottom ? pub.bottom.slice() : null;
-    D.last = [null, null, null]; D.lastPlay = null; D.passCount = 0;
+    D.last = fill(n, null); D.lastPlay = null; D.passCount = 0;
     D.turn = e.seat;
   } else if (e.kind === 'play') {
-    if (!D.lastPlay) D.last = [null, null, null];
-    var info = classify(e.cards);
+    if (!D.lastPlay) D.last = fill(n, null);
+    var info = classify(e.cards, rules);
     D.last[e.seat] = { t: 'play', cards: e.cards, type: info ? info.type : 'single' };
     D.lastPlay = { seat: e.seat, cards: e.cards, type: info ? info.type : 'single' };
     D.passCount = 0;
     D.counts[e.seat] -= e.cards.length;
-    D.turn = (e.seat + 1) % 3;
+    D.turn = (e.seat + 1) % n;
     if (info) {
-      if (info.type === 'bomb') { D.bombs++; fx = 'bomb'; }
-      else if (info.type === 'rocket') { D.bombs++; fx = 'rocket'; }
-      else if (info.type === 'plane' || info.type === 'plane1' || info.type === 'plane2') fx = 'plane';
+      if (info.type === 'bomb') {
+        D.bombs++;
+        var big = n === 4 && info.len >= 5;
+        fx = { kind: 'bomb', label: big ? NUM[info.len] + '炸' : '炸弹', big: big };
+      } else if (info.type === 'rocket') { D.bombs++; fx = n === 4 ? { kind: 'rocket', label: '天王炸', big: true, king: true } : { kind: 'rocket', label: '火箭' }; }
+      else if (info.type === 'plane' || info.type === 'plane1' || info.type === 'plane2') fx = { kind: 'plane', label: '飞机' };
     }
   } else if (e.kind === 'pass') {
     D.last[e.seat] = { t: 'pass' };
     D.passCount++;
-    if (D.passCount >= 2 && D.lastPlay) { D.turn = D.lastPlay.seat; D.lastPlay = null; D.passCount = 0; }
-    else D.turn = (e.seat + 1) % 3;
+    if (D.passCount >= n - 1 && D.lastPlay) { D.turn = D.lastPlay.seat; D.lastPlay = null; D.passCount = 0; }
+    else D.turn = (e.seat + 1) % n;
   } else if (e.kind === 'redeal') {
-    D.last = [null, null, null]; D.bid = 0; D.counts = [17, 17, 17]; D.turn = e.seat; D.notice = '没人叫分，重新发牌';
+    D.last = fill(n, null); D.bid = 0; D.counts = fill(n, D.per); D.turn = e.seat; D.notice = '没人叫分，重新发牌';
   }
   return fx;
 }
@@ -123,8 +131,11 @@ export function createTable(box, host) {
     if (x.seats[s]) return makeAvatar(host.person(x.seats[s]), size);
     return botAvatar(size);
   }
-  function rel(s) { var m = mySeat(); return m >= 0 ? (s - m + 3) % 3 : s; } // 0 我（下），1 下家（右），2 上家（左）；旁观时 0 号位在下
-  function posClass(s) { var r = rel(s); return r === 0 ? 'me' : r === 1 ? 'r' : 'l'; }
+  function nP() { var x = T.g; return T.D ? T.D.n : x && x.pub && x.pub.players === 4 ? 4 : 3; }
+  function rules() { return { players: nP() }; }
+  // 0 我（下），1 下家（右）；三人局 2 是上家（左）；四人局 2 是对家（上），3 是上家（左）；旁观时 0 号位在下
+  function rel(s) { var m = mySeat(), n = nP(); return m >= 0 ? (s - m + n) % n : s; }
+  function posClass(s) { var r = rel(s); return r === 0 ? 'me' : r === 1 ? 'r' : nP() === 4 ? (r === 2 ? 't' : 'l') : 'l'; }
 
   // ----- 回放 -----
   function feed(initial) {
@@ -178,7 +189,7 @@ export function createTable(box, host) {
     T.sheetRound = x.pub.round;
     var delay = instant ? 0 : 900;
     var go = function () { if (T.dead) return; T.sheet = true; T.sheetHidden = false; host.refreshScores(); render(); };
-    if (x.pub.spring && !instant) { banner('春天', 'spring'); setTimeout(go, 1900); }
+    if (x.pub.spring && !instant) { banner(x.pub.winner === 'landlord' ? '春天' : '反春', 'spring'); setTimeout(go, 1900); }
     else if (delay) setTimeout(go, delay);
     else go();
   }
@@ -187,15 +198,15 @@ export function createTable(box, host) {
     fxLayer.appendChild(b);
     setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 1900);
   }
-  function playFx(kind) {
-    if (!kind) return;
-    var name = { bomb: 'bomb', rocket: 'rocket', plane: 'plane' }[kind];
-    var label = { bomb: '炸弹', rocket: '火箭', plane: '飞机' }[kind];
-    var wrap = h('div', { class: 'ddz-fx ' + kind, 'aria-hidden': 'true' });
-    wrap.appendChild(img('ddz/fx-' + name + '.png', 'ddz-fx-img', label));
-    wrap.appendChild(h('span', { class: 'ddz-fx-t', text: label }));
+  function playFx(fx) {
+    if (!fx) return;
+    var wrap = h('div', { class: 'ddz-fx ' + fx.kind + (fx.big ? ' big' : '') + (fx.king ? ' king' : ''), 'aria-hidden': 'true' });
+    wrap.appendChild(img('ddz/fx-' + fx.kind + '.png', 'ddz-fx-img', fx.label));
+    wrap.appendChild(h('span', { class: 'ddz-fx-t', text: fx.label }));
+    if (fx.king) fxLayer.appendChild(h('div', { class: 'ddz-flash' }));
     fxLayer.appendChild(wrap);
     setTimeout(function () { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); }, 1300);
+    if (fx.king) setTimeout(function () { var f = fxLayer.querySelector('.ddz-flash'); if (f) f.remove(); }, 1300);
   }
 
   // ----- 我的手牌（显示用）：服务器的手牌 + 还没回放到的「我已经出掉的牌」 - 还没回放到的「底牌」 -----
@@ -261,13 +272,23 @@ export function createTable(box, host) {
     return box;
   }
 
-  function playsRow(cards, maxW) {
-    var n = cards.length, cw = 30;
-    var step = n > 1 ? Math.min(16, (maxW - cw) / (n - 1)) : 0;
-    var row = h('div', { class: 'ddz-plays-row' });
-    row.style.setProperty('--step', step.toFixed(1) + 'px');
-    sortHand(cards).forEach(function (c) { row.appendChild(cardEl(c, 'pc')); });
-    return row;
+  // 一手牌排成一行（牌多就均匀分成几行，每行至少叠 16px），四人局两侧的位置窄，用 wrap
+  function playsRow(cards, maxW, wrap) {
+    var n = cards.length, cw = wrap ? 26 : 30, minStep = 16;
+    var cap = Math.max(1, Math.floor((maxW - cw) / minStep) + 1);
+    var lines = wrap ? Math.ceil(n / cap) : 1;
+    var per = Math.ceil(n / lines);
+    var sorted = sortHand(cards);
+    var col = h('div', { class: 'ddz-plays-col' });
+    for (var li = 0; li < lines; li++) {
+      var part = sorted.slice(li * per, (li + 1) * per);
+      var step = part.length > 1 ? Math.min(minStep, (maxW - cw) / (part.length - 1)) : 0;
+      var row = h('div', { class: 'ddz-plays-row' + (wrap ? ' sm' : '') });
+      row.style.setProperty('--step', step.toFixed(1) + 'px');
+      part.forEach(function (c) { row.appendChild(cardEl(c, 'pc' + (wrap ? ' sm' : ''))); });
+      col.appendChild(row);
+    }
+    return col;
   }
   function slot(s) {
     var D = T.D, a = D.last[s];
@@ -278,29 +299,45 @@ export function createTable(box, host) {
     else if (a.t === 'pass') el.appendChild(h('span', { class: 'ddz-pill', text: '不出' }));
     else {
       var W = root.clientWidth || 360;
-      el.appendChild(playsRow(a.cards, pc === 'me' ? W - 40 : Math.max(120, W * 0.5 - 24)));
+      if (nP() === 4) el.appendChild(playsRow(a.cards, pc === 'me' || pc === 't' ? W - 40 : Math.max(84, W * 0.5 - 86), pc === 'l' || pc === 'r'));
+      else el.appendChild(playsRow(a.cards, pc === 'me' ? W - 40 : Math.max(120, W * 0.5 - 24)));
     }
     return el;
   }
 
   function renderTable() {
-    var x = T.g, D = T.D, m = mySeat(), vs = m >= 0 ? m : 0;
-    var seatAt = function (r) { return (vs + r) % 3; };
-    var top = h('div', { class: 'ddz-top' });
-    top.appendChild(seatBox(seatAt(2)));
+    var x = T.g, D = T.D, m = mySeat(), vs = m >= 0 ? m : 0, n = D.n, four = n === 4;
+    var seatAt = function (r) { return (vs + r) % n; };
+    root.classList.toggle('p4', four);
     var mid = h('div', { class: 'ddz-info' });
     var bt = h('div', { class: 'ddz-bottom' });
-    for (var i = 0; i < 3; i++) bt.appendChild(D.bottom && D.landlord !== null ? cardEl(D.bottom[i], 'pc small') : backEl('small'));
+    var bn = four ? 8 : 3;
+    for (var i = 0; i < bn; i++) bt.appendChild(D.bottom && D.landlord !== null && D.bottom[i] !== undefined ? cardEl(D.bottom[i], 'pc' + (four ? ' sm' : ' small')) : backEl('small'));
     mid.appendChild(bt);
     var mult = Math.max(1, (D.bid || 1)) * Math.pow(2, D.bombs);
     mid.appendChild(h('div', { class: 'ddz-mult', text: D.phase === 'bidding' ? '叫分中' : '× ' + mult }));
-    top.appendChild(mid);
-    top.appendChild(seatBox(seatAt(1)));
+    var top = h('div', { class: 'ddz-top' + (four ? ' p4' : '') });
+    if (four) {
+      top.appendChild(mid);
+      top.appendChild(seatBox(seatAt(2)));
+    } else {
+      top.appendChild(seatBox(seatAt(2)));
+      top.appendChild(mid);
+      top.appendChild(seatBox(seatAt(1)));
+    }
     root.appendChild(top);
 
     var table = h('div', { class: 'ddz-mid' });
-    table.appendChild(slot(seatAt(2)));
-    table.appendChild(slot(seatAt(1)));
+    if (four) {
+      table.appendChild(seatBox(seatAt(3)));
+      table.appendChild(seatBox(seatAt(1)));
+      table.appendChild(slot(seatAt(2)));
+      table.appendChild(slot(seatAt(3)));
+      table.appendChild(slot(seatAt(1)));
+    } else {
+      table.appendChild(slot(seatAt(2)));
+      table.appendChild(slot(seatAt(1)));
+    }
     table.appendChild(slot(seatAt(0)));
     if (D.notice) table.appendChild(h('div', { class: 'ddz-notice', text: D.notice }));
     root.appendChild(table);
@@ -335,7 +372,7 @@ export function createTable(box, host) {
       var hint = h('button', { type: 'button', class: 'btn small ghost', text: '提示' });
       hint.disabled = T.busy;
       hint.addEventListener('click', onHint);
-      var ok = sel.length > 0 && !!classify(sel) && beats(sel, D.lastPlay ? D.lastPlay.cards : null);
+      var ok = sel.length > 0 && !!classify(sel, rules()) && beats(sel, D.lastPlay ? D.lastPlay.cards : null, rules());
       var play = h('button', { type: 'button', class: 'btn small ddz-play', text: '出牌' });
       play.disabled = T.busy || !ok;
       play.addEventListener('click', function () { doPlay(); });
@@ -358,15 +395,27 @@ export function createTable(box, host) {
     root.appendChild(hw);
   }
 
+  // 手牌：最多 10 张一排；再多分两排（三人局）。四人局最多 33 张：按宽度算每排最多放几张（相邻牌至少露出 18px），两排放不下才用三排
   function renderHand(hw, hand) {
-    var n = hand.length, W = root.clientWidth || 360;
-    var cw = Math.max(44, Math.min(58, Math.round(W * 0.14)));
-    var rows = n > 10 ? [hand.slice(0, Math.ceil(n / 2)), hand.slice(Math.ceil(n / 2))] : [hand];
+    var n = hand.length, W = root.clientWidth || 360, four = nP() === 4;
+    var cw = four ? Math.max(38, Math.min(52, Math.round(W * 0.122))) : Math.max(44, Math.min(58, Math.round(W * 0.14)));
+    var rows;
+    if (n <= 10) rows = [hand];
+    else if (!four) rows = [hand.slice(0, Math.ceil(n / 2)), hand.slice(Math.ceil(n / 2))];
+    else {
+      var cap = Math.floor((W - cw - 16) / 18) + 1;
+      var nr = n <= 2 * cap ? 2 : 3, per = Math.ceil(n / nr);
+      rows = [];
+      for (var q = 0; q < nr; q++) rows.push(hand.slice(q * per, (q + 1) * per));
+    }
     hw.style.setProperty('--cw', cw + 'px');
+    hw.classList.toggle('rows3', rows.length === 3);
+    var maxK = 0;
+    rows.forEach(function (rc) { if (rc.length > maxK) maxK = rc.length; });
     rows.forEach(function (rc, ri) {
       var row = h('div', { class: 'ddz-hrow r' + ri });
       var k = rc.length;
-      var step = k > 1 ? Math.min(cw * 0.78, (W - cw - 16) / (k - 1)) : 0;
+      var step = k > 1 ? Math.min(cw * 0.78, (W - cw - 16) / ((four ? maxK : k) - 1)) : 0;
       row.style.setProperty('--step', step.toFixed(1) + 'px');
       row.style.width = (cw + step * (k - 1)).toFixed(1) + 'px';
       rc.forEach(function (c, i) {
@@ -415,7 +464,7 @@ export function createTable(box, host) {
     if (!hand) return;
     var key = hand.join(',') + '|' + (D.lastPlay ? D.lastPlay.cards.join(',') : '');
     if (key !== T.hintKey) { T.hintKey = key; T.hintI = -1; }
-    var list = hints(hand, D.lastPlay ? D.lastPlay.cards : null);
+    var list = hints(hand, D.lastPlay ? D.lastPlay.cards : null, rules());
     if (!list.length) { toast('没有能压住的牌'); return; }
     T.hintI = (T.hintI + 1) % list.length;
     T.sel = {};
@@ -472,11 +521,12 @@ export function createTable(box, host) {
     var x = T.g;
     var lb = h('div', { class: 'ddz-lobby' });
     lb.appendChild(h('div', { class: 'ddz-title', text: x.status === 'closed' ? '这桌已关闭' : '斗地主' }));
-    lb.appendChild(h('div', { class: 'ddz-sub', text: x.status === 'closed' ? '回到聊天，再开一桌吧' : '三人一桌，坐满就能开始' }));
+    lb.appendChild(h('div', { class: 'ddz-sub', text: x.status === 'closed' ? '回到聊天，再开一桌吧' : '3 到 4 人一桌，人不够开始时自动补机器人' }));
     var sc = host.scores();
-    var m = mySeat(), filled = 0;
-    [0, 1, 2].forEach(function (s) {
+    var m = mySeat(), filled = 0, humans = 0;
+    [0, 1, 2, 3].forEach(function (s) {
       if (x.seats[s] || x.bots[s]) filled++;
+      if (x.seats[s]) humans++;
       var row = h('div', { class: 'ddz-lrow' + (x.seats[s] || x.bots[s] ? ' on' : '') });
       row.appendChild(h('div', { class: 'ddz-lav' }, x.seats[s] || x.bots[s] ? avatarOfSeat(s, 48) : h('span', { class: 'ddz-empty', text: String(s + 1) })));
       var nm = h('div', { class: 'ddz-lnm' }, h('b', { text: x.seats[s] || x.bots[s] ? nameOfSeat(s) : '空位' }));
@@ -498,10 +548,12 @@ export function createTable(box, host) {
     });
     if (x.status === 'waiting') {
       if (m >= 0) {
-        var st = lbtn(filled === 3 ? '开始' : '还差 ' + (3 - filled) + ' 个人', 'btn ddz-start', function () { host.start(); });
-        st.disabled = filled < 3;
+        // 按钮上写清楚会发生什么：不足 3 人补机器人到 3 人；3 人三人局；4 人四人局
+        var label = filled >= 4 ? '开始（四人局）' : filled === 3 ? '开始（三人局）' : '开始（三人局，补 ' + (3 - filled) + ' 个机器人）';
+        var st = lbtn(label, 'btn ddz-start', function () { host.start(); });
+        st.disabled = humans < 1;
         lb.appendChild(st);
-      } else lb.appendChild(h('div', { class: 'ddz-sub', text: filled === 3 ? '人满了，等他们开始' : '你可以坐到空位上一起玩' }));
+      } else lb.appendChild(h('div', { class: 'ddz-sub', text: filled >= 4 ? '人满了，等他们开始' : '你可以坐到空位上一起玩' }));
     }
     root.appendChild(lb);
   }
@@ -517,11 +569,12 @@ export function createTable(box, host) {
     var shade = h('div', { class: 'ddz-shade' });
     var sh = h('div', { class: 'ddz-sheet', role: 'dialog', 'aria-label': '结算' });
     var L = pub.landlord;
+    var n = pub.players === 4 ? 4 : 3;
     var iWin = me >= 0 ? ((pub.winner === 'landlord') === (me === L)) : null;
     sh.appendChild(h('div', { class: 'ddz-res ' + (iWin === null ? '' : iWin ? 'win' : 'lose'), text: iWin === null ? (pub.winner === 'landlord' ? '地主赢了' : '农民赢了') : iWin ? '你赢了' : '你输了' }));
-    sh.appendChild(h('div', { class: 'ddz-res-sub', text: (pub.winner === 'landlord' ? '地主' : '农民') + '获胜' + (pub.spring ? '，春天' : '') }));
+    sh.appendChild(h('div', { class: 'ddz-res-sub', text: (pub.winner === 'landlord' ? '地主' : '农民') + '获胜' + (pub.spring ? (pub.winner === 'landlord' ? '，春天' : '，反春') : '') }));
     var list = h('div', { class: 'ddz-rrows' });
-    for (var s = 0; s < 3; s++) {
+    for (var s = 0; s < n; s++) {
       var row = h('div', { class: 'ddz-rrow' + (s === me ? ' me' : '') });
       row.appendChild(h('div', { class: 'ddz-rav' }, avatarOfSeat(s, 40), img(s === L ? 'ddz/badge-landlord.png' : 'ddz/badge-farmer.png', 'ddz-role', s === L ? '地主' : '农民')));
       row.appendChild(h('div', { class: 'ddz-rnm' }, h('b', { text: nameOfSeat(s) }), h('span', { text: (s === L ? '地主' : '农民') + (pub.finalHands ? '，剩 ' + pub.finalHands[s].length + ' 张' : '') })));
@@ -530,14 +583,18 @@ export function createTable(box, host) {
       list.appendChild(row);
     }
     sh.appendChild(list);
-    var bombs = pub.bombs;
+    var bombs = pub.bombs, kings = 0;
+    (pub.log || []).forEach(function (e) { if (e.kind === 'play' && n === 4 && e.cards.length === 4 && classify(e.cards, { players: 4 }).type === 'rocket') kings++; });
+    var bt = bombs ? bombs + ' 个' + (kings ? '（天王炸 ' + kings + '）' : '') + ' ×' + Math.pow(2, bombs) : '无';
+    var springText = pub.spring ? (pub.winner === 'landlord' ? '春天 ×2' : '反春 ×2') : '无';
     sh.appendChild(h('div', { class: 'ddz-mulx' },
       h('span', { text: '叫分 ' + pub.bid }),
-      h('i', { text: '×' }), h('span', { text: '炸弹 ' + (bombs ? '×' + Math.pow(2, bombs) : '无') }),
-      h('i', { text: '×' }), h('span', { text: '春天 ' + (pub.spring ? '×2' : '无') }),
+      h('i', { text: '×' }), h('span', { text: '炸弹 ' + bt }),
+      h('i', { text: '×' }), h('span', { text: springText }),
       h('i', { text: '=' }), h('b', { text: pub.multiplier + ' 倍' })));
-    // 本群累计（桌上的真人）
-    var sc = host.scores(), tot = h('div', { class: 'ddz-tot' }, h('div', { class: 'ddz-tot-h', text: '本群累计' }));
+    sh.appendChild(h('div', { class: 'ddz-share', text: '地主 ' + (n - 1) + ' 份，每个农民 1 份' }));
+    // 本群 / 你们的累计（桌上的真人）
+    var sc = host.scores(), tot = h('div', { class: 'ddz-tot' }, h('div', { class: 'ddz-tot-h', text: host.dm ? '你们的累计' : '本群累计' }));
     var any = false;
     x.seats.forEach(function (u) {
       if (!u) return;
