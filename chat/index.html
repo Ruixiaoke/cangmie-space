@@ -6,7 +6,7 @@
 <title>藏咩空间</title>
 <meta name="theme-color" content="#f4e3c8" media="(prefers-color-scheme: light)" id="tcLight">
 <meta name="theme-color" content="#1c120d" media="(prefers-color-scheme: dark)" id="tcDark">
-<script id="theme-init">(function(){try{var t=localStorage.getItem('chat.theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);var c=t==='dark'?'#1c120d':'#f4e3c8';document.getElementById('tcLight').content=c;document.getElementById('tcDark').content=c}}catch(e){}})()</script>
+<script id="theme-init">(function(){try{var C={chunyang:['#e8eef5','#0f1828']},r=document.documentElement,t=localStorage.getItem('chat.theme'),k=localStorage.getItem('chat.skin'),c=Object.prototype.hasOwnProperty.call(C,k)?C[k]:null,L=c?c[0]:'#f4e3c8',D=c?c[1]:'#1c120d';if(c)r.setAttribute('data-skin',k);if(t==='light'||t==='dark'){r.setAttribute('data-theme',t);L=D=t==='dark'?D:L}document.getElementById('tcLight').content=L;document.getElementById('tcDark').content=D}catch(e){}})()</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
@@ -36,6 +36,7 @@
 <link rel="stylesheet" href="css/rank.css">
 <link rel="stylesheet" href="css/agent.css">
 <link rel="stylesheet" href="css/group.css">
+<link rel="stylesheet" href="css/skin-chunyang.css">
 <link rel="stylesheet" href="css/fallback.css">
 </head>
 <body>
