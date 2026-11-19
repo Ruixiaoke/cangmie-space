@@ -1,5 +1,5 @@
 // jx3.ts（剑三公开数据工具）的测试：假的 fetch，不连网
-import { jx3CacheClear, jx3Info, stripHtml } from "./jx3.ts";
+import { beijingDate, jx3CacheClear, jx3Info, stripHtml } from "./jx3.ts";
 
 const j = (s: string) => JSON.parse(s);
 const ok = (detail: unknown) => new Response(JSON.stringify({ status: 200, detail }), { headers: { "Content-Type": "application/json" } });
@@ -75,4 +75,52 @@ Deno.test("celebs, saohua, bad kind, network failure", async () => {
 
 Deno.test("stripHtml entities and whitespace", () => {
   if (stripHtml("<p>a&amp;b</p><br/><p>  c&lt;d </p>") !== "a&b\nc<d") throw new Error(stripHtml("<p>a&amp;b</p><br/><p>  c&lt;d </p>"));
+});
+
+// 假的 jx3_calendar 表：select().eq("date").maybeSingle() 和 upsert()
+function fakeDb(rows: Record<string, unknown>) {
+  const upserts: Record<string, unknown>[] = [];
+  return {
+    upserts,
+    from(table: string) {
+      if (table !== "jx3_calendar") throw new Error("unexpected table " + table);
+      let date = "";
+      // deno-lint-ignore no-explicit-any
+      const b: any = {
+        select: () => b,
+        eq: (c: string, v: string) => { if (c === "date") date = v; return b; },
+        maybeSingle: () => Promise.resolve({ data: rows[date] ? { data: rows[date] } : null, error: null }),
+        upsert: (r: Record<string, unknown>) => { upserts.push(r); return Promise.resolve({ error: null }); },
+      };
+      return b;
+    },
+  };
+}
+
+Deno.test("beijingDate: UTC+8 and day offset", () => {
+  const t = Date.parse("2026-11-19T17:30:00Z"); // 北京 11-20 01:30
+  if (beijingDate(t, 0) !== "2026-11-20" || beijingDate(t, 6) !== "2026-11-26") throw new Error(beijingDate(t, 0));
+});
+
+Deno.test("calendar reads the prefetched row first, falls back to live and saves it", async () => {
+  jx3CacheClear();
+  const now = Date.parse("2026-11-19T02:00:00Z"); // 北京 11-19 10:00
+  const f = fake(() => ok({ date: "2026-11-20", war: "大战！英雄南山马场" }));
+  const db = fakeDb({ "2026-11-19": { date: "2026-11-19", war: "大战！英雄大阳津" } });
+  const today = j(await jx3Info(f.fn, { kind: "calendar" }, now, db));
+  if (today.war !== "大战！英雄大阳津" || f.urls.length) throw new Error("should come from the table without fetching");
+  const tomorrow = j(await jx3Info(f.fn, { kind: "calendar", day: 1 }, now, db));
+  if (tomorrow.war !== "大战！英雄南山马场" || f.urls.length !== 1 || f.urls[0].searchParams.get("num") !== "1") throw new Error("live fallback");
+  if (db.upserts.length !== 1 || db.upserts[0].date !== "2026-11-20") throw new Error("should save the live result: " + JSON.stringify(db.upserts));
+});
+
+Deno.test("network errors retry once; business errors don't", async () => {
+  jx3CacheClear();
+  let n = 0;
+  const flaky = (() => { n++; return n === 1 ? Promise.reject(new Error("timeout")) : Promise.resolve(ok({ text: "第二次成功" })); }) as unknown as typeof fetch;
+  if (j(await jx3Info(flaky, { kind: "saohua" })).text !== "第二次成功" || n !== 2) throw new Error("retry");
+  let m = 0;
+  const bad = (() => { m++; return Promise.resolve(new Response(JSON.stringify({ status: 400, detail: "服务器名称不正确" }))); }) as unknown as typeof fetch;
+  await jx3Info(bad, { kind: "server", server: "x" });
+  if (m !== 2) throw new Error("server does 2 parallel calls, no retries: " + m);
 });

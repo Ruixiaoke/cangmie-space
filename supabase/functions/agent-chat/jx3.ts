@@ -1,13 +1,17 @@
 // 剑三（剑网三）公开游戏数据：jx3_info 工具。数据来自第三方 JX3API（https://www.jx3api.com，非官方），只用不要 token 的免费接口。
 //
 // 只读；请求里只带服务器名、活动名这类参数，不带任何用户信息。结果在函数实例里缓存几分钟，免得一问一请求。
+// JX3API 服务器在大陆，从海外访问常要 5 到 10 秒甚至超时：单次 10 秒，网络失败重试一次。
+// 日常（calendar）由 GitHub Actions（.github/workflows/jx3-calendar.yml）每天早上预先抓进 public.jx3_calendar，这里先读库；
+// 库里没有那一天时才现查，查到的写回库里。
 // 接口挂了 / 改了格式时返回 { error }，助手会说查不到，聊天本身不受影响。
 // 以后买了 token 想接金价、物价、奇遇：在这里加 kind，并把 token 放进 Edge Function 的 secret（不要写进代码）。
 
 export const JX3_BASE = "https://www.jx3api.com";
 export const JX3_KINDS = ["calendar", "server", "news", "celebs", "saohua"] as const;
 export const JX3_CELEBS = ["楚天社", "云从社", "披风会", "穹野卫"];
-const TIMEOUT_MS = 6000;
+const TIMEOUT_MS = 10_000;
+const TRIES = 2;
 const TTL_MS: Record<string, number> = { calendar: 10 * 60_000, server: 60_000, news: 10 * 60_000, celebs: 2 * 60_000, saohua: 0 };
 const NEWS_EXCERPT = 400;
 
@@ -20,7 +24,17 @@ class Jx3Error extends Error {
   constructor(public code: string, public msg?: string) { super(code); }
 }
 
+// 网络失败 / 超时 / 5xx 重试一次；业务错误（比如服务器名不对）不重试
 async function get(fetchFn: typeof fetch, path: string, params: Record<string, string | number>): Promise<unknown> {
+  for (let i = 0; ; i++) {
+    try {
+      return await getOnce(fetchFn, path, params);
+    } catch (e) {
+      if (!(e instanceof Jx3Error) || e.code !== "jx3_unavailable" || e.msg || i + 1 >= TRIES) throw e;
+    }
+  }
+}
+async function getOnce(fetchFn: typeof fetch, path: string, params: Record<string, string | number>): Promise<unknown> {
   const qs = new URLSearchParams();
   for (const [k, v] of Object.entries(params)) qs.set(k, String(v));
   const url = JX3_BASE + path + (qs.size ? "?" + qs.toString() : "");
@@ -53,12 +67,34 @@ const beijing = (unix: number) => {
   return `${d.getUTCMonth() + 1}月${d.getUTCDate()}日 ${String(d.getUTCHours()).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")}`;
 };
 
-async function run(fetchFn: typeof fetch, kind: string, args: Row): Promise<{ key: string; out: Row }> {
+// 北京时间的日期 + day 天，YYYY-MM-DD
+export function beijingDate(now: number, day: number): string {
+  return new Date(now + 8 * 3600_000 + day * 86400_000).toISOString().slice(0, 10);
+}
+
+// deno-lint-ignore no-explicit-any
+type Db = any;
+async function calendarDay(fetchFn: typeof fetch, db: Db | undefined, day: number, now: number): Promise<{ d: Row; cached: boolean }> {
+  const date = beijingDate(now, day);
+  if (db) {
+    try {
+      const { data } = await db.from("jx3_calendar").select("data").eq("date", date).maybeSingle();
+      if (data?.data && typeof data.data === "object") return { d: data.data as Row, cached: true };
+    } catch { /* 读库失败就现查 */ }
+  }
+  const d = await get(fetchFn, "/active/calendar", { num: day }) as Row;
+  if (db && d && typeof d.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d.date)) {
+    try { await db.from("jx3_calendar").upsert({ date: d.date, data: d, fetched_at: new Date(now).toISOString() }, { onConflict: "date" }); } catch { /* 写不进也不影响回答 */ }
+  }
+  return { d, cached: false };
+}
+
+async function run(fetchFn: typeof fetch, kind: string, args: Row, db: Db | undefined, now: number): Promise<{ key: string; out: Row }> {
   if (kind === "calendar") {
     const day = Number.isInteger(args.day) ? Math.max(0, Math.min(6, args.day as number)) : 0;
-    const d = await get(fetchFn, "/active/calendar", { num: day }) as Row;
+    const { d } = await calendarDay(fetchFn, db, day, now);
     return {
-      key: "calendar:" + day,
+      key: "calendar:" + beijingDate(now, day),
       out: {
         date: d.date, week: d.week ? "星期" + d.week : undefined,
         war: d.war, battle: d.battle, school: d.school, rescue: d.rescue, orecar: d.orecar,
@@ -121,11 +157,11 @@ async function run(fetchFn: typeof fetch, kind: string, args: Row): Promise<{ ke
 }
 
 // 工具入口：返回给模型的 JSON 字符串，永远不抛出
-export async function jx3Info(fetchFn: typeof fetch, args: Row, now = Date.now()): Promise<string> {
+export async function jx3Info(fetchFn: typeof fetch, args: Row, now = Date.now(), db?: Db): Promise<string> {
   const kind = typeof args.kind === "string" ? args.kind : "";
   if (!(JX3_KINDS as readonly string[]).includes(kind)) return JSON.stringify({ error: "bad_kind", allowed: JX3_KINDS });
   // 缓存键要在请求前就能算出来：和 run() 里的规则保持一致
-  const pre = kind === "calendar" ? "calendar:" + (Number.isInteger(args.day) ? Math.max(0, Math.min(6, args.day)) : 0)
+  const pre = kind === "calendar" ? "calendar:" + beijingDate(now, Number.isInteger(args.day) ? Math.max(0, Math.min(6, args.day)) : 0)
     : kind === "server" ? "server:" + (typeof args.server === "string" ? args.server.trim().slice(0, 12) : "")
     : kind === "news" ? "news:" + (Number.isInteger(args.limit) ? Math.max(1, Math.min(5, args.limit)) : 3)
     : kind === "celebs" ? "celebs:" + (typeof args.name === "string" && JX3_CELEBS.includes(args.name) ? args.name : JX3_CELEBS[0])
@@ -133,7 +169,7 @@ export async function jx3Info(fetchFn: typeof fetch, args: Row, now = Date.now()
   const hit = cache.get(pre);
   if (hit && now - hit.at < (TTL_MS[kind] ?? 0)) return hit.text;
   try {
-    const { key, out } = await run(fetchFn, kind, args);
+    const { key, out } = await run(fetchFn, kind, args, db, now);
     const text = JSON.stringify({ kind, source: "JX3API（第三方，非官方）", ...out });
     if (TTL_MS[kind]) {
       if (cache.size > 200) cache.clear();
