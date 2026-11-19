@@ -15,6 +15,8 @@
   background:var(--scene-bg);background-size:cover;background-position:center;
 }
 @media (min-width:481px){ #shell{box-shadow:0 0 0 1px var(--hair),0 0 48px rgba(0,0,0,.2)} }
+/* 手机横屏也铺满整屏（480px 居中只给电脑用）；左右让开刘海 */
+@media (orientation:landscape) and (pointer:coarse){ #shell{max-width:none;box-shadow:none;padding-left:var(--safe-l);padding-right:var(--safe-r)} }
 .screen{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
 .center{align-items:center;justify-content:center;text-align:center;padding:24px;gap:16px}
 
