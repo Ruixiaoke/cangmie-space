@@ -13,7 +13,7 @@ import pathlib
 import sys
 
 root = pathlib.Path(__file__).resolve().parent.parent
-for name in ("persona", "ye-ying"):
+for name in ("persona", "ye-ying", "xie-yunliu", "li-wangsheng"):
     src = root / "agent" / f"{name}.md"
     dst = root / "supabase" / "functions" / "agent-chat" / f"{name}.gen.ts"
     text = src.read_text(encoding="utf-8")
