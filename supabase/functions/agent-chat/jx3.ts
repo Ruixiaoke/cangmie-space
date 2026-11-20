@@ -6,16 +6,18 @@
 // 库里没有那一天时才现查，查到的写回库里。
 // 接口挂了 / 改了格式时返回 { error }，助手会说查不到，聊天本身不受影响。
 // 物价和万宝楼（auction / wbl_role / wbl_look）走另外两个免费的第三方 / 官方未公开接口：
-//   JX3BOX（node.jx3box.com 搜物品，next2.jx3box.com 交易行价格）、万宝楼 trade-api.seasunwbl.com（在售角色 / 外观）。
+//   JX3BOX（node.jx3box.com 搜物品，next2.jx3box.com 交易行价格）、万宝楼 trade-api.seasunwbl.com（在售角色 / 外观 / 金币）。
+// 金价（gold）：万宝楼在售金币（goods_type=1），每份标价 ¥10 之类、卖若干金，attrs.gold_price 是「1 元能买多少金」。
+//   JX3BOX 的金价走势接口（spider2.jx3box.com/api/spider/gold/trend）2026 年 5 月以后就不更新了，别用。
 //   都不要登录，请求里只带物品名 / 服务器名 / 门派这类参数；接口随时可能改，所以出错一律返回 { error }。
-// 以后买了 token 想接金价、奇遇：在这里加 kind，并把 token 放进 Edge Function 的 secret（不要写进代码）。
+// 以后买了 token 想接奇遇、第三方平台金价：在这里加 kind，并把 token 放进 Edge Function 的 secret（不要写进代码）。
 
 export const JX3_BASE = "https://www.jx3api.com";
-export const JX3_KINDS = ["calendar", "server", "news", "celebs", "saohua", "auction", "wbl_role", "wbl_look"] as const;
+export const JX3_KINDS = ["calendar", "server", "news", "celebs", "saohua", "auction", "wbl_role", "wbl_look", "gold"] as const;
 export const JX3_CELEBS = ["楚天社", "云从社", "披风会", "穹野卫"];
 const TIMEOUT_MS = 10_000;
 const TRIES = 2;
-const TTL_MS: Record<string, number> = { calendar: 10 * 60_000, server: 60_000, news: 10 * 60_000, celebs: 2 * 60_000, saohua: 0, auction: 5 * 60_000, wbl_role: 3 * 60_000, wbl_look: 3 * 60_000 };
+const TTL_MS: Record<string, number> = { calendar: 10 * 60_000, server: 60_000, news: 10 * 60_000, celebs: 2 * 60_000, saohua: 0, auction: 5 * 60_000, wbl_role: 3 * 60_000, wbl_look: 3 * 60_000, gold: 3 * 60_000 };
 const GATEWAY_TTL_MS = 60 * 60_000;
 const WBL_SIZE = 8;
 const LOOK_PAGE_SIZE = 10; // 万宝楼 size 超过 10 左右就报「每页数量格式不正确」
@@ -97,6 +99,14 @@ export function fmtYuan(fen: number): string {
   return "¥" + (Number.isInteger(y) ? String(y) : y.toFixed(2).replace(/0+$/, ""));
 }
 
+// 金 -> 「9020金」/「10.8万金」
+export function fmtGold(g: number): string {
+  const n = Math.max(0, Math.round(g));
+  return n >= 10000 ? (Math.round(n / 1000) / 10) + "万金" : n + "金";
+}
+// 用户说「金价」「金币」时模型常把它当交易行物品名：这几个名字转去查金价
+const GOLD_WORDS = ["金", "金币", "金价", "金子", "游戏币", "金币比例"];
+
 const str = (v: unknown, n: number) => typeof v === "string" ? v.trim().slice(0, n) : "";
 const serverArg = (v: unknown) => str(v, 12).replace(/服$/, "");
 
@@ -142,6 +152,39 @@ async function wblList(fetchFn: typeof fetch, params: Record<string, string | nu
   const b = await httpJson(fetchFn, WBL_BASE + "/buyer/goods/list?" + qs.toString()) as Row;
   if (b?.code !== 1 || !Array.isArray(b?.data?.list)) throw new Jx3Error("jx3_unavailable");
   return { list: b.data.list, total: Number(b.data.total_record) || 0 };
+}
+
+// 金价：万宝楼某服在售金币，按「1 元买多少金」从高到低（对买家最划算的在前），再取一条最低的看区间
+// 2026-11 实测所有服都在 1元 = 739 到 902 金之间，最划算的一页全挂在 902：万宝楼给比例设了上下限，顶格时要提醒这是上限不是自由行情
+const goldRatio = (r: Row) => {
+  const g = Number(r?.attrs?.gold_price);
+  if (Number.isFinite(g) && g > 0) return g;
+  const size = Number(r?.single_unit_size), fen = Number(r?.single_unit_price);
+  return size > 0 && fen > 0 ? Math.floor(size / (fen / 100)) : NaN;
+};
+async function gold(fetchFn: typeof fetch, g: Gate): Promise<Row> {
+  const base = { goods_type: 1, page: 1, zone_id: g.zone_id, server_id: g.server_id };
+  const [best, worst] = await Promise.all([
+    wblList(fetchFn, { ...base, size: LOOK_PAGE_SIZE, "sort[gold_price]": 0 }),
+    wblList(fetchFn, { ...base, size: 1, "sort[gold_price]": 1 }),
+  ]);
+  const rows = best.list.filter((r) => Number.isFinite(goldRatio(r)));
+  const note = "数据来自官方万宝楼的在售金币（寄售中的报价，不是成交价），可能有延迟，仅供参考；比例是 1 元能买多少金，越高越划算。不提供卖家信息，要买请对方自己去万宝楼看。DD373、UU898 这些第三方平台的价格查不到";
+  if (!rows.length) return { server: g.server_name, zone: g.zone_name, on_sale: false, note: "万宝楼这个服现在没有在售的金币。" + note };
+  const top = goldRatio(rows[0]);
+  const low = worst.list.length ? goldRatio(worst.list[0]) : NaN;
+  const capped = rows.length >= LOOK_PAGE_SIZE && rows.every((r) => goldRatio(r) === top);
+  const atTop = rows.filter((r) => goldRatio(r) === top).reduce((s, r) => s + Math.max(0, Number(r.single_unit_size) || 0) * Math.max(0, Number(r.remain_unit_count) || 0), 0);
+  return {
+    server: g.server_name, zone: g.zone_name, on_sale: true,
+    best: `1元 = ${top}金`,
+    per_10k_gold: "1万金 ≈ " + fmtYuan(Math.round(1_000_000 / top)),
+    best_ratio_stock: atTop ? "这个比例前几单合计约 " + fmtGold(atTop) : undefined,
+    range: Number.isFinite(low) && low !== top ? `在售比例从 1元 = ${low}金 到 1元 = ${top}金` : undefined,
+    top_ratios: rows.map(goldRatio),
+    capped: capped || undefined,
+    note: (capped ? "最划算的一整页都挂在同一个比例，多半是万宝楼允许的比例上限，实际行情可能比这更划算，报的时候说明这一点。" : "") + note,
+  };
 }
 
 // 交易行：先在 JX3BOX 按名字搜物品，再查价格。同名物品（比如绑定 / 不绑定）会有好几个 id，一次把前几个候选的价格都查了，取第一个有价格的
@@ -280,6 +323,7 @@ async function run(fetchFn: typeof fetch, kind: string, args: Row, db: Db | unde
   if (kind === "auction") {
     const item = str(args.item, 30), server = serverArg(args.server);
     if (!item) throw new Jx3Error("item_required");
+    if (GOLD_WORDS.includes(item)) throw new Jx3Error("bad_argument", "金价不是交易行物品，用 kind=gold 带 server 查万宝楼金价");
     if (!server) throw new Jx3Error("server_required");
     return { key: "auction:" + server + ":" + item, out: await auction(fetchFn, item, server) };
   }
@@ -330,6 +374,12 @@ async function run(fetchFn: typeof fetch, kind: string, args: Row, db: Db | unde
       },
     };
   }
+  if (kind === "gold") {
+    const server = serverArg(args.server);
+    if (!server) throw new Jx3Error("server_required");
+    const g = await findGate(fetchFn, server, now);
+    return { key: "gold:" + server, out: await gold(fetchFn, g) };
+  }
   throw new Jx3Error("bad_kind");
 }
 
@@ -345,12 +395,13 @@ export async function jx3Info(fetchFn: typeof fetch, args: Row, now = Date.now()
     : kind === "auction" ? "auction:" + serverArg(args.server) + ":" + str(args.item, 30)
     : kind === "wbl_role" ? "wbl_role:" + serverArg(args.server) + ":" + str(args.sect, 12) + ":" + str(args.shape, 8)
     : kind === "wbl_look" ? "wbl_look:" + serverArg(args.server) + ":" + str(args.item, 20)
+    : kind === "gold" ? "gold:" + serverArg(args.server)
     : "saohua";
   const hit = cache.get(pre);
   if (hit && now - hit.at < (TTL_MS[kind] ?? 0)) return hit.text;
   try {
     const { key, out } = await run(fetchFn, kind, args, db, now);
-    const source = kind === "auction" ? "JX3BOX（第三方）" : kind === "wbl_role" || kind === "wbl_look" ? "官方万宝楼公开列表（未公开接口）" : "JX3API（第三方，非官方）";
+    const source = kind === "auction" ? "JX3BOX（第三方）" : kind === "wbl_role" || kind === "wbl_look" || kind === "gold" ? "官方万宝楼公开列表（未公开接口）" : "JX3API（第三方，非官方）";
     const text = JSON.stringify({ kind, source, ...out });
     if (TTL_MS[kind]) {
       if (cache.size > 200) cache.clear();
