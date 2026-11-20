@@ -17,7 +17,7 @@ class Fx:
         s.items = []
         for p in ph:
             s.items.append(dict(
-                ph=float(p), speed=int(rng.choice([1, 1, 2])), x0=float(W * rng.beta(1.5, 1.5)), R=float(rng.uniform(*s.size)),
+                ph=float(p), speed=int(rng.choice([1, 1, 2])), x0=float(rng.uniform(0, W) if cfg.get('uniform_x') else W * rng.beta(1.5, 1.5)), R=float(rng.uniform(*s.size)),
                 a0=float(rng.uniform(0, TAU)), swing=float(rng.uniform(0.6, 1.2)), m=int(rng.integers(1, 3)),
                 b=float(rng.uniform(0, TAU)), fx=int(rng.integers(1, 3)), m2=int(rng.integers(1, 3)),
                 c=float(rng.uniform(0, TAU)), col=s.cols[int(rng.integers(len(s.cols)))]))

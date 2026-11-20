@@ -10,8 +10,9 @@ class Fx:
         P = s.P
         g = rng.random((H, P)).astype(np.float32)
         acc = g.copy()
-        for k in range(1, 7): acc += np.roll(g, k, axis=1)
-        acc /= 7
+        nb = int(cfg.get('grain_len', 7))  # 颗粒沿风向的拉伸长度（横屏大画面要更长）
+        for k in range(1, nb): acc += np.roll(g, k, axis=1)
+        acc /= nb
         acc = (acc - acc.mean()) / (acc.std() + 1e-6)
         s.grain = np.clip(0.55 + float(cfg.get('contrast', 0.22)) * acc + 0.0, 0, 1.4).astype(np.float32)
         s.xi = np.arange(W)[None, :].repeat(H, 0)
@@ -20,13 +21,16 @@ class Fx:
         n = int(cfg.get('lanes', 7))
         cols = [hexrgb(c) for c in cfg.get('colors', ['#b98a52', '#a97a46'])]
         ys = cfg.get('y_range', [200, 760])
+        slope = cfg.get('slope', [0.22, 0.4])
+        wr = cfg.get('width', [8, 14])
+        curl = cfg.get('curl', [4, 10])
         for j in range(n):
             yc = ys[0] + (ys[1] - ys[0]) * (j + rng.uniform(0.1, 0.9)) / n
-            sl = float(rng.uniform(0.22, 0.4))
+            sl = float(rng.uniform(*slope))
             harm = [(int(h), float(rng.uniform(0.3, 1)), float(rng.uniform(0, TAU))) for h in rng.choice([1, 2], 2, replace=False)]
-            s.lanes.append(dict(y0=yc - sl * W / 2, sl=sl, w=float(rng.uniform(8, 14)), k=int(1),
+            s.lanes.append(dict(y0=yc - sl * W / 2, sl=sl, w=float(rng.uniform(*wr)), k=int(1),
                                 amp=float(cfg.get('opacity', 0.4)) * float(rng.uniform(0.7, 1.0)),
-                                harm=harm, curl=float(rng.uniform(4, 10)), cph=float(rng.uniform(0, TAU)),
+                                harm=harm, curl=float(rng.uniform(*curl)), cph=float(rng.uniform(0, TAU)),
                                 off=int(rng.integers(0, P)), gy=int(rng.integers(0, H)), col=cols[j % len(cols)]))
 
     def draw(s, out, t):

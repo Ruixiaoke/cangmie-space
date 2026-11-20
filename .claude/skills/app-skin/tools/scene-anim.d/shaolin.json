@@ -63,6 +63,78 @@
     }
    ],
    "glow": 0.22
+  },
+  "wide": {
+   "day": {
+    "effects": [
+     {
+      "fx": "shaolin_bodhi_leaves",
+      "count": 36,
+      "opacity": 0.92,
+      "size": [
+       16,
+       24
+      ],
+      "sway": 36,
+      "colors": [
+       [
+        "#8fa83e",
+        "#c9c45a",
+        "#4f5e1e"
+       ],
+       [
+        "#a8b048",
+        "#d8cc66",
+        "#5a5f1e"
+       ]
+      ],
+      "uniform_x": true
+     },
+     {
+      "fx": "shaolin_bell_rings",
+      "x": 1208,
+      "y": 264,
+      "radius": 560,
+      "color": "#d19a1c",
+      "opacity": 0.95,
+      "width": 2.4,
+      "hit": 22
+     }
+    ]
+   },
+   "night": {
+    "effects": [
+     {
+      "fx": "shaolin_bodhi_leaves",
+      "count": 18,
+      "opacity": 0.8,
+      "size": [
+       16,
+       24
+      ],
+      "sway": 36,
+      "colors": [
+       [
+        "#6f8030",
+        "#a8a44a",
+        "#3e4a18"
+       ]
+      ],
+      "uniform_x": true
+     },
+     {
+      "fx": "shaolin_bell_rings",
+      "x": 1208,
+      "y": 262,
+      "radius": 560,
+      "color": "#ffe29a",
+      "opacity": 0.7,
+      "width": 2.4,
+      "hit": 22
+     }
+    ],
+    "glow": 0.22
+   }
   }
  }
 }

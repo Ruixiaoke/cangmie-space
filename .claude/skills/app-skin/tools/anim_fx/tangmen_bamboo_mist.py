@@ -9,15 +9,16 @@ class Fx:
         self.bands = []
         for b in cfg['bands']:
             k = int(b.get('repeat', 2))
-            P = 512 / k
-            puffs = [(float((j + rng.uniform(-.3, .3)) * P / 6), float(rng.uniform(-14, 14)), float(rng.uniform(22, 48)), float(rng.uniform(.5, 1.1))) for j in range(6)]
+            P = W / k
+            sc_, npf = float(cfg.get('scale', 1)), int(cfg.get('puffs', 6))
+            puffs = [(float((j + rng.uniform(-.3, .3)) * P / npf), float(rng.uniform(-14, 14)) * sc_, float(rng.uniform(22, 48)) * sc_, float(rng.uniform(.5, 1.1))) for j in range(npf)]
             self.bands.append((b, P, puffs))
 
     def draw(self, out, t):
         sc = self.scene
         for b, P, puffs in self.bands:
             cy, sp = b['y'], b.get('spread', 24)
-            y0, y1 = int(max(0, cy - sp * 4 - 20)), int(min(768, cy + sp * 4 + 20))
+            y0, y1 = int(max(0, cy - sp * 4 - 20)), int(min(H, cy + sp * 4 + 20))
             X, Y = sc.xx[y0:y1], sc.yy[y0:y1]
             cloud = np.zeros_like(X)
             for px, dy, sx, w in puffs:

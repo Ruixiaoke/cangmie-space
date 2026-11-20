@@ -90,9 +90,10 @@ class Flash:
                     e = math.sin(math.pi * u) ** 1.5 * c.get('strength', 1)
                     (x0, y0), (x1, y1) = f['from'], f['to']
                     hx_, hy_ = x0 + (x1 - x0) * u, y0 + (y1 - y0) * u
+                    gr = c.get('glow_r', 14)
                     def g(dx, dy, e=e):
-                        yield .7 * e * np.exp(-.5 * (np.hypot(dx, dy) / 14) ** 2), np.array((215, 235, 255), np.float32)
-                    stamp(self.sc, out, hx_, hy_, 14, g)
+                        yield .7 * e * np.exp(-.5 * (np.hypot(dx, dy) / gr) ** 2), np.array((215, 235, 255), np.float32)
+                    stamp(self.sc, out, hx_, hy_, gr, g)
 
 
 def make(cfg, scene, rng):

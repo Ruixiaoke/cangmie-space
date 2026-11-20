@@ -114,6 +114,7 @@ description: 聊天应用的整套外观皮肤（纯阳 chunyang 这类：换场
 | 文件 | 规格 |
 |---|---|
 | `scene-day.jpg` / `scene-night.jpg` | 1024×1536 竖图，每张 ≤ 220KB。一对，构图和视角相同。**下半部分 55% 要平静、低对比**（玻璃面板压在上面），没有人物和文字 |
+| `scene-day-wide.jpg` / `scene-night-wide.jpg` | 桌面横屏版：同一处场景向左右展开成 16:9 全景，2560×1440（生图给不了这么大时 1536×864），JPEG 质量 88。用竖图当参考让 Codex 生成，地标、配色、时辰和竖图一致，主景在水平中间，没有文字、边框 |
 | `ornament.png`（纹样） | 768×128 透明 PNG，纯白线条、无填充、无阴影（只当 `mask` 用，只看 alpha），四角 alpha 为 0，≤ 40KB |
 | `emblem.png`（徽记） | 256×256 透明 PNG，主体约 80%，四角 alpha 为 0，≤ 60KB；要在 22px 下认得出。主体别用纯白（七秀的白色短剑在浅色顶栏上消失过，后来靠 `skins.css` 的描边才显出来） |
 
@@ -131,7 +132,8 @@ description: 聊天应用的整套外观皮肤（纯阳 chunyang 这类：换场
 - **不要往画里加原图没有的东西**（比如自己画一条船）：程序画的物件和水墨原画风格对不上。动效是在原画上「动起来」，不是改画。
 - **形状要像**：自己放大看连续 4 帧。做过返工的教训：鹤画成硬边多边形像剪纸、剑气画成圆头拖尾像流星、芦花画成放射细刺像星星、雪花太大太亮像贴纸、风沙满屏乱闪太躁。要柔和、像水墨笔触，克制，但明显在动。
 - **验收**：脚本最后打印「相邻帧平均变化」和「首尾接缝」。变化低于 0.3 基本看不出在动（纯阳第一版只有 0.01），要加大粒子、提高对比度：浅色粒子落在浅色场景上会消失，换深一点的颜色或换粒子种类；接缝要和相邻帧差不多。还要亲眼看：取一帧放大看粒子，再在 app 里截图看文字是否清楚。
-- **样式**：`--scene-img` 写 gif，新增 `--scene-still` 写 jpg，`--scene-bg` 里 `var(--scene-img)` 后面加一层 `var(--scene-still)`，`#shell` 的 `background-size` 多一个 `cover`；再加 `prefers-reduced-motion: reduce` 时把 `--scene-img` 换回 jpg（白天、`data-theme="dark"`、跟随系统三处）。照 `skin-chunyang.css` 末尾抄。
+- **桌面横屏版**：竖图在桌面窗口里铺满会放大近 3 倍、上下裁掉一大半，很糊（用户反馈过「全门派壁纸在 PC 端分辨率太低」）。所以每个皮肤另有 `scene-<v>-wide.jpg`（见第 4 节）和同尺寸的全彩动图 `scene-<v>-wide.webp`：`animate-scene.py --wide chat/skins/<id> scene-anim.d/<id>.json <id>`，设定写在同一个 json 的 `"wide": {"day": {...}, "night": {...}}` 里，用和竖屏相同的插件，坐标、数量（按面积 2 到 4 倍）、大小（按画布宽度放大）按横屏构图重新调。WebP 不受 256 色限制，不会断层，`quant` 在横屏里不用。插件里的竖屏默认值不能改（加参数让横屏覆盖），改完用竖屏模式重跑确认 gif 没变。验收的「相邻帧变化」横屏至少 0.3。
+- **样式**：`--scene-img` 写 gif，新增 `--scene-still` 写 jpg，`--scene-bg` 里 `var(--scene-img)` 后面加一层 `var(--scene-still)`，`#shell` 的 `background-size` 多一个 `cover`；再加 `prefers-reduced-motion: reduce` 时把 `--scene-img` 换回 jpg（白天、`data-theme="dark"`、跟随系统三处）。照 `skin-chunyang.css` 末尾抄。文件最后是桌面块：`@media (min-width:960px)` 里把 `--scene-img` / `--scene-still` 换成 `-wide.webp` / `-wide.jpg`，白天、`data-theme="dark"`、跟随系统、减少动态效果四种情况都写（照任意一个门派 CSS 的最后一段抄，断点和 `desktop.css` 一致）。手机上这些规则不生效，不会下载横屏图。
 
 ### 5. 注册
 

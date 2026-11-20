@@ -11,6 +11,8 @@ class Fx:
         s.op = float(cfg.get('opacity', 0.95))
         s.size = cfg.get('size', [9, 15])
         s.sway = float(cfg.get('sway', 16))
+        s.uniform = bool(cfg.get('uniform_x', False))
+        s.pad = float(cfg.get('pad', 22))
         s.cols = [(hexrgb(a), hexrgb(b), hexrgb(c)) for a, b, c in cfg.get('colors', [['#c9861a', '#f2c230', '#8d5a0c']])]
         ph = (np.arange(n) + rng.uniform(0.2, 0.8, n)) / n
         rng.shuffle(ph)
@@ -18,7 +20,7 @@ class Fx:
         for p in ph:
             s.items.append(dict(
                 ph=float(p), speed=int(rng.choice([1, 1, 2]) if cfg.get('fast', True) else 1),
-                x0=float(W * rng.beta(1.4, 1.8)), R=float(rng.uniform(*s.size)),
+                x0=float(W * (rng.uniform(0, 1) if s.uniform else rng.beta(1.4, 1.8))), R=float(rng.uniform(*s.size)),
                 a0=float(rng.uniform(0, TAU)), swing=float(rng.uniform(0.5, 1.1)), m=int(rng.integers(1, 3)),
                 b=float(rng.uniform(0, TAU)), spin=int(rng.choice([-1, 1])), fx=int(rng.integers(1, 3)),
                 m2=int(rng.integers(1, 3)), c=float(rng.uniform(0, TAU)), col=s.cols[int(rng.integers(len(s.cols)))]))
@@ -52,7 +54,7 @@ class Fx:
         return fn
 
     def draw(s, out, t):
-        pad = 22
+        pad = s.pad
         for it in s.items:
             u = (it['speed'] * t + it['ph']) % 1.0
             y = -pad + u * (H + 2 * pad)

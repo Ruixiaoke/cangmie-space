@@ -2,6 +2,12 @@
 """把皮肤的静态场景图（GPT 生成的 scene-day.jpg / scene-night.jpg）做成无缝循环的 GIF 背景。
 
   python3 animate-scene.py <皮肤目录 chat/skins/<id>> <动画设定 json> <id> [day|night ...]
+  python3 animate-scene.py --wide <皮肤目录> <动画设定 json> <id> [day|night ...]   # 桌面横屏版
+
+--wide：底图换成 scene-<v>-wide.jpg（横屏，画布尺寸就用这张图自己的尺寸，比如 2560x1440），
+设定读 json 里的 "wide": {"day": {...}, "night": {...}}，输出全彩动图 scene-<v>-wide.webp
+（GIF 只有 256 色，大画面上渐变会断层；WebP 有损压缩，体积也小）。插件里的 W、H 跟着变，
+坐标、数量、大小都要按横屏构图重新调，竖屏的数字不能照搬。
 
 底图一个像素都不改，只在上面叠加：
   - 粒子（雪、花瓣、落叶、火星、萤火虫、星光、尘沙），按设定分几层远近；
@@ -238,6 +244,13 @@ def encode(frames, path, quant=None):
                 disposal=1, transparency=TR)
 
 
+def encode_webp(frames, path, quality=82):
+    """全彩动图：libwebp 自己只存相邻帧之间变化的区域。"""
+    ims = [Image.fromarray(f) for f in frames]
+    ims[0].save(path, save_all=True, append_images=ims[1:], duration=DELAY, loop=0,
+                quality=quality, method=4, lossless=False)
+
+
 def measure(path):
     im = Image.open(path); fr = []
     try:
@@ -251,16 +264,31 @@ def measure(path):
 
 
 def main():
-    folder, cfgp, sid = Path(sys.argv[1]), sys.argv[2], sys.argv[3]
-    which = sys.argv[4:] or ['day', 'night']
+    global W, H
+    args = sys.argv[1:]
+    wide = '--wide' in args
+    args = [a for a in args if a != '--wide']
+    folder, cfgp, sid = Path(args[0]), args[1], args[2]
+    which = args[3:] or ['day', 'night']
     conf = json.load(open(cfgp, encoding='utf-8'))[sid]
+    if wide:
+        conf = conf['wide']
     for kind in which:
-        sc = Scene(folder / f'scene-{kind}.jpg', conf[kind], seed=zlib.crc32(f'{sid}-{kind}'.encode()) % 100000)
+        suffix = '-wide' if wide else ''
+        src = folder / f'scene-{kind}{suffix}.jpg'
+        if wide:
+            W, H = Image.open(src).size
+            _fx_cache.clear()
+        sc = Scene(src, conf[kind], seed=zlib.crc32(f'{sid}-{kind}{suffix}'.encode()) % 100000)
         frames = [sc.render(i / FRAMES) for i in range(FRAMES)]
-        out = folder / f'scene-{kind}.gif'
-        encode(frames, out, conf[kind].get('quant'))
+        if wide:
+            out = folder / f'scene-{kind}-wide.webp'
+            encode_webp(frames, out, conf[kind].get('quality', 82))
+        else:
+            out = folder / f'scene-{kind}.gif'
+            encode(frames, out, conf[kind].get('quant'))
         n, d, top, seam = measure(out)
-        print(f'{sid} {kind}: {n} frames, diff {d:.2f} (top {top:.2f}), seam {seam:.2f}, glows {len(sc.glows)}, {out.stat().st_size // 1024} KB')
+        print(f'{sid} {kind}{suffix}: {W}x{H}, {n} frames, diff {d:.2f} (top {top:.2f}), seam {seam:.2f}, glows {len(sc.glows)}, {out.stat().st_size // 1024} KB')
 
 
 if __name__ == '__main__':

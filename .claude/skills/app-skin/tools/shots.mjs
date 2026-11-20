@@ -1,9 +1,10 @@
-// 纯阳皮肤截图：SKIN=chunyang|default，主题 light / dark，390x844
+// 皮肤截图：SKIN=chunyang|default，主题 light / dark，默认 390x844；桌面用 VW=1440 VH=900（DSF 默认 2）
 import { chromium } from 'playwright';
 import http from 'http'; import fs from 'fs'; import path from 'path';
 const PORT = Number(process.env.PORT || 8079), WT = process.env.WT, OUT = process.env.OUT, SKIN = process.env.SKIN || 'chunyang', ONLY = process.env.ONLY || '';
+const VW = Number(process.env.VW || 390), VH = Number(process.env.VH || 844), DSF = Number(process.env.DSF || 2);
 fs.mkdirSync(OUT, { recursive: true });
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.webmanifest': 'application/json' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.webmanifest': 'application/json' };
 const srv = http.createServer((req, res) => {
   let f = path.join(WT, decodeURIComponent(req.url.split('?')[0]));
   if (fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, 'index.html');
@@ -15,7 +16,7 @@ const browser = await chromium.launch({ executablePath: '/Applications/Google Ch
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const errs = [];
 async function ctxFor(scheme, extra) {
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, colorScheme: scheme, deviceScaleFactor: 2 });
+  const ctx = await browser.newContext({ viewport: { width: VW, height: VH }, colorScheme: scheme, deviceScaleFactor: DSF });
   await ctx.addInitScript(([skin, x]) => {
     localStorage.setItem('chat.devSupabaseUrl', 'http://localhost:1'); localStorage.setItem('chat.devSupabaseAnonKey', 'k');
     localStorage.setItem('chat.skin', skin);
