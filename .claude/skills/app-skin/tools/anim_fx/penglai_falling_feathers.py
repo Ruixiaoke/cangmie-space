@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""蓬莱：飘落的白色羽毛。参数：count 列数，d 每个循环下落距离，size 羽毛长度范围，opacity，edge 边缘色（让白羽毛在浅色天空上看得见）。"""
+"""蓬莱：飘落的白色羽毛。参数：count 列数，d 每个循环下落距离，size 羽毛长度范围，opacity，edge 边缘色（让白羽毛在浅色天空上看得见）。
+横屏可调（默认值是 512 宽竖屏的数字）：amp 左右摆幅范围 [24, 48]，lw 描边和羽脉粗细倍数 (1)。"""
 import math
 import numpy as np
 from PIL import Image, ImageDraw
@@ -58,13 +59,14 @@ class Feathers:
     def __init__(self, cfg, scene, rng):
         self.cfg = cfg
         self.items = [dict(x0=rng.uniform(10, W - 10), y0=rng.uniform(0, 1), L=rng.uniform(*cfg.get('size', [14, 22])),
-                           a=rng.uniform(0, TAU), A=rng.uniform(24, 48), b=rng.uniform(0, TAU),
+                           a=rng.uniform(0, TAU), A=rng.uniform(*cfg.get('amp', [24, 48])), b=rng.uniform(0, TAU),
                            f=int(rng.choice([1, 1, 2])), sg=int(rng.choice([-1, 1]))) for _ in range(int(cfg.get('count', 10)))]
 
     def draw(self, out, t):
         cfg = self.cfg; d = float(cfg.get('d', 400))
         hx = lambda s: tuple(int(s[i:i + 2], 16) for i in (1, 3, 5))
         edge = hx(cfg.get('edge', '#7d9bb8')) + (255,); body = hx(cfg.get('color', '#ffffff')) + (255,)
+        lw = float(cfg.get('lw', 1))
         cv = Canvas()
         for it in self.items:
             for y in chain_ys(it['y0'] * d, d, t):
@@ -84,12 +86,12 @@ class Feathers:
                     hw = .17 * L * (math.sin(math.pi * s ** .8) ** .9)
                     top.append(T(u, -hw)); bot.append(T(u, hw))
                 pts = top + bot[::-1]
-                cv.poly(pts, body, edge, 0.9)
-                cv.line([T(-L * .62, 0), T(L * .5, 0)], edge, 0.9)
+                cv.poly(pts, body, edge, 0.9 * lw)
+                cv.line([T(-L * .62, 0), T(L * .5, 0)], edge, 0.9 * lw)
                 for s in (.3, .5, .7):
                     u = (s - .5) * L
-                    cv.line([T(u, 0), T(u + .12 * L, -.14 * L * math.sin(math.pi * s))], edge, .6)
-                    cv.line([T(u, 0), T(u + .12 * L, .14 * L * math.sin(math.pi * s))], edge, .6)
+                    cv.line([T(u, 0), T(u + .12 * L, -.14 * L * math.sin(math.pi * s))], edge, .6 * lw)
+                    cv.line([T(u, 0), T(u + .12 * L, .14 * L * math.sin(math.pi * s))], edge, .6 * lw)
         cv.blit(out, cfg.get('opacity', .95))
 
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """霸刀：真正的五尖枫叶（红、橙两色），翻滚着飘落。
-参数：count 列数，d 每个循环下落距离（也是同一列叶子的间距），size [最小,最大] 半径，palette 颜色列表，opacity。"""
+参数：count 列数，d 每个循环下落距离（也是同一列叶子的间距），size [最小,最大] 半径，palette 颜色列表，opacity。
+横屏可调（默认值是 512 宽竖屏的数字）：amp 左右摆幅范围 [22, 44]，lw 描边和叶脉粗细倍数 (1)。"""
 import math
 import numpy as np
 from PIL import Image, ImageDraw
@@ -95,10 +96,11 @@ class Maple:
             self.items.append(dict(x0=rng.uniform(10, W - 10), y0=rng.uniform(0, 1),
                                    r=rng.uniform(*cfg.get('size', [8, 13])), a=rng.uniform(0, TAU),
                                    spin=int(rng.choice([-1, 1])), f=int(rng.choice([1, 2])), b=rng.uniform(0, TAU),
-                                   A=rng.uniform(22, 44), col=pal[int(rng.integers(len(pal)))]))
+                                   A=rng.uniform(*cfg.get('amp', [22, 44])), col=pal[int(rng.integers(len(pal)))]))
 
     def draw(self, out, t):
         cfg = self.cfg; d = float(cfg.get('d', 400)); op = cfg.get('opacity', .95)
+        lw = float(cfg.get('lw', 1))
         cv = Canvas()
         for it in self.items:
             for y in chain_ys(it['y0'] * d, d, t):
@@ -115,11 +117,11 @@ class Maple:
                 fill = tuple(int(c) for c in col) + (255,)
                 edge = (int(col[0] * .55), int(col[1] * .4), int(col[2] * .35), 255)
                 pts = [T(p) for p in OUTLINE]
-                cv.poly(pts, fill, edge, 1.0)
+                cv.poly(pts, fill, edge, 1.0 * lw)
                 vc = (int(col[0] * .62), int(col[1] * .5), int(col[2] * .45), 255)
                 for _, _, ex, ey in VEINS:
-                    cv.line([T((0, .12)), T((ex, ey))], vc, 0.8)
-                cv.line([T((0, .38)), T((0, 1.22))], vc, 1.1)
+                    cv.line([T((0, .12)), T((ex, ey))], vc, 0.8 * lw)
+                cv.line([T((0, .38)), T((0, 1.22))], vc, 1.1 * lw)
         cv.blit(out, op)
 
 

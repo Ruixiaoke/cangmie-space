@@ -30,7 +30,7 @@ class Canvas:
         out += (sm[..., :3] - out) * a
 
 
-def stamp(sc, out, cx, cy, rad, fn):
+def stamp(sc, out, cx, cy, rad, fn, vis=1.0):
     """和 scene.stamp 一样，但不做画面边缘的环绕（灯漂出画面时影子也一起出去）"""
     pad = int(math.ceil(rad * 3)) + 2
     x0, x1 = max(0, int(cx) - pad), min(W, int(cx) + pad + 1)
@@ -40,7 +40,7 @@ def stamp(sc, out, cx, cy, rad, fn):
     dx = sc.xx[y0:y1, x0:x1] - cx; dy = sc.yy[y0:y1, x0:x1] - cy
     for alpha, col in fn(dx, dy):
         patch = out[y0:y1, x0:x1]
-        patch += (col - patch) * alpha[:, :, None]
+        patch += (col - patch) * (alpha * vis)[:, :, None]
 
 
 def petal(base, ang, length, width, s, rot):
@@ -62,6 +62,7 @@ class Lanterns:
         self.rows = cfg['rows']
         self.dir = cfg.get('direction', -1)
         self.sc = scene
+        self.unit = float(cfg.get('unit', 25))  # 一个缩放单位的像素数；横屏可放大
 
     def lantern(self, cv, cx, cy, s, rot, fl):
         night = self.night
@@ -92,7 +93,7 @@ class Lanterns:
         night = self.night
         rows = sorted(self.rows, key=lambda r: r['y'])
         for r in rows:
-            S = float(r['S']); s = float(r['s']) * 25
+            S = float(r['S']); s = float(r['s']) * self.unit
             xs = []
             base = ((r.get('x0', 0) + self.dir * S * t) % S)
             k = -1
@@ -100,6 +101,10 @@ class Lanterns:
                 xs.append(base + k * S); k += 1
             for x in xs:
                 ph = x / S
+                vis = 1.0  # 行参数 xmin/fade：左侧有礁石的行，灯在 xmin 之前淡出
+                if 'xmin' in r:
+                    vis = float(smooth((x - r['xmin']) / float(r.get('fade', 100))))
+                    if vis <= 0.003: continue
                 bob = 1.3 * s / 21 * math.sin(TAU * (t * 2 + ph * 0) + ph * TAU)
                 cy = r['y'] + bob
                 rot = 0.07 * math.sin(TAU * t + ph * TAU + 1.1)
@@ -110,11 +115,11 @@ class Lanterns:
                         gx = np.exp(-.5 * (dx / (s * 1.3)) ** 2)
                         yield (0.20 + 0.06 * fl) * gx * np.exp(-.5 * ((dy - s * 0.7) / (s * 2.3)) ** 2) * (dy > -s * .1), np.array((255, 176, 92), np.float32)
                         yield .45 * np.exp(-.5 * ((dx / (s * 2.2)) ** 2 + ((dy + s * .3) / (s * .85)) ** 2)) * (0.3 + 0.12 * fl), np.array((255, 190, 110), np.float32)
-                    stamp(sc, out, x, cy, s * 3, refl)
+                    stamp(sc, out, x, cy, s * 3, refl, vis)
                 else:
                     def shadow(dx, dy, s=s):
                         yield .30 * np.exp(-.5 * ((dx / (s * 1.55)) ** 2 + ((dy - s * .35) / (s * .55)) ** 2)), np.array((42, 98, 104), np.float32)
-                    stamp(sc, out, x, cy, s * 3, shadow)
+                    stamp(sc, out, x, cy, s * 3, shadow, vis)
                 # 涟漪
                 cv0 = Canvas()
                 for j in range(2):
@@ -123,20 +128,20 @@ class Lanterns:
                     al = int(255 * (1 - u) ** 1.5 * (0.5 if night else 0.75))
                     col = (255, 205, 140, al) if night else (255, 255, 255, al)
                     cv0.ell(x, cy + 0.35 * s, rx, ry, outline=col, w=1.0)
-                cv0.blit(out)
+                cv0.blit(out, vis)
                 if night:
                     def halo(dx, dy, s=s, fl=fl):
                         d = np.hypot(dx, dy * 1.05)
                         yield (0.32 + 0.08 * fl) * np.exp(-.5 * (d / (s * 1.1)) ** 2), np.array((255, 170, 80), np.float32)
-                    stamp(sc, out, x, cy - 0.35 * s, s * 2.6, halo)
+                    stamp(sc, out, x, cy - 0.35 * s, s * 2.6, halo, vis)
                 cv = Canvas()
                 self.lantern(cv, x, cy, s, rot, fl)
-                cv.blit(out)
+                cv.blit(out, vis)
                 if night:
                     def core(dx, dy, s=s, fl=fl):
                         d = np.hypot(dx, dy)
                         yield (0.5 + 0.25 * fl) * np.exp(-.5 * (d / (s * .38)) ** 2), np.array((255, 240, 190), np.float32)
-                    stamp(sc, out, x, cy - 0.4 * s, s * 1.2, core)
+                    stamp(sc, out, x, cy - 0.4 * s, s * 1.2, core, vis)
 
 
 def make(cfg, scene, rng):

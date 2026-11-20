@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """段氏：天空和山上缓缓飘过的云影（半透明的深色云影在画面上方移动）。
-cfg: clouds [[y, x0, size, strength]], dir, color, opacity, ymax"""
+cfg: clouds [[y, x0, size, strength]], dir, color, opacity, ymax
+横屏可调：fade 下缘渐隐的宽度 (90)"""
 import math
 import numpy as np
 
@@ -16,7 +17,7 @@ class Shadows:
             blobs = [(float(rng.uniform(-1.1, 1.1)) * size, float(rng.uniform(-.35, .35)) * size * .6,
                       float(rng.uniform(.45, .85)) * size, float(rng.uniform(.6, 1))) for _ in range(6)]
             self.clouds.append((y, x0, size, st, blobs))
-        self.fade = (1 - smooth((scene.yy - cfg.get('ymax', 330)) / 90)).astype(np.float32)
+        self.fade = (1 - smooth((scene.yy - cfg.get('ymax', 330)) / float(cfg.get('fade', 90)))).astype(np.float32)
 
     def draw(self, out, t):
         sc = self.sc

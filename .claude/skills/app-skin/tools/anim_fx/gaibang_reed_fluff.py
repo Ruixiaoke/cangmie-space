@@ -1,4 +1,5 @@
-"""丐帮：芦花絮。蓬松的白色种絮带细丝，被风横着吹过湖面，轻轻上下浮动。"""
+"""丐帮：芦花絮。蓬松的白色种絮带细丝，被风横着吹过湖面，轻轻上下浮动。
+横屏可调（默认是 512 宽竖屏的数字）：span 横向范围和飘行距离基准 (512)，bob 上下浮动幅度范围 [4, 9]。"""
 import math
 import numpy as np
 
@@ -8,14 +9,15 @@ class Fx:
         self.scene, self.cfg = scene, cfg
         n = int(cfg.get('count', 22))
         y0, y1 = cfg.get('y_range', [150, 560])
+        span = float(cfg.get('span', 512))
         self.items = []
         for i in range(n):
             self.items.append(dict(
-                x0=float(rng.uniform(-60, 512)),
+                x0=float(rng.uniform(-60, span)),
                 y=float(rng.uniform(y0, y1)), ph=float((i + rng.uniform(.1, .9)) / n),
                 r=float(rng.uniform(*cfg.get('size', [2.0, 3.2]))), a=float(rng.uniform(0, math.tau)),
-                bob=float(rng.uniform(4, 9)), k=int(rng.choice([1, 2])),
-                dist=float(rng.uniform(.45, .8)) * 512, rot=float(rng.uniform(-.5, .5)),
+                bob=float(rng.uniform(*cfg.get('bob', [4, 9]))), k=int(rng.choice([1, 2])),
+                dist=float(rng.uniform(.45, .8)) * span, rot=float(rng.uniform(-.5, .5)),
                 strands=[(float(rng.uniform(-1.6, 1.6)), float(rng.uniform(2.6, 4.2))) for _ in range(11)]))
         rng.shuffle(self.items)
 

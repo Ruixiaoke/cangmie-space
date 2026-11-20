@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """段氏：洱海湖面上的碎金波光。湖面区域里一片片闪动的光斑，像阳光 / 月光在水上的倒影碎片。
-cfg: count, region [x0,y0,x1,y1], hot [cx, spread] (光斑更集中的竖带，可选), color, core, opacity"""
+cfg: count, region [x0,y0,x1,y1], hot [cx, spread] (光斑更集中的竖带，可选), color, core, opacity
+横屏可调：scale 光斑尺寸和摆幅倍数 (1，默认按 512 宽设计)"""
 import math
 import numpy as np
 
@@ -15,6 +16,7 @@ class Glitter:
         self.core = hexrgb(cfg.get('core', '#fff3c0'))
         self.op = float(cfg.get('opacity', .9))
         self.f = []
+        k = float(cfg.get('scale', 1))
         for _ in range(n):
             y = y0 + (y1 - y0) * float(rng.random()) ** 1.5
             if hot and rng.random() < float(cfg.get('hot_share', .6)):
@@ -22,9 +24,9 @@ class Glitter:
             else:
                 x = float(rng.uniform(x0, x1))
             persp = .6 + 1.2 * (y - y0) / max(1, y1 - y0)
-            self.f.append(dict(x=x, y=y, rx=float(rng.uniform(3, 9)) * persp, ry=float(rng.uniform(.8, 1.5)),
+            self.f.append(dict(x=x, y=y, rx=float(rng.uniform(3, 9)) * persp * k, ry=float(rng.uniform(.8, 1.5)) * k,
                                bl=int(rng.integers(1, 4)), ph=float(rng.uniform(0, math.tau)),
-                               dx=float(rng.uniform(2, 7)), pw=float(rng.uniform(2.5, 5))))
+                               dx=float(rng.uniform(2, 7)) * k, pw=float(rng.uniform(2.5, 5))))
 
     def draw(self, out, t):
         for f in self.f:

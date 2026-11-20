@@ -14,6 +14,7 @@ class Fx:
         s.tip = hexrgb(cfg.get('tip', '#fcd0dc'))
         s.edge = hexrgb(cfg.get('edge', '#c8567a'))
         size = cfg.get('size', [9, 14])
+        s.pad = float(cfg.get('pad', 20))  # 横屏：花瓣大，出入画面的余量要加大
         ph = (np.arange(n) + rng.uniform(0.2, 0.8, n)) / n
         rng.shuffle(ph)
         s.items = [dict(ph=float(p), speed=int(rng.choice([1, 1, 2])), x0=float(W * rng.beta(1.2, 1.5)), L=float(rng.uniform(*size)),
@@ -40,7 +41,7 @@ class Fx:
         return fn
 
     def draw(s, out, t):
-        pad = 20
+        pad = s.pad
         for it in s.items:
             u = (it['speed'] * t + it['ph']) % 1.0
             y = -pad + u * (H + 2 * pad)

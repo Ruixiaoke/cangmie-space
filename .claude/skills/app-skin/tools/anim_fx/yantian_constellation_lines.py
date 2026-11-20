@@ -116,9 +116,10 @@ class Stars:
                     yield np.clip((.55 + .45 * b) * (1 - np.clip((d - 1.2 * c.get('node_scale', 1)) / 1.2, 0, 1)), 0, 1), np.minimum(dot + 40, 255)
                 stamp(sc, out, x, y, 4 * c.get('node_scale', 1), fn)
         for hx_, hy_ in heads:
-            def fn(dx, dy):
-                yield .8 * np.exp(-.5 * (np.hypot(dx, dy) / 2.2) ** 2), np.array((255, 255, 255), np.float32)
-            stamp(sc, out, hx_, hy_, 3, fn)
+            hs = c.get('head_scale', 1)  # 横屏：划线笔尖的亮点放大
+            def fn(dx, dy, hs=hs):
+                yield .8 * np.exp(-.5 * (np.hypot(dx, dy) / (2.2 * hs)) ** 2), np.array((255, 255, 255), np.float32)
+            stamp(sc, out, hx_, hy_, 3 * hs, fn)
         # 背景星点
         for s in self.bg:
             fl = max(0.0, math.sin(TAU * s['k'] * t + s['a'])) ** 2

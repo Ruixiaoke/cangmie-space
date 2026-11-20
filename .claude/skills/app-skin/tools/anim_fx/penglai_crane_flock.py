@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """蓬莱：飞过天空的白鹤剪影，翅膀上下扇动，三只一组成行从右向左飞过。
 参数：y 飞行带中心，S 一个循环飞过的距离（组与组的间距），unit 鹤的大小，flaps 每个循环扇翅次数，
-body/edge/tip 颜色，opacity，birds = [{"o":横向偏移,"dy":纵向偏移,"s":缩放,"ph":扇翅相位}]。"""
+body/edge/tip 颜色，opacity，birds = [{"o":横向偏移,"dy":纵向偏移,"s":缩放,"ph":扇翅相位}]。
+横屏可调（默认值是 512 宽竖屏的数字）：bob 上下起伏像素 (2.0)，blur 边缘柔化 (0.55)。"""
 import math
 import numpy as np
 from PIL import Image, ImageDraw
@@ -138,9 +139,9 @@ class Cranes:
                 if x > W + 100: break
                 if x < -100: continue
                 flap = TAU * n * t + b['ph'] + TAU * x / S
-                y = c['y'] + b['dy'] + (x - W / 2) * 0.04 - 2.0 * math.sin(flap + 1.0)
+                y = c['y'] + b['dy'] + (x - W / 2) * 0.04 - c.get('bob', 2.0) * math.sin(flap + 1.0)
                 crane(cv, x, y, c['unit'] * b['s'], flap, body, grey, tip, b.get('a', 1.0) * c.get('opacity', .85))
-        cv.blit(out, 1.0, blur=0.55)
+        cv.blit(out, 1.0, blur=c.get('blur', 0.55))
 
 
 def make(cfg, scene, rng):
