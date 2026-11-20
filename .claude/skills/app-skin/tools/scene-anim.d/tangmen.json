@@ -1,0 +1,152 @@
+{
+ "tangmen": {
+  "day": {
+   "effects": [
+    {
+     "fx": "tangmen_bamboo_mist",
+     "bands": [
+      {
+       "y": 250,
+       "spread": 30,
+       "color": [
+        238,
+        245,
+        244
+       ],
+       "opacity": 0.42,
+       "dir": 1,
+       "repeat": 2
+      },
+      {
+       "y": 372,
+       "spread": 38,
+       "color": [
+        140,
+        164,
+        170
+       ],
+       "opacity": 0.2,
+       "dir": -1,
+       "repeat": 2
+      },
+      {
+       "y": 480,
+       "spread": 42,
+       "color": [
+        232,
+        240,
+        241
+       ],
+       "opacity": 0.35,
+       "dir": 1,
+       "repeat": 2
+      }
+     ]
+    },
+    {
+     "fx": "tangmen_bamboo_leaves",
+     "count": 18,
+     "colors": [
+      [
+       96,
+       148,
+       66
+      ],
+      [
+       150,
+       182,
+       80
+      ]
+     ],
+     "edge": [
+      34,
+      66,
+      38
+     ],
+     "opacity": 0.95,
+     "size": [
+      8,
+      13
+     ]
+    }
+   ]
+  },
+  "night": {
+   "glow": 0.18,
+   "effects": [
+    {
+     "fx": "tangmen_bamboo_mist",
+     "bands": [
+      {
+       "y": 250,
+       "spread": 30,
+       "color": [
+        120,
+        156,
+        160
+       ],
+       "opacity": 0.55,
+       "dir": 1,
+       "repeat": 2
+      },
+      {
+       "y": 372,
+       "spread": 38,
+       "color": [
+        8,
+        24,
+        26
+       ],
+       "opacity": 0.5,
+       "dir": -1,
+       "repeat": 2
+      },
+      {
+       "y": 480,
+       "spread": 42,
+       "color": [
+        108,
+        140,
+        146
+       ],
+       "opacity": 0.45,
+       "dir": 1,
+       "repeat": 2
+      }
+     ]
+    },
+    {
+     "fx": "tangmen_bamboo_leaves",
+     "count": 24,
+     "colors": [
+      [
+       62,
+       104,
+       82
+      ],
+      [
+       84,
+       124,
+       92
+      ]
+     ],
+     "edge": [
+      10,
+      24,
+      20
+     ],
+     "rib": [
+      120,
+      160,
+      130
+     ],
+     "opacity": 0.95,
+     "size": [
+      8,
+      13
+     ]
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,59 @@
+{
+ "gaibang": {
+  "day": {
+   "effects": [
+    {
+     "fx": "gaibang_reed_fluff",
+     "count": 40,
+     "size": [
+      4.2,
+      6.0
+     ],
+     "opacity": 0.95,
+     "y_range": [
+      150,
+      580
+     ]
+    }
+   ]
+  },
+  "night": {
+   "effects": [
+    {
+     "fx": "gaibang_reed_fluff",
+     "count": 22,
+     "size": [
+      4.0,
+      5.6
+     ],
+     "opacity": 0.6,
+     "color": [
+      205,
+      216,
+      208
+     ],
+     "shade": [
+      8,
+      18,
+      16
+     ],
+     "y_range": [
+      150,
+      560
+     ]
+    },
+    {
+     "fx": "gaibang_fisher_fire",
+     "boats": [
+      {
+       "x": 178,
+       "y": 236,
+       "s": 1.0
+      }
+     ],
+     "reflect": 11
+    }
+   ]
+  }
+ }
+}

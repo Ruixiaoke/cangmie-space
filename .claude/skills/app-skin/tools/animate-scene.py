@@ -11,6 +11,13 @@
 输出 512x768、44 帧 x 90 ms、无限循环；不限体积。最后打印验收数据：
 相邻帧平均变化（整幅 / 上半幅）和首尾接缝，接缝应和相邻帧差不多。
 
+插件动效：设定里 "effects": [ {"fx": "<名字>", ...参数} ] 会加载 tools/anim_fx/<名字>.py。
+  插件文件里写 make(cfg, scene, rng) -> 对象，对象有 draw(out, t) 方法：
+    out 是当前帧 H x W x 3 的 float32 数组（直接在上面画），t 是 0 到 1 的循环进度（t=1 必须和 t=0 一样）。
+  可用的工具：scene.base（底图）、scene.xx / scene.yy（像素坐标网格）、scene.stamp(out, cx, cy, rad, fn)
+  （在一个点附近画一个小图形，fn(dx, dy) 逐个 yield (alpha, colour)，自动处理画面边缘的环绕），
+  以及本模块的 W、H、TAU、smooth()、hexrgb()。门派专属的动效都写成插件，内置的粒子种类留给简单场合。
+
 动画设定 json：{ "<id>": { "day": {...}, "night": {...} } }，每个场景：
   "particles": [ { "kind": "snow|petal|leaf|ember|firefly|sparkle|dust",
                    "count": 60, "size": [1.0, 2.0], "opacity": 0.8,
@@ -19,9 +26,10 @@
                    "colors": ["#ffffff"], # 随机取
                    "top_bias": 0.2 } ],   # 0 到 0.4：越大越集中在上半幅
   "mist": [ { "y": 0.42, "spread": 0.04, "opacity": 0.22, "dir": 1, "color": "#c8d4e6" } ],
-  "glow": 0.15                            # 晚上暖色亮点的起伏幅度，0 = 不做
+  "glow": 0.15,                           # 晚上暖色亮点的起伏幅度，0 = 不做
+  "quant": "maxcoverage"                  # 可选：强制减色算法（大片同色渐变断层时用）
 """
-import json, math, sys, zlib
+import importlib.util, json, math, sys, zlib
 from pathlib import Path
 import numpy as np
 from PIL import Image
@@ -60,6 +68,9 @@ class Scene:
                     fx=int(rng.integers(1, 3)), fy=int(rng.integers(1, 3)), blink=int(rng.integers(1, 4))))
             ys = np.linspace(0, 1, 4097)
             self.layers.append((p, items, ys, ys + bias * np.sin(np.pi * ys)))
+        self.effects = []
+        for k, e in enumerate(cfg.get('effects', [])):
+            self.effects.append(load_fx(e['fx']).make(e, self, np.random.default_rng(seed + 101 + k)))
         self.mist = []
         for k, m in enumerate(cfg.get('mist', [])):
             r = np.random.default_rng(seed + 7 + k)
@@ -176,16 +187,42 @@ class Scene:
                         d = np.hypot(dx, dy) / r
                         yield op * (1 - smooth((d - .3) / .6)), col
                 self.stamp(out, x, y, r, fn)
+        for e in self.effects:
+            e.draw(out, t)
         return np.rint(out).clip(0, 255).astype(np.uint8)
 
 
-def encode(frames, path):
+FX_DIR = Path(__file__).resolve().parent / 'anim_fx'
+_fx_cache = {}
+
+
+def load_fx(name):
+    if name not in _fx_cache:
+        spec = importlib.util.spec_from_file_location('anim_fx_' + name, FX_DIR / f'{name}.py')
+        mod = importlib.util.module_from_spec(spec)
+        mod.W, mod.H, mod.TAU, mod.smooth, mod.hexrgb = W, H, TAU, smooth, hexrgb
+        spec.loader.exec_module(mod)
+        _fx_cache[name] = mod
+    return _fx_cache[name]
+
+
+def encode(frames, path, quant=None):
     """全局调色板（254 色 + 1 个透明色）。第 2 帧起，和上一帧颜色相同的像素记成透明：
     GIF 只存变化的像素，体积小很多，解码出来的画面和整帧存储完全一样。"""
     mont = Image.new('RGB', (W * 4, H * 2))
     for i, f in enumerate(frames[::max(1, len(frames) // 8)][:8]):
         mont.paste(Image.fromarray(f), ((i % 4) * W, (i // 4) * H))
-    pal = mont.quantize(colors=254, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+    # 减色算法：默认两种都试、挑整幅平均误差小的；场景设定里写 "quant": "maxcoverage" 可以强制
+    # （大片同色渐变，比如凌雪阁夜里的红墙，用 MEDIANCUT 会断成一层层色块，整幅误差却不一定更大）
+    ref = np.asarray(mont, np.int16)
+    best = None
+    methods = {'mediancut': [Image.Quantize.MEDIANCUT], 'maxcoverage': [Image.Quantize.MAXCOVERAGE]}.get(quant, [Image.Quantize.MEDIANCUT, Image.Quantize.MAXCOVERAGE])
+    for method in methods:
+        cand = mont.quantize(colors=254, method=method, dither=Image.Dither.NONE)
+        err = float(np.abs(np.asarray(mont.quantize(palette=cand, dither=Image.Dither.NONE).convert('RGB'), np.int16) - ref).mean())
+        if best is None or err < best[0]:
+            best = (err, cand)
+    pal = best[1]
     raw = pal.getpalette()[:254 * 3]
     pal.putpalette(raw + [0, 0, 0] * (256 - 254))
     idx = [np.asarray(Image.fromarray(f).quantize(palette=pal, dither=Image.Dither.NONE)) for f in frames]
@@ -221,7 +258,7 @@ def main():
         sc = Scene(folder / f'scene-{kind}.jpg', conf[kind], seed=zlib.crc32(f'{sid}-{kind}'.encode()) % 100000)
         frames = [sc.render(i / FRAMES) for i in range(FRAMES)]
         out = folder / f'scene-{kind}.gif'
-        encode(frames, out)
+        encode(frames, out, conf[kind].get('quant'))
         n, d, top, seam = measure(out)
         print(f'{sid} {kind}: {n} frames, diff {d:.2f} (top {top:.2f}), seam {seam:.2f}, glows {len(sc.glows)}, {out.stat().st_size // 1024} KB')
 

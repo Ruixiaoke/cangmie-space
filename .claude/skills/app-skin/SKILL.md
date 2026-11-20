@@ -28,7 +28,7 @@ description: 聊天应用的整套外观皮肤（纯阳 chunyang 这类：换场
 | `chat/js/mascot.js` 的 `SKIN_MASCOT` | 可选：皮肤 id → 固定用哪个吉祥物（`CHARS` 的下标；纯阳是 1）。不写就照常随机 |
 | `chat/js/views/me.js` | 皮肤选择器（色块网格），读 `SKINS` 自动生成，不用改 |
 | `chat/css/skins.css` | 所有整套外观皮肤共用的修正（`:root[data-skin]` 前缀）：登录页和「我的」页压在场景上的文字加柔光、登录页返回链接加玻璃底、页名前徽记加细描边、皮肤选择器网格。某个问题在所有皮肤上都有，就改这里，不要每个皮肤各改一遍 |
-| `.claude/skills/app-skin/tools/` | 截图脚本 `shots.mjs`、假数据 `fake-sb.js`、预览页生成 `build-preview.py` / `build-gallery.py`、场景动画 `animate-scene.py` 和各皮肤的动画设定 `scene-anim.json` |
+| `.claude/skills/app-skin/tools/` | 截图脚本 `shots.mjs`、假数据 `fake-sb.js`、预览页生成 `build-preview.py` / `build-gallery.py`、场景动画 `animate-scene.py`、门派专属动效插件 `anim_fx/`、各门派的动画设定 `scene-anim.d/` |
 
 ## 规则
 
@@ -123,9 +123,13 @@ description: 聊天应用的整套外观皮肤（纯阳 chunyang 这类：换场
 
 所有整套外观皮肤的场景都是循环 GIF：`scene-day.gif`、`scene-night.gif` 叠在同名的静态 jpg 上面。
 
-- **做法**：用 `tools/animate-scene.py`，在 GPT 生成的静态场景上叠加粒子、雾带和晚上的灯火起伏。底图一个像素都不改，所有运动都是循环的整数倍，首尾无缝。不要让生图模型重画每一帧，帧和帧对不上会闪。（OpenAI Images 2.6 号称能直接出 GIF，但我们这边的 Codex 生图接口试过没有这个输出。以后有了可以再试，验收标准不变。）
-- **设定**：`tools/scene-anim.json` 里每个皮肤一项，`day` / `night` 各写粒子、雾带和灯火（字段说明在 `animate-scene.py` 开头）。粒子种类：`snow` 雪、`petal` 花瓣、`leaf` 落叶、`ember` 往上飘的火星、`firefly` 萤火虫、`sparkle` 星光闪烁、`dust` 横飘的尘沙。照场景选：纯阳、苍云、凌雪阁、药宗下雪；七秀、万花、段氏落花瓣；少林、霸刀、天策落叶；明教、霸刀晚上飘火星；晚上的湖边、林子放萤火虫；海上、星空用星光。晚上的灯火位置由脚本从夜景图里自动找暖色亮点，不用手填。
-- **生成**：`python3 .claude/skills/app-skin/tools/animate-scene.py chat/skins/<id> .claude/skills/app-skin/tools/scene-anim.json <id>`（可以只跑 `day` 或 `night`）。几个皮肤可以并行跑。输出 512×768、44 帧 × 90 ms、无限循环，不限体积（一般 0.6 到 2.5MB：和上一帧相同的像素存成透明，只记变化）。
+- **做法**：用 `tools/animate-scene.py`，在 GPT 生成的静态场景上叠加粒子、雾带和晚上的灯火起伏。底图一个像素都不改，所有运动都是循环的整数倍，首尾无缝。动效写成插件（见下）。不要让生图模型重画每一帧，帧和帧对不上会闪。（OpenAI Images 2.6 号称能直接出 GIF，但我们这边的 Codex 生图接口试过没有这个输出。以后有了可以再试，验收标准不变。）
+- **每个门派的动效都要专属、互不重复**：用户明确要求过，不能几个门派共用萤火虫、落叶、花瓣、雾带。现有分配（新皮肤不要和这些撞）：纯阳竖直飘雪；少林扇形银杏叶 + 钟声金环；天策斜向风沙带；万花五瓣紫花 + 墨晕；七秀粉色绸带 + 桃花瓣；五毒扇翅蝴蝶；丐帮芦花絮 + 渔火倒影；藏剑月牙形金色剑气；唐门细长竹叶 + 竹海流雾；明教沙流（白天）+ 圣火火星（夜里）；苍云斜向暴风雪雪线；长歌湖面荷花灯；霸刀五尖红枫叶；蓬莱水墨白鹤 + 羽毛；凌雪阁六角雪花晶体 + 寒光；衍天宗星座连线；药宗温泉蒸汽；刀宗礁石浪沫；万灵萤火虫 + 林间光束；段氏洱海碎金波光 + 云影；无相楼提线木偶悬丝 + 红色剪纸。
+- **写法**：每种动效是 `tools/anim_fx/<门派>_<效果>.py` 一个插件（接口见 `animate-scene.py` 开头和 `anim_fx/README.md`），每个门派的设定是 `tools/scene-anim.d/<id>.json`（`{"<id>": {"day": {"effects": [...], "glow": 0.2}, "night": {...}}}`）。内置的 `particles` / `mist` 只留给临时试验，正式皮肤都用专属插件。`glow`（夜里画中灯火明暗）只给画里真有灯火的门派。
+- **生成**：`python3 .claude/skills/app-skin/tools/animate-scene.py chat/skins/<id> .claude/skills/app-skin/tools/scene-anim.d/<id>.json <id>`（可以只跑 `day` 或 `night`）。几个门派可以交给几个子代理并行做：每个子代理只新建自己门派的插件和设定，不改 `animate-scene.py`。
+- **GIF 只有 254 色**：大片同色渐变（凌雪阁夜里的红墙）可能断成一层层色块；工具默认在两种减色算法里挑整幅误差小的，局部断层时在那个场景的设定里写 `"quant": "maxcoverage"` 强制换算法，或者别在那片区域加大面积的光晕。
+- **不要往画里加原图没有的东西**（比如自己画一条船）：程序画的物件和水墨原画风格对不上。动效是在原画上「动起来」，不是改画。
+- **形状要像**：自己放大看连续 4 帧。做过返工的教训：鹤画成硬边多边形像剪纸、剑气画成圆头拖尾像流星、芦花画成放射细刺像星星、雪花太大太亮像贴纸、风沙满屏乱闪太躁。要柔和、像水墨笔触，克制，但明显在动。
 - **验收**：脚本最后打印「相邻帧平均变化」和「首尾接缝」。变化低于 0.3 基本看不出在动（纯阳第一版只有 0.01），要加大粒子、提高对比度：浅色粒子落在浅色场景上会消失，换深一点的颜色或换粒子种类；接缝要和相邻帧差不多。还要亲眼看：取一帧放大看粒子，再在 app 里截图看文字是否清楚。
 - **样式**：`--scene-img` 写 gif，新增 `--scene-still` 写 jpg，`--scene-bg` 里 `var(--scene-img)` 后面加一层 `var(--scene-still)`，`#shell` 的 `background-size` 多一个 `cover`；再加 `prefers-reduced-motion: reduce` 时把 `--scene-img` 换回 jpg（白天、`data-theme="dark"`、跟随系统三处）。照 `skin-chunyang.css` 末尾抄。
 

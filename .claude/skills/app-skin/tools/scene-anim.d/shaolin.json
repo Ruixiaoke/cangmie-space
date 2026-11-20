@@ -1,0 +1,68 @@
+{
+ "shaolin": {
+  "day": {
+   "effects": [
+    {
+     "fx": "shaolin_ginkgo",
+     "count": 20,
+     "opacity": 0.95,
+     "size": [
+      9,
+      15
+     ],
+     "sway": 16,
+     "colors": [
+      [
+       "#c9861a",
+       "#f2c230",
+       "#8d5a0c"
+      ],
+      [
+       "#d8962a",
+       "#ffd24a",
+       "#8d5a0c"
+      ]
+     ]
+    },
+    {
+     "fx": "shaolin_bell_rings",
+     "x": 426,
+     "y": 150,
+     "radius": 240,
+     "color": "#d19a1c",
+     "opacity": 0.95
+    }
+   ]
+  },
+  "night": {
+   "effects": [
+    {
+     "fx": "shaolin_ginkgo",
+     "count": 9,
+     "opacity": 0.85,
+     "size": [
+      8,
+      13
+     ],
+     "sway": 14,
+     "colors": [
+      [
+       "#a8741c",
+       "#e0b040",
+       "#6a420c"
+      ]
+     ]
+    },
+    {
+     "fx": "shaolin_bell_rings",
+     "x": 425,
+     "y": 140,
+     "radius": 240,
+     "color": "#ffe29a",
+     "opacity": 0.7
+    }
+   ],
+   "glow": 0.22
+  }
+ }
+}

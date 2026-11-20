@@ -1,0 +1,37 @@
+{
+ "wanhua": {
+  "day": {
+   "effects": [
+    {
+     "fx": "wanhua_flowers",
+     "count": 14,
+     "opacity": 0.95,
+     "ink": 5,
+     "ink_color": "#4b3a78",
+     "ink_opacity": 0.6
+    }
+   ]
+  },
+  "night": {
+   "effects": [
+    {
+     "fx": "wanhua_flowers",
+     "count": 8,
+     "opacity": 0.9,
+     "colors": [
+      [
+       "#7f58c0",
+       "#d3bcf6",
+       "#3a2272"
+      ]
+     ],
+     "heart": "#f0dc90",
+     "ink": 5,
+     "ink_color": "#e6eaff",
+     "ink_opacity": 0.75,
+     "ink_glow": true
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,114 @@
+{
+ "duanshi": {
+  "day": {
+   "effects": [
+    {
+     "fx": "duanshi_lake_glitter",
+     "count": 230,
+     "region": [
+      20,
+      215,
+      500,
+      620
+     ],
+     "hot": [
+      420,
+      60
+     ],
+     "hot_share": 0.3,
+     "color": "#dc9a14",
+     "core": "#ffd44e",
+     "opacity": 1.0
+    },
+    {
+     "fx": "duanshi_cloud_shadows",
+     "clouds": [
+      [
+       70,
+       40,
+       70,
+       1.0
+      ],
+      [
+       150,
+       300,
+       90,
+       0.9
+      ],
+      [
+       230,
+       170,
+       80,
+       0.8
+      ],
+      [
+       110,
+       430,
+       60,
+       0.7
+      ]
+     ],
+     "color": "#44506e",
+     "opacity": 0.34,
+     "dir": 1,
+     "ymax": 330
+    }
+   ]
+  },
+  "night": {
+   "effects": [
+    {
+     "fx": "duanshi_lake_glitter",
+     "count": 170,
+     "region": [
+      60,
+      215,
+      460,
+      560
+     ],
+     "hot": [
+      235,
+      40
+     ],
+     "hot_share": 0.6,
+     "color": "#d8e2f4",
+     "core": "#ffffff",
+     "opacity": 0.95
+    },
+    {
+     "fx": "duanshi_cloud_shadows",
+     "clouds": [
+      [
+       70,
+       40,
+       70,
+       1.0
+      ],
+      [
+       150,
+       300,
+       90,
+       0.9
+      ],
+      [
+       230,
+       170,
+       80,
+       0.8
+      ],
+      [
+       110,
+       430,
+       60,
+       0.7
+      ]
+     ],
+     "color": "#06080e",
+     "opacity": 0.42,
+     "dir": 1,
+     "ymax": 330
+    }
+   ]
+  }
+ }
+}
