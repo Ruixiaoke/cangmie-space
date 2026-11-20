@@ -1,7 +1,7 @@
 // agent.ts 的本地测试：用假的数据库和假的 OpenAI（mock fetch），不访问网络
 // 运行：deno test supabase/functions/agent-chat/agent_test.ts
 import {
-  buildHistoryBlock, buildMemoryBlock, buildUserInput, extractReply, HISTORY_AGENT_CHARS, HISTORY_BLOCK_CHARS, HISTORY_USER_CHARS, MAX_OUTPUT_TOKENS, MAX_REPLY, MAX_ROUNDS,
+  buildHistoryBlock, buildMemoryBlock, buildUserInput, extractReply, plainText, HISTORY_AGENT_CHARS, HISTORY_BLOCK_CHARS, HISTORY_USER_CHARS, MAX_OUTPUT_TOKENS, MAX_REPLY, MAX_ROUNDS,
   MEMORY_BLOCK_CHARS, PINNED_MAX, runJob, SEARCH_CONTEXT_SIZE, systemInstructions, TEMPERATURE, TOOL_SPECS, type Memory,
 } from "./agent.ts";
 
@@ -552,4 +552,14 @@ Deno.test("other 400 errors are not retried", async () => {
     fetchFn: (() => { n++; return Promise.resolve(new Response(JSON.stringify({ error: { message: "bad input" } }), { status: 400 })); }) as unknown as typeof fetch,
   }, 7);
   if (n !== 1 || w.state.job.status !== "failed") throw new Error(n + " " + JSON.stringify(w.state.job));
+});
+
+Deno.test("plainText: strips Markdown and utm_source=openai, keeps ordinary ? and *", () => {
+  const eq = (a: string, b: string) => { if (plainText(a) !== b) throw new Error(JSON.stringify(plainText(a)) + " != " + JSON.stringify(b)); };
+  eq("门路： https://jx3.seasunwbl.com/ ([jx3.seasunwbl.com](https://jx3.seasunwbl.com/?utm_source=openai))\n\n进去", "门路： https://jx3.seasunwbl.com/\n\n进去");
+  eq("**椿山漫·故人**，**150元**", "椿山漫·故人，150元");
+  eq("看 [万宝楼](https://a.com/g?id=3&utm_source=openai) 好", "看 万宝楼 https://a.com/g?id=3 好");
+  eq("## 标题\n你要哪个? 好的? 2*3", "标题\n你要哪个? 好的? 2*3");
+  const r = extractReply([{ type: "message", content: [{ type: "output_text", text: "**好**", annotations: [] }] }]);
+  if (r !== "好") throw new Error(r);
 });

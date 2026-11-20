@@ -221,18 +221,17 @@ Deno.test("wbl_look: keyword, cheapest first, no seller info; server filter is c
   const o = j(await jx3Info(f.fn, { kind: "wbl_look", item: "何意味" }));
   const q = f.urls[0].searchParams;
   if (f.urls.length !== 1 || q.get("goods_type") !== "3" || q.get("keyword") !== "何意味" || q.get("sort[price]") !== "1" || q.get("size") !== "10") throw new Error(String(f.urls[0]));
-  if (o.total_all_servers !== 6 || o.cheapest[0].name !== "头顶表情【何意味】" || o.cheapest[0].type !== "其他" || o.cheapest[0].price !== "¥10" || o.cheapest[1].price !== "¥1099" || o.cheapest[0].server !== "唯我独尊" || !o.source.includes("万宝楼")) throw new Error(JSON.stringify(o));
+  if (o.total_all_servers !== 6 || o.items[0].name !== "头顶表情【何意味】" || o.items[0].type !== "其他" || o.items[0].price !== "¥10" || o.items[1].price !== "¥1099" || o.items[0].server !== "唯我独尊" || !o.source.includes("万宝楼")) throw new Error(JSON.stringify(o));
   if (JSON.stringify(o).includes("consignment") || JSON.stringify(o).includes("眺***")) throw new Error("leak");
   const s = j(await jx3Info(f.fn, { kind: "wbl_look", item: "何意味", server: "梦江南" }));
-  if (s.cheapest.length !== 1 || s.cheapest[0].server !== "梦江南" || s.cheapest[0].price !== "¥1099" || !s.note.includes("不能按服务器筛") || s.scanned_cheapest !== 2) throw new Error(JSON.stringify(s));
-  if (j(await jx3Info(f.fn, { kind: "wbl_look" })).error !== "item_required") throw new Error("item");
+  if (s.items.length !== 1 || s.items[0].server !== "梦江南" || s.items[0].price !== "¥1099" || !s.note.includes("不能按服务器筛") || s.scanned !== 2) throw new Error(JSON.stringify(s));
   if (j(await jx3Info(f.fn, { kind: "wbl_look", item: "x", server: "不存在" })).error !== "server_unknown") throw new Error("server");
   // 本服的货在第 3 页才出现：最多翻 3 页，不会无限翻
   jx3CacheClear();
   let pages = 0;
   const full = fake((u) => { if (u.pathname.endsWith("/gateways")) return wbl(GATES); pages++; return wbl({ list: Array.from({ length: 10 }, () => item("头顶表情【x】", "唯我独尊", 1000)), total_record: 500 }); });
   const none = j(await jx3Info(full.fn, { kind: "wbl_look", item: "头顶表情", server: "梦江南" }));
-  if (pages !== 3 || none.cheapest.length !== 0 || none.scanned_cheapest !== 30) throw new Error(pages + JSON.stringify(none));
+  if (pages !== 3 || none.items.length !== 0 || none.scanned !== 30) throw new Error(pages + JSON.stringify(none));
 });
 
 Deno.test("gold: 万宝楼 gold listings for one server, best ratio first, range, no sellers", async () => {
@@ -269,4 +268,29 @@ Deno.test("gold: a full page at one ratio is flagged as the 万宝楼 cap", asyn
   const f = fake((u) => u.pathname.endsWith("/gateways") ? wbl(GATES) : wbl({ list: Array.from({ length: 10 }, () => coin), total_record: 0 }));
   const o = j(await jx3Info(f.fn, { kind: "gold", server: "梦江南" }));
   if (o.capped !== true || !o.note.includes("上限") || o.range !== undefined) throw new Error(JSON.stringify(o));
+});
+
+Deno.test("wbl_look without a name: most-watched first, optional type, server scan over more pages", async () => {
+  jx3CacheClear();
+  const it = (name: string, server: string, price: number, fans: number) => ({ info: name, attrs: { appearance_type_name: "发型" }, server_name: server, single_unit_price: price, followed_num: fans, seller_role_name: "眺***" });
+  const f = fake((u) => u.pathname.endsWith("/gateways") ? wbl(GATES) : wbl({ list: [it("金发·登云峰", "绝代天骄", 131100, 3719), it("红发·赤影", "梦江南", 500000, 45)], total_record: 2 }));
+  const o = j(await jx3Info(f.fn, { kind: "wbl_look", type: "发型" }));
+  const q = f.urls[0].searchParams;
+  if (q.has("keyword") || q.get("sort[followed_num]") !== "0" || q.has("sort[price]") || q.get("filter[appearance_type]") !== "3") throw new Error(String(f.urls[0]));
+  if (o.mode !== "热门" || o.items[0].name !== "金发·登云峰" || o.items[0].watchers !== 3719 || o.items[0].price !== "¥1311" || !o.note.includes("不要补别的")) throw new Error(JSON.stringify(o));
+  if (JSON.stringify(o).includes("眺***")) throw new Error("leak");
+  if (j(await jx3Info(f.fn, { kind: "wbl_look", type: "不是类型" })).error !== "bad_argument") throw new Error("type");
+  // 热门 + 服务器：先拿全服热门名字，再逐个按名字查本服价格
+  jx3CacheClear();
+  const g = fake((u) => {
+    if (u.pathname.endsWith("/gateways")) return wbl(GATES);
+    const kw = u.searchParams.get("keyword");
+    if (!kw) return wbl({ list: [it("金发·登云峰", "绝代天骄", 131100, 3719), it("金发·登云峰", "绝代天骄", 1000, 1716), it("红发·赤影", "绝代天骄", 2000, 45)], total_record: 3 });
+    if (kw === "金发·登云峰") return wbl({ list: [it("金发·登云峰", "唯我独尊", 900, 0), it("金发·登云峰", "梦江南", 98800, 0)], total_record: 2 });
+    return wbl({ list: [it("红发·赤影之二", "梦江南", 100, 0)], total_record: 1 });
+  });
+  const s = j(await jx3Info(g.fn, { kind: "wbl_look", server: "梦江南" }));
+  const kws = g.urls.map((u) => u.searchParams.get("keyword")).filter(Boolean);
+  if (kws.join() !== "金发·登云峰,红发·赤影") throw new Error(kws.join());
+  if (s.items.length !== 2 || s.items[0].price_here !== "¥988" || s.items[0].watchers !== 3719 || s.items[1].price_here !== null || s.items[1].here !== "本服最便宜的 10 条里没有") throw new Error(JSON.stringify(s));
 });
