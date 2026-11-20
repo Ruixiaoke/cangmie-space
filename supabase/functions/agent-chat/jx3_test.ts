@@ -234,3 +234,39 @@ Deno.test("wbl_look: keyword, cheapest first, no seller info; server filter is c
   const none = j(await jx3Info(full.fn, { kind: "wbl_look", item: "头顶表情", server: "梦江南" }));
   if (pages !== 3 || none.cheapest.length !== 0 || none.scanned_cheapest !== 30) throw new Error(pages + JSON.stringify(none));
 });
+
+Deno.test("gold: 万宝楼 gold listings for one server, best ratio first, range, no sellers", async () => {
+  jx3CacheClear();
+  const coin = (ratio: number, size: number, count: number) => ({ info: size + "金", seller_role_name: "姑***", server_name: "梦江南", consignment_id: "1439932131312476160", single_unit_size: size, single_unit_price: 1000, remain_unit_count: count, attrs: { gold_price: ratio } });
+  const f = fake((u) => {
+    if (u.pathname.endsWith("/gateways")) return wbl(GATES);
+    return u.searchParams.get("sort[gold_price]") === "0"
+      ? wbl({ list: [coin(902, 9020, 12), coin(902, 9020, 3), coin(900, 9000, 5)], total_record: 0 })
+      : wbl({ list: [coin(739, 7397, 100)], total_record: 0 });
+  });
+  const o = j(await jx3Info(f.fn, { kind: "gold", server: "梦江南服" }));
+  const q = f.urls.find((u) => u.searchParams.get("sort[gold_price]") === "0")!.searchParams;
+  if (q.get("goods_type") !== "1" || q.get("server_id") !== "gate0502" || q.get("zone_id") !== "z05") throw new Error(String(q));
+  if (o.best !== "1元 = 902金" || o.per_10k_gold !== "1万金 ≈ ¥11.09" || o.range !== "在售比例从 1元 = 739金 到 1元 = 902金" || o.best_ratio_stock !== "这个比例前几单合计约 13.5万金" || o.top_ratios.join() !== "902,902,900" || !o.source.includes("万宝楼")) throw new Error(JSON.stringify(o));
+  const text = JSON.stringify(o);
+  if (text.includes("姑***") || text.includes("1439932131312476160")) throw new Error("leak");
+  const n = f.urls.length;
+  await jx3Info(f.fn, { kind: "gold", server: "梦江南" });
+  if (f.urls.length !== n) throw new Error("cached");
+  if (j(await jx3Info(f.fn, { kind: "gold" })).error !== "server_required") throw new Error("server");
+  if (j(await jx3Info(f.fn, { kind: "gold", server: "不存在" })).error !== "server_unknown") throw new Error("unknown");
+  jx3CacheClear();
+  const none = j(await jx3Info(fake((u) => u.pathname.endsWith("/gateways") ? wbl(GATES) : wbl({ list: [], total_record: 0 })).fn, { kind: "gold", server: "梦江南" }));
+  if (none.on_sale !== false || none.best) throw new Error(JSON.stringify(none));
+  // 把「金」当交易行物品查：提示改用 gold
+  const a = j(await jx3Info(f.fn, { kind: "auction", item: "金", server: "梦江南" }));
+  if (a.error !== "bad_argument" || !a.message.includes("kind=gold")) throw new Error(JSON.stringify(a));
+});
+
+Deno.test("gold: a full page at one ratio is flagged as the 万宝楼 cap", async () => {
+  jx3CacheClear();
+  const coin = { info: "9020金", single_unit_size: 9020, single_unit_price: 1000, remain_unit_count: 1, attrs: { gold_price: 902 } };
+  const f = fake((u) => u.pathname.endsWith("/gateways") ? wbl(GATES) : wbl({ list: Array.from({ length: 10 }, () => coin), total_record: 0 }));
+  const o = j(await jx3Info(f.fn, { kind: "gold", server: "梦江南" }));
+  if (o.capped !== true || !o.note.includes("上限") || o.range !== undefined) throw new Error(JSON.stringify(o));
+});
