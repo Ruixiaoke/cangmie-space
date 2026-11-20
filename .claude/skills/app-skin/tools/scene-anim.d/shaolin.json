@@ -3,24 +3,24 @@
   "day": {
    "effects": [
     {
-     "fx": "shaolin_ginkgo",
-     "count": 20,
-     "opacity": 0.95,
+     "fx": "shaolin_bodhi_leaves",
+     "count": 16,
+     "opacity": 0.92,
      "size": [
       9,
-      15
+      14
      ],
-     "sway": 16,
+     "sway": 18,
      "colors": [
       [
-       "#c9861a",
-       "#f2c230",
-       "#8d5a0c"
+       "#8fa83e",
+       "#c9c45a",
+       "#4f5e1e"
       ],
       [
-       "#d8962a",
-       "#ffd24a",
-       "#8d5a0c"
+       "#a8b048",
+       "#d8cc66",
+       "#5a5f1e"
       ]
      ]
     },
@@ -37,19 +37,19 @@
   "night": {
    "effects": [
     {
-     "fx": "shaolin_ginkgo",
-     "count": 9,
-     "opacity": 0.85,
+     "fx": "shaolin_bodhi_leaves",
+     "count": 8,
+     "opacity": 0.8,
      "size": [
-      8,
-      13
+      9,
+      14
      ],
-     "sway": 14,
+     "sway": 18,
      "colors": [
       [
-       "#a8741c",
-       "#e0b040",
-       "#6a420c"
+       "#6f8030",
+       "#a8a44a",
+       "#3e4a18"
       ]
      ]
     },
