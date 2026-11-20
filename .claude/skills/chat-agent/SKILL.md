@@ -78,6 +78,17 @@ agent 不是用户：没有 profile，不能加好友、不能入座小游戏。
 - 部署需要的 secret（`OPENAI_API_KEY` 等）所有 agent 共用，不用加。
 - 人设里提到别的 agent 时（谢云流和李忘生互相提起），他们在同一个聊天里会被分别叫到，各自只说自己的话（应用规则和 `ownReply` 保证）。
 
+### 剑三数据工具 jx3_info（`supabase/functions/agent-chat/jx3.ts`）
+
+工具定义和系统提示里的规则对所有 agent 一模一样（改了会动提示缓存，只改一处）。kind：calendar / server / news / celebs / saohua 走 JX3API（免费、不要 token）；下面三个是后加的物价和万宝楼，都是免费、不用登录、没有官方文档的接口，随时可能改，出错一律返回 `{ error }`，聊天不受影响。
+
+- `auction`（物价，带 item + server）：先 `GET https://node.jx3box.com/item_merged/name/{名字}?client=std&per=10` 搜物品（同名会有绑定 / 不绑定两个 id，绑定的排后面），再 `POST https://next2.jx3box.com/api/auction/`，**JSON** body `{"item_ids":[...],"server":"梦江南","aggregate_type":"hourly"}`（表单不行；aggregate_type 只有 hourly / daily，两个返回一样，只有最新一个价，没有走势）。价格单位是铜（1金 = 10000铜，1银 = 100铜），输出换算成「548金72银」。服务器名不对或没成交返回 `[]`。
+- `wbl_role`（万宝楼在售角色，带 server，可选 sect / shape）：`GET https://trade-api.seasunwbl.com/api/buyer/goods/list?goods_type=2&size=8&zone_id=&server_id=&sort[price]=1&filter[role_sect]=&filter[role_shape]=`。`sort[price]=1` 是价格升序（0 降序）；筛选要写 `filter[role_sect]`（门派 id，1 凌雪阁 … 21 段氏，见 `SECTS`）、`filter[role_shape]`（1 成男 2 成女 3 正太 4 萝莉）、`filter[role_camp]`（1 浩气 2 恶人 3 中立，工具没用）；裸的 `role_sect=` 之类被忽略。门派 / 体型 id 来自 `GET /api/platform/setting/goods_filter_config?goods_type=2`。价格单位是分，输出「¥1099」。size 最大 10 左右，再大报「每页数量格式不正确」。
+- `wbl_look`（万宝楼在售外观，带 item，server 可选）：`goods_type=3&keyword=外观名`（子串匹配 `info`，比如「何意味」「头顶表情」），同样 `sort[price]=1`。**这个接口不认服务器筛选**（server_id / zone_id / filter 都被忽略），指定服务器时在本地翻最便宜的 3 页（每页 10 条）按 `server_name` 筛，回复里会写明这一点。`goods_type=1` 会报错，不用。
+- 服务器名 -> `server_id` / `zone_id`：`GET /api/platform/setting/gateways`，缓存一小时（电信区 z05、双线区 z21、无界区 z51）。
+- 不输出 consignment_id、卖家名（接口里本来就打了码）、门派之外的个人信息；请求里只带物品名 / 服务器 / 门派，不带任何用户数据。系统提示要求 agent 只报数字和出处，不劝买劝卖，没说服务器先问。
+- 请求量要克制：每个查询缓存 3 到 5 分钟（auction 5 分钟，wbl 3 分钟），10 秒超时、网络失败重试一次；不要加轮询、不要批量爬。接口改了就改 `jx3.ts` 和 `jx3_test.ts`（假 fetch）。
+
 ## 检查
 
 1. `python3 agent/gen-persona.py --check`；`node --check` 改过的 JS；仓库根目录 `npx -y eslint@9 chat` 0 错误。
