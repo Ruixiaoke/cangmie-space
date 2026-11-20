@@ -57,6 +57,7 @@
 <link rel="stylesheet" href="css/skin-wanling.css">
 <link rel="stylesheet" href="css/skin-duanshi.css">
 <link rel="stylesheet" href="css/skin-wuxiang.css">
+<link rel="stylesheet" href="css/desktop.css">
 <link rel="stylesheet" href="css/fallback.css">
 </head>
 <body>
@@ -176,6 +177,9 @@
     </div>
     <div id="qsheet" hidden><div class="qs" role="dialog" aria-label="被引用的消息"><div class="qs-name" id="qsName"></div><div class="qs-text" id="qsText"></div><button type="button" class="btn small ghost" id="qsClose">关闭</button></div></div>
   </section>
+
+  <!-- 桌面端双栏：右栏没开聊天时的空状态（手机上不显示，见 css/desktop.css） -->
+  <div id="deskEmpty"><div class="desk-card glass"><div class="hero" id="deskHero"></div><h2>选一个聊天开始</h2><p>左边点一个好友或群。<br><kbd>Alt</kbd> + <kbd>↑</kbd> <kbd>↓</kbd> 切换会话，<kbd>Esc</kbd> 关闭，<kbd>Enter</kbd> 发送，<kbd>Shift</kbd> + <kbd>Enter</kbd> 换行</p></div></div>
 
   <div id="toast" role="status" aria-live="polite"></div>
   <div id="pop" hidden></div>

@@ -23,7 +23,8 @@ import { sand, sandDisable, sandKill, sandNew } from '../skins/sand.js';
 import { S, convKey, makeAvatar, profileOf, sb } from '../state.js';
 import { emptyState } from '../mascot.js';
 import { $, clear, h, isVisible, toast } from '../utils.js';
-import { convOf, peerFromConv } from '../views/chats.js';
+import { convOf, markActiveConv, peerFromConv } from '../views/chats.js';
+import { isDesktop } from '../desktop.js';
 import { groupOf, memberIds } from '../groups/data.js';
 import { closeGroupInfo } from '../groups/info.js';
 import { makeGroupAvatar } from '../groups/ui.js';
@@ -69,10 +70,13 @@ export async function openGroup(gid, fromHistory) {
 }
 async function openConv(id, fromHistory) {
   if (S.chat && convKey(S.chat) === convKey(id)) return;
+  // 桌面端可以从左栏直接点另一个会话：先把上一个会话的东西收干净（手机上一定是先退出再进，S.chat 为空）
+  if (S.chat) teardownChat();
   S.chat = { peer: id.peer, gid: id.gid, msgs: [], ids: new Set(), nodes: new Map(), hasMore: false, loadingOlder: false, loaded: false,
     bstate: {}, bshow: {}, btstate: {}, btshow: {}, finfo: {}, bev: [], fxApplied: new Set(), agentJobs: {} };
   var key = convKey(S.chat);
-  if (!fromHistory) { try { history.pushState({ chat: key }, ''); } catch (e) { /* 忽略 */ } }
+  // 手机上返回键 = 退出聊天，所以每进一个聊天记一条历史；桌面端双栏不需要（后退会把聊天关掉而不是回上一个会话）
+  if (!fromHistory && !isDesktop()) { try { history.pushState({ chat: key }, ''); } catch (e) { /* 忽略 */ } }
   $('chat').hidden = false;
   closePanels();
   $('input').value = '';
@@ -83,6 +87,7 @@ async function openConv(id, fromHistory) {
   clear($('chatEmpty'));
   $('olderRow').hidden = true;
   renderChatHeader();
+  markActiveConv();
   refreshPlusPanel();
   closeNotifications(id.gid != null ? 'grp-' + id.gid : 'msg-' + id.peer);
   applySkin();
@@ -90,14 +95,19 @@ async function openConv(id, fromHistory) {
   await fetchLatest(true);
   if (S.chat && convKey(S.chat) === key) { markReadIfNeeded(); agentResync(); }
 }
-export function closeChat() {
-  if (!S.chat) return;
+// 收掉当前会话的东西（小程序、群资料、排行榜、特效、计时器、沙子皮肤），不动聊天页的显隐
+function teardownChat() {
   closeLeaderboard();
   closeApp();
   closeGroupInfo();
   S.chat = null;
   stopFx(); stopDecay(); closeActMenu(); resetLive();
   sandDisable();
+}
+export function closeChat() {
+  if (!S.chat) return;
+  teardownChat();
+  markActiveConv();
   $('chat').hidden = true;
   closePanels();
   resetQuoteUi();

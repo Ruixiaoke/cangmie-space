@@ -1,0 +1,54 @@
+/* 桌面端（宽屏）：双栏。左栏是消息 / 好友 / 我的（原来的手机界面），右栏是当前聊天；没开聊天时右栏是空状态。
+   断点和 js/desktop.js 的 DESK_MQ 一致。窄屏（手机）一条规则都不生效。
+   场景背景铺满整个窗口（左栏透出场景，右栏聊天页仍是自己的底色）。 */
+#deskEmpty{display:none}
+@media (min-width: 960px){
+  :root{--desk-list:380px}
+  #shell{max-width:none;left:0;transform:none;box-shadow:none}
+
+  /* 默认外观的场景是给手机窄屏画的「窗框」（横竖两道框线、窗台），拉宽到整个窗口会变成横穿左栏的线：
+     宽屏上只留窗外的光和底色 */
+  :root:not([data-skin]) #shell{background:
+    radial-gradient(70% 60% at 88% -4%,rgba(255,226,158,.9),rgba(255,226,158,0) 62%),
+    linear-gradient(112deg,transparent 18%,rgba(255,242,208,.55) 36%,rgba(255,242,208,0) 64%),
+    linear-gradient(180deg,#f7e8cc 0,#f4e3c8 48%,#ebd5b2 100%)}
+  :root:not([data-skin])[data-theme="dark"] #shell{background:
+    radial-gradient(60% 46% at 14% 6%,rgba(255,176,98,.4),rgba(255,176,98,0) 70%),
+    linear-gradient(180deg,#1c120d 0,#26170f 62%,#1a100b 100%)}
+
+  /* 左栏 */
+  #app{position:absolute;top:0;bottom:0;left:0;width:var(--desk-list);border-right:1px solid var(--hair)}
+  #chatList .card{transition:transform .16s var(--ease),box-shadow .16s var(--ease),background-color .16s var(--ease)}
+  #chatList .card:hover{background-color:var(--g-bar)}
+  #chatList .card.on{background-color:color-mix(in srgb,var(--pink) 14%,var(--g-card));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--pink) 55%,transparent),var(--sh-1)}
+  #chatList .card.on .name{color:var(--pink-text)}
+
+  /* 右栏：聊天。返回键在双栏里没有意义（左栏一直在） */
+  #chat{left:var(--desk-list);box-shadow:-1px 0 0 var(--hair)}
+  #chat > .top > #chatBack{display:none}
+  #chat > .top{padding-left:16px}
+  /* 群资料：内容限宽居中（开关别离名字太远）；它自己的返回键保留 */
+  .gi-body{padding-left:max(16px,calc((100% - 720px) / 2));padding-right:max(16px,calc((100% - 720px) / 2))}
+  /* 宽栏里一行别拉得太长 */
+  #msgs .col{max-width:min(calc(100% - 48px),640px)}
+
+  /* 右栏空状态 */
+  #deskEmpty{display:flex;position:absolute;top:0;bottom:0;left:var(--desk-list);right:0;align-items:center;justify-content:center;padding:32px;z-index:1}
+  #app[hidden] ~ #deskEmpty,#chat:not([hidden]) ~ #deskEmpty{display:none}
+  .desk-card{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:360px;padding:28px 32px;border-radius:var(--r-panel);text-align:center}
+  .desk-card .hero{width:112px;height:112px;margin:0}
+  .desk-card h2{font-size:var(--fs-lg);font-weight:600}
+  .desk-card p{font-size:var(--fs-sm);color:var(--t2);line-height:1.7}
+  .desk-card kbd{display:inline-block;min-width:22px;padding:0 6px;border:1px solid var(--hair);border-bottom-width:2px;border-radius:6px;background:var(--g-chip);font:inherit;font-size:var(--fs-xs);line-height:20px;color:var(--t1)}
+
+  /* 登录页：卡片别撑满整个窗口 */
+  #auth .auth-card{max-width:420px}
+
+  /* 底部弹出的面板（排行榜、配方图鉴）在宽屏里居中、限宽 */
+  #rankSheet>*,#recipeSheet .sheet{width:min(100%,560px);margin-left:auto;margin-right:auto}
+}
+@media (min-width: 960px) and (prefers-color-scheme: dark){
+  :root:not([data-skin]):not([data-theme="light"]) #shell{background:
+    radial-gradient(60% 46% at 14% 6%,rgba(255,176,98,.4),rgba(255,176,98,0) 70%),
+    linear-gradient(180deg,#1c120d 0,#26170f 62%,#1a100b 100%)}
+}
