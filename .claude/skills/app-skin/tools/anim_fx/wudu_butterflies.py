@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""五毒：蝴蝶（蓝紫、银色），翅膀明显扇动，飞行路线是平滑的曲线。夜里发淡淡荧光。"""
+"""五毒：蝴蝶（蓝紫、银色），翅膀明显扇动，飞行路线是平滑的曲线。夜里发淡淡荧光。
+横屏可调：amp 飞行曲线摆幅倍数 (1，默认按 512 宽设计)；size、y 本来就能设。"""
 import math
 import numpy as np
 
@@ -15,11 +16,12 @@ class Fx:
         size = cfg.get('size', [13, 18])
         ys = cfg.get('y', [60, 620])
         s.items = []
+        amp = float(cfg.get('amp', 1))
         for i in range(n):
             s.items.append(dict(
                 k=int(rng.choice([-1, 1, 1])), x0=float(rng.uniform(0, W)), y0=float(rng.uniform(*ys)),
-                A=float(rng.uniform(25, 60)), fa=int(rng.choice([2, 3, 4])), pa=float(rng.uniform(0, TAU)),
-                A2=float(rng.uniform(8, 18)), fb=int(rng.choice([5, 7])), pb=float(rng.uniform(0, TAU)),
+                A=float(rng.uniform(25, 60)) * amp, fa=int(rng.choice([2, 3, 4])), pa=float(rng.uniform(0, TAU)),
+                A2=float(rng.uniform(8, 18)) * amp, fb=int(rng.choice([5, 7])), pb=float(rng.uniform(0, TAU)),
                 S=float(rng.uniform(*size)), flaps=int(rng.choice([5, 6, 7])), pf=float(rng.uniform(0, 3)),
                 pal=s.pal[i % len(s.pal)]))
 

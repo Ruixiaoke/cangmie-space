@@ -14,6 +14,7 @@ class Steam:
         self.shade_a = float(cfg.get('shade_opacity', .5))
         self.rise = float(cfg.get('rise', 150))
         self.lamp = cfg.get('lamp')
+        self.lamp_r = float(cfg.get('lamp_r', 75.0))  # 灯火染暖的范围（横屏放大）
         self.lamp_col = hexrgb(cfg.get('lamp_color', '#ffd89a'))
         self.puffs = []
         for src in cfg['sources']:
@@ -38,7 +39,7 @@ class Steam:
             tint = 0.0
             if self.lamp:
                 d = math.hypot(x - self.lamp[0], y - self.lamp[1])
-                tint = math.exp(-d / 75.0)
+                tint = math.exp(-d / self.lamp_r)
             col = self.col + (self.lamp_col - self.col) * tint * .75
             a0 = a0 * (1 + .2 * tint)
             for ox, oy, w in p['subs']:

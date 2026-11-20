@@ -54,6 +54,62 @@
      "reflect": 11
     }
    ]
+  },
+  "wide": {
+   "day": {
+    "effects": [
+     {
+      "fx": "gaibang_reed_fluff",
+      "count": 40,
+      "size": [
+       5,
+       8
+      ],
+      "opacity": 0.7,
+      "y_range": [
+       220,
+       560
+      ],
+      "span": 1000,
+      "bob": [
+       8,
+       16
+      ]
+     }
+    ]
+   },
+   "night": {
+    "effects": [
+     {
+      "fx": "gaibang_reed_fluff",
+      "count": 25,
+      "size": [
+       5,
+       8
+      ],
+      "opacity": 0.45,
+      "color": [
+       205,
+       216,
+       208
+      ],
+      "shade": [
+       8,
+       18,
+       16
+      ],
+      "y_range": [
+       220,
+       560
+      ],
+      "span": 1000,
+      "bob": [
+       8,
+       16
+      ]
+     }
+    ]
+   }
   }
  }
 }

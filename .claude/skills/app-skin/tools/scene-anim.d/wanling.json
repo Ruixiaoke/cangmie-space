@@ -123,6 +123,6 @@
      "drift": 26
     }
    ]
-  }
- }
-}
+  },
+ "wide": {"day": {"effects": [{"fx": "wanling_light_shafts", "beams": [[70, 34, 1.0], [250, 46, 0.9], [420, 38, 1.0], [610, 50, 0.8], [800, 42, 1.0], [1000, 54, 0.8], [1180, 40, 0.9], [1380, 48, 0.7]], "slant": 0.34, "length": 600, "fade_in": 110, "widen": 1450, "color": "#fff3cf", "opacity": 0.75, "sweep": 78}, {"fx": "wanling_fireflies", "count": 64, "region": [0, 250, 1536, 540], "color": "#b4cf22", "core": "#eeff7a", "size": [5, 7.5], "opacity": 1.0, "drift": 58, "halo_pad": 2.6}], "quality": 88}, "night": {"effects": [{"fx": "wanling_light_shafts", "beams": [[70, 34, 1.0], [250, 46, 0.9], [420, 38, 1.0], [610, 50, 0.8], [800, 42, 1.0], [1000, 54, 0.8], [1180, 40, 0.9], [1380, 48, 0.7]], "slant": 0.34, "length": 600, "fade_in": 110, "widen": 1450, "color": "#c4d6f6", "opacity": 0.6, "sweep": 78}, {"fx": "wanling_fireflies", "count": 110, "region": [0, 150, 1536, 540], "color": "#d4f84e", "core": "#f8ffb8", "size": [4.5, 7.2], "opacity": 1.0, "drift": 66, "halo_pad": 2.6}], "quality": 88}}
+}}

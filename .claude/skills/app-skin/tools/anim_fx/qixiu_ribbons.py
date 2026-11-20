@@ -13,11 +13,12 @@ class Fx:
         s.light = hexrgb(cfg.get('light', '#ffc2d6'))
         s.edge = hexrgb(cfg.get('edge', '#b02f5c'))
         ys = cfg.get('y', [170, 255, 340])
+        sc = float(cfg.get('scale', 1.0))  # 横屏：摆幅、宽度按画布放大（默认 1，竖屏不变）
         s.rb = []
         for j in range(n):
-            s.rb.append(dict(ph=(j + 0.0) / n, y0=float(ys[j % len(ys)]), A=float(rng.uniform(26, 42)), k=float(rng.choice([1.5, 2.0, 2.5])),
-                             m=int(rng.choice([1, 2])), f=float(rng.uniform(0, TAU)), A2=float(rng.uniform(8, 16)), k2=float(rng.choice([3.5, 4.5])),
-                             m2=int(rng.choice([1, 2])), f2=float(rng.uniform(0, TAU)), hmax=float(rng.uniform(15, 22)),
+            s.rb.append(dict(ph=(j + 0.0) / n, y0=float(ys[j % len(ys)]), A=float(rng.uniform(26, 42)) * sc, k=float(rng.choice([1.5, 2.0, 2.5])),
+                             m=int(rng.choice([1, 2])), f=float(rng.uniform(0, TAU)), A2=float(rng.uniform(8, 16)) * sc, k2=float(rng.choice([3.5, 4.5])),
+                             m2=int(rng.choice([1, 2])), f2=float(rng.uniform(0, TAU)), hmax=float(rng.uniform(15, 22)) * sc,
                              kt=float(rng.choice([2.0, 3.0])), mt=int(rng.choice([1, 2])), ft=float(rng.uniform(0, TAU))))
         s.xs = np.arange(W, dtype=np.float32)
         s.ys = scene.yy[:, :1]

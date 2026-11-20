@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """无相楼：从画面顶部垂下的提线木偶悬丝。细线，下端有小十字提线板的影子，随风轻轻摆动。
-cfg: strings [[x, length, phase]], color, plate_color, opacity, sway, lamps [[x,y]] (夜里被灯光照成淡金色)"""
+cfg: strings [[x, length, phase]], color, plate_color, opacity, sway, lamps [[x,y]] (夜里被灯光照成淡金色)
+横屏可调（默认值是 512 宽竖屏的数字）：scale 提线板等小件的放大倍数 (1)，lw 悬丝粗细 (1)，plate_lw 提线板杆粗细 (2)，
+lamp_r 灯光照亮悬丝的范围 [150, 190]"""
 import math
 import numpy as np
 
@@ -31,6 +33,10 @@ class Strings:
         self.sway = float(cfg.get('sway', 7))
         self.lamps = cfg.get('lamps')
         self.lit = hexrgb(cfg.get('lit_color', '#ffd98a'))
+        self.k = float(cfg.get('scale', 1))
+        self.lw = int(cfg.get('lw', 1))
+        self.plw = int(cfg.get('plate_lw', 2))
+        self.lamp_r = cfg.get('lamp_r', [150, 190])
 
     def draw(self, out, t):
         mask = np.zeros((H, W), np.float32)
@@ -45,21 +51,21 @@ class Strings:
                 s = i / n
                 pts.append((x + bx_off * s ** 1.6, s * length))
             for (ax, ay), (bx, by) in zip(pts, pts[1:]):
-                line(mask, ax, ay, bx, by, 1.0)
+                line(mask, ax, ay, bx, by, 1.0, self.lw)
             ex, ey = pts[-1]
             ang = .22 * math.sin(math.tau * t + ph + .6)
             ca, sa = math.cos(ang), math.sin(ang)
             # 十字提线板：横杆 + 竖杆
-            for (ux, uy, hl) in ((ca, sa, 10), (-sa, ca, 5)):
-                line(mask, ex - ux * hl, ey - uy * hl + 3, ex + ux * hl, ey + uy * hl + 3, 1.0, 2)
+            for (ux, uy, hl) in ((ca, sa, 10 * self.k), (-sa, ca, 5 * self.k)):
+                line(mask, ex - ux * hl, ey - uy * hl + 3 * self.k, ex + ux * hl, ey + uy * hl + 3 * self.k, 1.0, self.plw)
             # 板下垂的几根细线
-            for dxk in (-8, 8):
-                px, py = ex + dxk * ca, ey + dxk * sa + 3
-                line(mask, px, py, px + dxk * .25 + 1.5 * math.sin(math.tau * t + ph + dxk), py + 16, .35, 1)
+            for dxk in (-8 * self.k, 8 * self.k):
+                px, py = ex + dxk * ca, ey + dxk * sa + 3 * self.k
+                line(mask, px, py, px + dxk * .25 + 1.5 * self.k * math.sin(math.tau * t + ph + dxk), py + 16 * self.k, .35, self.lw)
         if self.lamps:
             lit = np.zeros((H, W), np.float32)
             for lx, ly in self.lamps:
-                lit += np.exp(-.5 * (((self.sc.xx - lx) / 150) ** 2 + ((self.sc.yy - ly) / 190) ** 2))
+                lit += np.exp(-.5 * (((self.sc.xx - lx) / self.lamp_r[0]) ** 2 + ((self.sc.yy - ly) / self.lamp_r[1]) ** 2))
             lit = np.clip(.35 + lit, 0, 1)[:, :, None]
             colr = self.col + (self.lit - self.col) * lit
         else:

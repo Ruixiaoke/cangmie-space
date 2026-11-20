@@ -18,6 +18,45 @@
     }
    ],
    "glow": 0.25
+  },
+  "wide": {
+   "day": {
+    "effects": [
+     {
+      "fx": "wudu_butterflies",
+      "count": 22,
+      "size": [
+       15,
+       22
+      ],
+      "y": [
+       40,
+       780
+      ],
+      "amp": 2.5
+     }
+    ]
+   },
+   "night": {
+    "effects": [
+     {
+      "fx": "wudu_butterflies",
+      "count": 22,
+      "glow": 0.4,
+      "opacity": 0.68,
+      "size": [
+       15,
+       22
+      ],
+      "y": [
+       40,
+       780
+      ],
+      "amp": 2.5
+     }
+    ],
+    "glow": 0.25
+   }
   }
  }
 }
