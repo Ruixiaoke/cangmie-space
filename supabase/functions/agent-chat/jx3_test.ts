@@ -1,6 +1,8 @@
 // jx3.ts（剑三公开数据工具）的测试：假的 fetch，不连网
-import { beijingDate, jx3CacheClear, jx3Info, stripHtml } from "./jx3.ts";
+import { beijingDate, fmtCopper, fmtYuan, jx3CacheClear, jx3Info, sectId, stripHtml } from "./jx3.ts";
 
+// deno-lint-ignore no-explicit-any
+type Row = Record<string, any>;
 const j = (s: string) => JSON.parse(s);
 const ok = (detail: unknown) => new Response(JSON.stringify({ status: 200, detail }), { headers: { "Content-Type": "application/json" } });
 function fake(handler: (u: URL) => Response | Promise<Response>) {
@@ -123,4 +125,112 @@ Deno.test("network errors retry once; business errors don't", async () => {
   const bad = (() => { m++; return Promise.resolve(new Response(JSON.stringify({ status: 400, detail: "服务器名称不正确" }))); }) as unknown as typeof fetch;
   await jx3Info(bad, { kind: "server", server: "x" });
   if (m !== 2) throw new Error("server does 2 parallel calls, no retries: " + m);
+});
+
+// ---- 物价 / 万宝楼 ----
+const raw = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+const wbl = (data: unknown) => raw({ code: 1, msg: "SUCCESS", data });
+const GATES = { list: [{ zone_id: "z05", zone_name: "电信区", servers: [{ server_id: "gate0502", server_name: "梦江南" }, { server_id: "gate0514", server_name: "乾坤一掷" }] }] };
+const role = (price: number, sect = "七秀", shape = "萝莉") => ({
+  attrs: { role_sect: sect, role_shape: shape, role_camp: "浩气盟", role_equipment_point: 8931, role_hair_count: 3, role_garment_count: 2, role_cloak_count: 1 },
+  server_name: "梦江南", single_unit_price: price, consignment_id: "1434938704250339328", seller_role_name: "惊***", info: "电信区-梦江南-惊***",
+});
+
+Deno.test("money formatting: 铜 -> 金银铜, 分 -> ¥", () => {
+  if (fmtCopper(5487200) !== "548金72银") throw new Error(fmtCopper(5487200));
+  if (fmtCopper(10000) !== "1金" || fmtCopper(150) !== "1银50铜" || fmtCopper(7) !== "7铜" || fmtCopper(0) !== "0铜" || fmtCopper(10001) !== "1金1铜") throw new Error("copper");
+  if (fmtYuan(109900) !== "¥1099" || fmtYuan(1050) !== "¥10.5" || fmtYuan(1) !== "¥0.01") throw new Error(fmtYuan(1050));
+  if (sectId("七秀")?.id !== 14 || sectId("纯阳")?.id !== 12 || sectId("万花")?.id !== 15 || sectId("药宗")?.id !== 18 || sectId("abc") !== null) throw new Error("sect");
+});
+
+Deno.test("auction: exact match, unbound variant preferred, POST json, cached", async () => {
+  jx3CacheClear();
+  let post: Row | null = null;
+  let method = "";
+  const fn = ((input: string, init?: RequestInit) => {
+    const u = new URL(input);
+    if (u.hostname === "node.jx3box.com") {
+      if (decodeURIComponent(u.pathname) !== "/item_merged/name/五行石（六级）" || u.searchParams.get("client") !== "std") throw new Error(String(u));
+      return Promise.resolve(raw({ list: [{ id: "5_24447", Name: "五行石（六级）", BindType: 3 }, { id: "5_24428", Name: "五行石（六级）" }, { id: "5_24423", Name: "五行石（一级）" }] }));
+    }
+    method = init?.method ?? "";
+    if (new Headers(init?.headers).get("Content-Type") !== "application/json") throw new Error("json body expected");
+    post = JSON.parse(String(init?.body));
+    return Promise.resolve(raw([{ item_id: "5_24428", server: "梦江南", price: 5487200, sample: 3146, timestamp: 1795132747 }]));
+  }) as unknown as typeof fetch;
+  const o = j(await jx3Info(fn, { kind: "auction", item: "五行石（六级）", server: "梦江南服" }));
+  if (method !== "POST" || post!.server !== "梦江南" || post!.item_ids[0] !== "5_24428" || post!.aggregate_type !== "hourly") throw new Error(JSON.stringify(post));
+  if (o.item !== "五行石（六级）" || o.price !== "548金72银" || o.samples !== 3146 || !/^\d+月\d+日 \d\d:\d\d$/.test(o.updated) || !o.note.includes("JX3BOX") || !o.source) throw new Error(JSON.stringify(o));
+  if (!o.alternatives.includes("五行石（一级）")) throw new Error("alternatives");
+  await jx3Info(fn, { kind: "auction", item: "五行石（六级）", server: "梦江南服" });
+  method = "";
+  if (method !== "") throw new Error("second call should hit cache");
+});
+
+Deno.test("auction: ambiguous name picks the shortest containing match and lists others; unknown item; unknown server; errors", async () => {
+  jx3CacheClear();
+  const mk = (items: Row[], prices: unknown) => fake((u) => u.hostname === "node.jx3box.com" ? raw({ list: items }) : raw(prices)).fn;
+  const items = [{ id: "5_1", Name: "隐元秘宝·五行石(陆)" }, { id: "5_2", Name: "五行石(陆)" }, { id: "5_3", Name: "五行石(柒)" }];
+  const o = j(await jx3Info(mk(items, [{ item_id: "5_2", server: "梦江南", price: 12345, sample: 5, timestamp: 1795132747 }]), { kind: "auction", item: "五行石", server: "梦江南" }));
+  if (o.item !== "五行石(陆)" || o.exact_match !== false || o.price !== "1金23银45铜" || !o.alternatives.includes("五行石(柒)")) throw new Error(JSON.stringify(o));
+  const none = j(await jx3Info(mk([], []), { kind: "auction", item: "没有这个", server: "梦江南" }));
+  if (none.found !== false) throw new Error(JSON.stringify(none));
+  const badServer = j(await jx3Info(mk(items, []), { kind: "auction", item: "五行石", server: "不存在服" }));
+  if (badServer.price !== null || !badServer.note.includes("服务器")) throw new Error(JSON.stringify(badServer));
+  if (j(await jx3Info(mk(items, []), { kind: "auction", item: "五行石" })).error !== "server_required") throw new Error("server required");
+  if (j(await jx3Info(mk(items, []), { kind: "auction", server: "梦江南" })).error !== "item_required") throw new Error("item required");
+  const down = (() => Promise.reject(new Error("net"))) as unknown as typeof fetch;
+  if (j(await jx3Info(down, { kind: "auction", item: "x", server: "梦江南" })).error !== "jx3_unavailable") throw new Error("down");
+  const err = fake(() => raw({ detail: [{ msg: "bad" }] }, 422)).fn;
+  if (j(await jx3Info(err, { kind: "auction", item: "x", server: "y" })).error !== "jx3_unavailable") throw new Error("422");
+});
+
+Deno.test("wbl_role: server mapping, sect/shape filters, cheapest first, no ids or sellers", async () => {
+  jx3CacheClear();
+  const f = fake((u) => u.pathname.endsWith("/gateways") ? wbl(GATES) : wbl({ list: [role(10000), role(109900)], total_record: 484 }));
+  const o = j(await jx3Info(f.fn, { kind: "wbl_role", server: "梦江南", sect: "七秀", shape: "萝莉" }));
+  const q = f.urls[1].searchParams;
+  if (q.get("goods_type") !== "2" || q.get("server_id") !== "gate0502" || q.get("zone_id") !== "z05" || q.get("sort[price]") !== "1" || q.get("filter[role_sect]") !== "14" || q.get("filter[role_shape]") !== "4" || q.get("size") !== "8") throw new Error(String(f.urls[1]));
+  if (o.total_on_sale !== 484 || o.cheapest[0].price !== "¥100" || o.cheapest[1].price !== "¥1099" || o.cheapest[0].gear_score !== 8931 || o.cheapest[0].camp !== "浩气盟" || o.cheapest[0].outfits !== 2 || o.cheapest[0].hairs !== 3 || o.cheapest[0].cloaks !== 1) throw new Error(JSON.stringify(o));
+  const text = JSON.stringify(o);
+  if (text.includes("1434938704250339328") || text.includes("惊***") || text.includes("consignment")) throw new Error("must not leak ids or sellers");
+  await jx3Info(f.fn, { kind: "wbl_role", server: "梦江南", sect: "七秀", shape: "萝莉" });
+  if ((f.urls.length as number) !== 2) throw new Error("cached");
+  const o2 = j(await jx3Info(f.fn, { kind: "wbl_role", server: "乾坤一掷" }));
+  if (f.urls.length !== 3 || f.urls[2].searchParams.get("server_id") !== "gate0514" || f.urls[2].searchParams.has("filter[role_sect]") || o2.error) throw new Error("gateways should be cached, no filters");
+});
+
+Deno.test("wbl_role: unknown server, bad sect, missing server, API error", async () => {
+  jx3CacheClear();
+  const f = fake((u) => u.pathname.endsWith("/gateways") ? wbl(GATES) : wbl({ list: [], total_record: 0 }));
+  const u = j(await jx3Info(f.fn, { kind: "wbl_role", server: "不存在" }));
+  if (u.error !== "server_unknown" || !u.servers.includes("梦江南")) throw new Error(JSON.stringify(u));
+  if (j(await jx3Info(f.fn, { kind: "wbl_role", server: "梦江南", sect: "不是门派" })).error !== "bad_argument") throw new Error("sect");
+  if (j(await jx3Info(f.fn, { kind: "wbl_role", sect: "七秀" })).error !== "server_required") throw new Error("server");
+  jx3CacheClear();
+  const apiErr = fake((u) => u.pathname.endsWith("/gateways") ? wbl(GATES) : raw({ code: -21004, msg: "排序格式不正确", data: {} }));
+  if (j(await jx3Info(apiErr.fn, { kind: "wbl_role", server: "梦江南" })).error !== "jx3_unavailable") throw new Error("api error");
+  const empty = j(await jx3Info(fake((u) => u.pathname.endsWith("/gateways") ? wbl(GATES) : wbl({ list: [], total_record: 0 })).fn, { kind: "wbl_role", server: "梦江南", sect: "七秀" }));
+  if (empty.total_on_sale !== 0 || empty.cheapest.length !== 0) throw new Error("empty");
+});
+
+Deno.test("wbl_look: keyword, cheapest first, no seller info; server filter is client-side over a few pages", async () => {
+  jx3CacheClear();
+  const item = (name: string, server: string, price: number) => ({ info: name, attrs: { appearance_type_name: "其他", item_index: 85264 }, server_name: server, single_unit_price: price, consignment_id: "135640", seller_role_name: "眺***" });
+  const f = fake((u) => u.pathname.endsWith("/gateways") ? wbl(GATES) : wbl({ list: [item("头顶表情【何意味】", "唯我独尊", 1000), item("头顶表情【何意味】", "梦江南", 109900)], total_record: 6 }));
+  const o = j(await jx3Info(f.fn, { kind: "wbl_look", item: "何意味" }));
+  const q = f.urls[0].searchParams;
+  if (f.urls.length !== 1 || q.get("goods_type") !== "3" || q.get("keyword") !== "何意味" || q.get("sort[price]") !== "1" || q.get("size") !== "10") throw new Error(String(f.urls[0]));
+  if (o.total_all_servers !== 6 || o.cheapest[0].name !== "头顶表情【何意味】" || o.cheapest[0].type !== "其他" || o.cheapest[0].price !== "¥10" || o.cheapest[1].price !== "¥1099" || o.cheapest[0].server !== "唯我独尊" || !o.source.includes("万宝楼")) throw new Error(JSON.stringify(o));
+  if (JSON.stringify(o).includes("consignment") || JSON.stringify(o).includes("眺***")) throw new Error("leak");
+  const s = j(await jx3Info(f.fn, { kind: "wbl_look", item: "何意味", server: "梦江南" }));
+  if (s.cheapest.length !== 1 || s.cheapest[0].server !== "梦江南" || s.cheapest[0].price !== "¥1099" || !s.note.includes("不能按服务器筛") || s.scanned_cheapest !== 2) throw new Error(JSON.stringify(s));
+  if (j(await jx3Info(f.fn, { kind: "wbl_look" })).error !== "item_required") throw new Error("item");
+  if (j(await jx3Info(f.fn, { kind: "wbl_look", item: "x", server: "不存在" })).error !== "server_unknown") throw new Error("server");
+  // 本服的货在第 3 页才出现：最多翻 3 页，不会无限翻
+  jx3CacheClear();
+  let pages = 0;
+  const full = fake((u) => { if (u.pathname.endsWith("/gateways")) return wbl(GATES); pages++; return wbl({ list: Array.from({ length: 10 }, () => item("头顶表情【x】", "唯我独尊", 1000)), total_record: 500 }); });
+  const none = j(await jx3Info(full.fn, { kind: "wbl_look", item: "头顶表情", server: "梦江南" }));
+  if (pages !== 3 || none.cheapest.length !== 0 || none.scanned_cheapest !== 30) throw new Error(pages + JSON.stringify(none));
 });
