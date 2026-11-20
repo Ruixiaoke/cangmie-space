@@ -1,0 +1,23 @@
+{
+ "wudu": {
+  "day": {
+   "effects": [
+    {
+     "fx": "wudu_butterflies",
+     "count": 12
+    }
+   ]
+  },
+  "night": {
+   "effects": [
+    {
+     "fx": "wudu_butterflies",
+     "count": 12,
+     "glow": 0.4,
+     "opacity": 0.68
+    }
+   ],
+   "glow": 0.25
+  }
+ }
+}

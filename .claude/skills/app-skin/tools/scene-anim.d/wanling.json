@@ -1,0 +1,128 @@
+{
+ "wanling": {
+  "day": {
+   "effects": [
+    {
+     "fx": "wanling_light_shafts",
+     "beams": [
+      [
+       70,
+       22,
+       1.0
+      ],
+      [
+       150,
+       30,
+       0.9
+      ],
+      [
+       250,
+       26,
+       1.0
+      ],
+      [
+       340,
+       34,
+       0.8
+      ],
+      [
+       430,
+       24,
+       0.9
+      ],
+      [
+       500,
+       30,
+       0.7
+      ]
+     ],
+     "slant": 0.34,
+     "length": 520,
+     "color": "#fff3cf",
+     "opacity": 0.75,
+     "sweep": 28
+    },
+    {
+     "fx": "wanling_fireflies",
+     "count": 24,
+     "region": [
+      0,
+      170,
+      512,
+      340
+     ],
+     "color": "#b4cf22",
+     "core": "#eeff7a",
+     "size": [
+      2.2,
+      3.2
+     ],
+     "opacity": 1.0,
+     "drift": 22
+    }
+   ]
+  },
+  "night": {
+   "effects": [
+    {
+     "fx": "wanling_light_shafts",
+     "beams": [
+      [
+       70,
+       22,
+       1.0
+      ],
+      [
+       150,
+       30,
+       0.9
+      ],
+      [
+       250,
+       26,
+       1.0
+      ],
+      [
+       340,
+       34,
+       0.8
+      ],
+      [
+       430,
+       24,
+       0.9
+      ],
+      [
+       500,
+       30,
+       0.7
+      ]
+     ],
+     "slant": 0.34,
+     "length": 520,
+     "color": "#c4d6f6",
+     "opacity": 0.6,
+     "sweep": 28
+    },
+    {
+     "fx": "wanling_fireflies",
+     "count": 44,
+     "region": [
+      0,
+      90,
+      512,
+      340
+     ],
+     "color": "#d4f84e",
+     "core": "#f8ffb8",
+     "size": [
+      1.8,
+      3.0
+     ],
+     "opacity": 1.0,
+     "drift": 26
+    }
+   ]
+  }
+ }
+}

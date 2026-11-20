@@ -1,0 +1,35 @@
+{
+ "mingjiao": {
+  "day": {
+   "effects": [
+    {
+     "fx": "mingjiao_dune_sand",
+     "streams": 30,
+     "grains": 16,
+     "y_range": [
+      290,
+      750
+     ],
+     "opacity": 0.8,
+     "dark": [
+      190,
+      128,
+      72
+     ]
+    }
+   ]
+  },
+  "night": {
+   "effects": [
+    {
+     "fx": "mingjiao_holy_embers",
+     "fire": [
+      323,
+      228
+     ],
+     "count": 130
+    }
+   ]
+  }
+ }
+}

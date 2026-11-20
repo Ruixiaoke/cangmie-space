@@ -1,0 +1,6 @@
+{"badao": {
+ "day": {"effects": [{"fx": "badao_maple_leaves", "count": 13, "d": 420, "size": [13, 19], "opacity": 0.96,
+   "palette": ["#c8281a", "#d9381c", "#e8661c", "#f08a22", "#b81e18"]}]},
+ "night": {"effects": [{"fx": "badao_maple_leaves", "count": 10, "d": 420, "size": [12, 17], "opacity": 0.8,
+   "palette": ["#8c2a1a", "#a03a18", "#b5601c"]}], "glow": 0.5}
+}}

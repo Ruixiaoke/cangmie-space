@@ -1,0 +1,44 @@
+{
+ "tiance": {
+  "day": {
+   "effects": [
+    {
+     "fx": "tiance_sandstorm",
+     "lanes": 3,
+     "opacity": 0.46,
+     "step": 6,
+     "contrast": 0.2,
+     "colors": [
+      "#a77940",
+      "#94683a",
+      "#b88a50"
+     ],
+     "y_range": [
+      280,
+      700
+     ]
+    }
+   ]
+  },
+  "night": {
+   "effects": [
+    {
+     "fx": "tiance_sandstorm",
+     "lanes": 3,
+     "opacity": 0.4,
+     "step": 6,
+     "contrast": 0.2,
+     "colors": [
+      "#9a8466",
+      "#85735a"
+     ],
+     "y_range": [
+      300,
+      700
+     ]
+    }
+   ],
+   "glow": 0.4
+  }
+ }
+}

@@ -1,0 +1,37 @@
+{
+ "qixiu": {
+  "day": {
+   "effects": [
+    {
+     "fx": "qixiu_ribbons",
+     "count": 3,
+     "opacity": 0.85
+    },
+    {
+     "fx": "qixiu_peach_petals",
+     "count": 12
+    }
+   ]
+  },
+  "night": {
+   "effects": [
+    {
+     "fx": "qixiu_ribbons",
+     "count": 3,
+     "opacity": 0.6,
+     "dark": "#a83a68",
+     "light": "#e895b8",
+     "edge": "#6a1e40"
+    },
+    {
+     "fx": "qixiu_peach_petals",
+     "count": 7,
+     "opacity": 0.8,
+     "base": "#d8708f",
+     "tip": "#f0b0c4"
+    }
+   ],
+   "glow": 0.25
+  }
+ }
+}

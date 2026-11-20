@@ -1,0 +1,4 @@
+{"cangyun": {
+ "day": {"effects": [{"fx": "cangyun_blizzard", "count": 170, "opacity": 0.95, "shade_alpha": 0.4, "shade": [96, 108, 132]}]},
+ "night": {"glow": 0.16, "effects": [{"fx": "cangyun_blizzard", "count": 140, "opacity": 0.62, "color": [176, 188, 212], "shade": [8, 12, 22], "shade_alpha": 0.4}]}
+}}
