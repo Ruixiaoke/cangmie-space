@@ -22,6 +22,9 @@ const GATEWAY_TTL_MS = 60 * 60_000;
 const WBL_SIZE = 8;
 const LOOK_PAGE_SIZE = 10; // 万宝楼 size 超过 10 左右就报「每页数量格式不正确」
 const LOOK_PAGES = 3;
+const HOT_NAMES = 5; // 不带外观名又指定了服务器：取全服最热门的几个名字，再逐个查它在本服最便宜的价
+// 万宝楼外观类型 id（goods_filter_config?goods_type=3 的 appearance_type，筛选参数 filter[appearance_type]）
+export const LOOK_TYPES = ["外观礼盒", "上衣", "发型", "披风", "头饰", "背挂", "腰挂", "面挂", "肩饰", "眼饰", "手饰", "佩囊", "小头像", "宠物", "挂宠", "坐骑", "马具", "其他"];
 const NEWS_EXCERPT = 400;
 
 // deno-lint-ignore no-explicit-any
@@ -352,25 +355,60 @@ async function run(fetchFn: typeof fetch, kind: string, args: Row, db: Db | unde
     };
   }
   if (kind === "wbl_look") {
-    const name = str(args.item, 20), server = serverArg(args.server);
-    if (!name) throw new Jx3Error("item_required");
+    // 带外观名：按价格从低到高；不带：按关注数从高到低看热门（可选外观类型）
+    const name = str(args.item, 20), server = serverArg(args.server), typeIn = str(args.type, 6);
+    const ti = typeIn ? LOOK_TYPES.indexOf(typeIn) : -1;
+    if (typeIn && ti < 0) throw new Jx3Error("bad_argument", "外观类型只能是 " + LOOK_TYPES.join(" "));
     const g = server ? await findGate(fetchFn, server, now) : null;
-    // 外观列表接口不认服务器筛选（试过 server_id / zone_id / filter[...] 都被忽略），要指定服务器就按价格从低到高翻几页，在本地按服务器名筛
+    const hot = !name;
+    // 热门 + 指定服务器：热门榜被少数几个服占满，本服的翻几页也筛不出来；先拿全服热门的名字，再按名字查本服价格
+    if (hot && g) {
+      const params: Record<string, string | number> = { goods_type: 3, page: 1, size: LOOK_PAGE_SIZE, "sort[followed_num]": 0 };
+      if (ti >= 0) params["filter[appearance_type]"] = ti + 1;
+      const top = (await wblList(fetchFn, params)).list;
+      const names = [...new Set(top.map((r) => String(r.info ?? "")).filter(Boolean))].slice(0, HOT_NAMES);
+      const local = await Promise.all(names.map((n) => wblList(fetchFn, { goods_type: 3, page: 1, size: LOOK_PAGE_SIZE, keyword: n, "sort[price]": 1 })
+        .then((r) => r.list.filter((x) => x.server_name === g.server_name && x.info === n)).catch(() => null)));
+      return {
+        key: "wbl_look:" + server + "::" + typeIn,
+        out: {
+          mode: "热门", type: typeIn || undefined, server: g.server_name,
+          items: names.map((n, i) => {
+            const src = top.find((r) => r.info === n);
+            const here = local[i];
+            return { name: n, type: src?.attrs?.appearance_type_name, watchers: Math.max(...top.filter((r) => r.info === n).map((r) => Number(r.followed_num) || 0)),
+              price_here: here && here.length ? fmtYuan(Number(here[0].single_unit_price)) : null,
+              here: here === null ? "查询失败" : here.length ? "本服在售" : "本服最便宜的 10 条里没有" };
+          }),
+          note: `数据来自官方万宝楼的公开列表。万宝楼不能按服务器筛外观，所以这里先取全服关注人数最多的 ${names.length} 个外观，再分别查它们在 ${g.server_name} 最便宜的在售价；price_here 为空表示本服没查到。watchers 是全服关注人数，只代表热度。价格是人民币，可能有延迟，仅供参考。列出来的都是真实查到的，只报这些，不要补别的外观名或价格。不提供卖家信息，要买请对方自己去万宝楼看`,
+        },
+      };
+    }
+    // 外观列表接口不认服务器筛选（试过 server_id / zone_id / filter[...] 都被忽略），要指定服务器就多翻几页，在本地按服务器名筛
     const rows: Row[] = [];
     let total = 0, scanned = 0;
-    for (let page = 1; page <= (g ? LOOK_PAGES : 1); page++) {
-      const r = await wblList(fetchFn, { goods_type: 3, page, size: LOOK_PAGE_SIZE, keyword: name, "sort[price]": 1 });
+    const pages = g ? LOOK_PAGES : 1;
+    for (let page = 1; page <= pages; page++) {
+      const params: Record<string, string | number> = { goods_type: 3, page, size: LOOK_PAGE_SIZE };
+      if (name) params.keyword = name;
+      if (hot) params["sort[followed_num]"] = 0; else params["sort[price]"] = 1;
+      if (ti >= 0) params["filter[appearance_type]"] = ti + 1;
+      const r = await wblList(fetchFn, params);
       total = r.total; scanned += r.list.length;
       rows.push(...(g ? r.list.filter((x) => x.server_name === g.server_name) : r.list));
       if (rows.length >= WBL_SIZE || r.list.length < LOOK_PAGE_SIZE || scanned >= total) break;
     }
+    const order = hot ? "按关注人数从多到少（热门）" : "按价格从低到高";
     return {
-      key: "wbl_look:" + server + ":" + name,
+      key: "wbl_look:" + server + ":" + name + ":" + typeIn,
       out: {
-        keyword: name, server: g?.server_name ?? "全部服务器", total_all_servers: total,
-        scanned_cheapest: g ? scanned : undefined,
-        cheapest: rows.slice(0, WBL_SIZE).map((r) => ({ name: r.info, type: r.attrs?.appearance_type_name, server: r.server_name, price: fmtYuan(Number(r.single_unit_price)) })),
-        note: "数据来自官方万宝楼的公开列表，按价格从低到高；名字是模糊匹配；价格是人民币，可能有延迟，仅供参考。" + (g ? `万宝楼接口不能按服务器筛外观，这里是在全服最便宜的 ${scanned} 条里挑出 ${g.server_name} 的，没列到不代表这个服没有；` : "") + "不提供卖家信息，要买请对方自己去万宝楼看",
+        keyword: name || undefined, mode: hot ? "热门" : "最便宜", type: typeIn || undefined,
+        server: g?.server_name ?? "全部服务器", total_all_servers: total,
+        scanned: g ? scanned : undefined,
+        items: rows.slice(0, WBL_SIZE).map((r) => ({ name: r.info, type: r.attrs?.appearance_type_name, server: r.server_name, price: fmtYuan(Number(r.single_unit_price)), watchers: hot ? Number(r.followed_num) || 0 : undefined })),
+        note: `数据来自官方万宝楼的公开列表，${order}；` + (name ? "名字是模糊匹配；" : "watchers 是关注这件的人数，只代表热度；") + "价格是人民币，可能有延迟，仅供参考。" +
+          (g ? `万宝楼接口不能按服务器筛外观，这里是在全服最便宜的 ${scanned} 条里挑出 ${g.server_name} 的，没列到不代表这个服没有；` : "") +
+          "列出来的都是真实在售的，只报这些，不要补别的外观名或价格。不提供卖家信息，要买请对方自己去万宝楼看",
       },
     };
   }
@@ -394,7 +432,7 @@ export async function jx3Info(fetchFn: typeof fetch, args: Row, now = Date.now()
     : kind === "celebs" ? "celebs:" + (typeof args.name === "string" && JX3_CELEBS.includes(args.name) ? args.name : JX3_CELEBS[0])
     : kind === "auction" ? "auction:" + serverArg(args.server) + ":" + str(args.item, 30)
     : kind === "wbl_role" ? "wbl_role:" + serverArg(args.server) + ":" + str(args.sect, 12) + ":" + str(args.shape, 8)
-    : kind === "wbl_look" ? "wbl_look:" + serverArg(args.server) + ":" + str(args.item, 20)
+    : kind === "wbl_look" ? "wbl_look:" + serverArg(args.server) + ":" + str(args.item, 20) + ":" + str(args.type, 6)
     : kind === "gold" ? "gold:" + serverArg(args.server)
     : "saohua";
   const hit = cache.get(pre);

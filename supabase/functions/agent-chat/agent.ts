@@ -24,7 +24,7 @@ import { PERSONA as XIE_YUNLIU_PERSONA } from "./xie-yunliu.gen.ts";
 import { PERSONA as LI_WANGSHENG_PERSONA } from "./li-wangsheng.gen.ts";
 import { PERSONA as TANG_WUYING_PERSONA } from "./tang-wuying.gen.ts";
 import { BOARD_GAMES, ddzRecord, fxqRecord, fxqStatus, gameHint, gameRecord, gameStatus, groupGameHint, mjRecord, mjStatus } from "./games.ts";
-import { JX3_CELEBS, JX3_KINDS, jx3Info } from "./jx3.ts";
+import { JX3_CELEBS, JX3_KINDS, LOOK_TYPES, jx3Info } from "./jx3.ts";
 
 // ---- 调参：全部数字集中在这里 ----
 export const MAX_REPLY = 4000; // 回复字数的最后保险
@@ -99,7 +99,7 @@ export function systemInstructions(id = "durian"): string {
 - 你在聊天里回复（可能是两个人的 1:1 聊天，也可能是多人群聊），聊天里的所有人都能看到你的回复。每次的 user 消息会告诉你聊天里有谁、现在是谁在叫你。群聊里回复叫你的那个人，也可以顺带照顾别人。
 - 你这次只以「${agentName(id)}」的身份发言。聊天里还有别的助手。即使对方同时提到几位助手，或请你们互相认识，也只说你自己的话，给其他人留出回应的空间。可以向别的助手打招呼，或回应聊天记录里对方已说过的话。不要替对方编写台词、动作或已经发生的事，也不要在回复里加角色名和冒号。
 - 用提问人的语言回复（多数是中文）。回复要像聊天，简短自然，不要写成长文；需要时再展开。
-- 不要使用 emoji。
+- 不要使用 emoji。回复是纯文字，聊天里不显示 Markdown：不要用 **加粗**、# 标题、[文字](链接) 这些写法，链接直接写网址。
 - 你是唐朝江湖里的人，始终守住这个身份，不要出戏。你说的话、见过的事、吃穿用度和身边的东西，都只能是那个时代有的。自己的话里不要出现后世才有的东西和说法（比如可乐、奶茶、咖啡、手机、外卖、电脑、汽车、网络、上班、打卡、加班），也不要用现代流行语和网络梗。
 - 对方说到现代的东西或说法时，能听懂意思的就按意思接，换成你那个时代的说法回应；听不懂的东西，就当是没见过的稀罕物，可以好奇地问一句是什么，不要装作很熟悉，也不要跳出身份去解释。
 - 不要每次都请人喝茶、端茶倒茶。招待和小动作要跟着场景和对方的话变化；同一段对话里，同一个意象（茶、灯、雨、风之类）不要反复用。
@@ -113,7 +113,7 @@ export function systemInstructions(id = "durian"): string {
 - 哪些记忆常驻（pinned）也由你定：称呼、过敏、禁忌这类每次都该知道的才常驻，最多 10 条，满了先取消或删掉一条再加。
 - 记忆标题用「人名·类别」或简短主题，20 字内，例如「小明·口味」「纪念日」「周末计划」。新建标题前先看记忆里有没有相近的，有就沿用，并把合并后的完整最新内容一起写进去（同标题会整条替换）。
 - 用户消息里如果写了「进行中的小游戏」，说明这两个人正在玩小游戏。聊到小游戏、或有人想要建议时，你可以用 game_status 看他们的井字棋、弹弓大战、台球（9球和8球）的当前局面，用 game_leaderboard 看这两个人的胜负战绩（含彼此的交手）。斗地主（私聊和群聊都能玩）只能用 game_leaderboard 带 game=ddz 看积分战绩：私聊里是两个人一起打的和各自的总计，群聊里是本群成员在本群的积分排名。麻将（私聊和群聊都能玩）：game_status 带 game=mahjong 看公开的局面（轮到谁、牌河、亮出来的吃碰杠、各家张数、牌墙剩余、最近的动作、结果），game_leaderboard 带 game=mahjong 看积分战绩；任何人的手牌都是秘密，包括提问人自己的，你看不到也不要猜，更不要透露。飞行棋（私聊和群聊都能玩）：game_status 带 game=fxq 看当前局面（每架飞机在哪、轮到谁、最近一次骰子、轮到的人有哪些走法和建议），game_leaderboard 带 game=fxq 看胜场。群聊里井字棋、弹弓大战、台球的工具都不可用。这两个工具只是看，你不能替任何人落子、出杆、认输、出牌、掷骰子或开局。
-- 有人问剑三（剑网三）里的事：今天或明天的日常、大战打哪、某个服开没开、维护到几点、最新公告、楚天社这些活动的时间、某个物品在交易行（物价）卖多少钱、某个服的金价（金币和人民币的比例）、万宝楼在售的角色和外观价格，用 jx3_info 查，不要凭记忆编，也不要先去网上搜。查不到就直说，并提一句数据来自第三方、可能有延迟。服务器名不清楚就先问；问物价、金价、万宝楼但没说服务器（万宝楼查外观可以不限服）也先问。说「金价」「金币价格」指的是金币和人民币的比例，用 kind=gold 查，不要当交易行物品去查；报的时候说「1元 = 多少金」，也可以顺带说一万金大约多少钱。物价和万宝楼的价格只当参考，照实报数字和出处，不要替人做买卖决定或劝买劝卖。万宝楼的卖家信息和寄售编号不要说。骚话只在气氛合适、有人想要时来一句。
+- 有人问剑三（剑网三）里的事：今天或明天的日常、大战打哪、某个服开没开、维护到几点、最新公告、楚天社这些活动的时间、某个物品在交易行（物价）卖多少钱、某个服的金价（金币和人民币的比例）、万宝楼在售的角色和外观价格，用 jx3_info 查，不要凭记忆编，也不要先去网上搜。查不到就直说，并提一句数据来自第三方、可能有延迟。服务器名不清楚就先问；问物价、金价、万宝楼但没说服务器（万宝楼查外观可以不限服）也先问。说「金价」「金币价格」指的是金币和人民币的比例，用 kind=gold 查，不要当交易行物品去查；报的时候说「1元 = 多少金」，也可以顺带说一万金大约多少钱。想看万宝楼外观但没说具体名字（比如「推荐几个」「有啥好看的」）时，不带 item 用 kind=wbl_look 看热门的，可以带 type 外观类型；推荐只从查到的结果里挑，每个都带上查到的价格和服务器。报的外观名和价格必须是这次 jx3_info 查到的，不要从网上或记忆里补名字和价格，也不要说「先前查到的数」。物价和万宝楼的价格只当参考，照实报数字和出处，不要替人做买卖决定或劝买劝卖。万宝楼的卖家信息和寄售编号不要说。骚话只在气氛合适、有人想要时来一句。
 - 给游戏建议要具体、正确：基于返回的局面说话。井字棋直接用返回的必胜点和必堵点；台球说清打哪个球、进哪个袋、大概多大力，也可以建议防守，但你看不到精确物理，台球的建议要说成「建议」「大概」。
 - 聊天的两个人都能看到你的回复。有人在对局中向你要建议时，公开、公平地说，不偏袒；可以善意地调侃一句。
 - 如果记忆只列了标题目录，需要细节时先用 recall 取全文再回答。`;
@@ -199,14 +199,15 @@ const TOOLS = [
   {
     type: "function",
     name: "jx3_info",
-    description: "只读：查剑网三（剑三）的公开游戏数据，来自第三方 JX3API（非官方，可能延迟或查不到）。kind=calendar 日常（大战、战场、矿车、福缘宠物、本周副本等），day 0 今天 1 明天，最多 6；kind=server 某个服务器现在开没开、上次开服和维护时间，必须带 server（如 梦江南、乾坤一掷）；kind=news 最新官方公告（标题、日期、链接，第一条带摘要），limit 1 到 5；kind=celebs 楚天社 / 云从社 / 披风会 / 穹野卫 接下来的公共任务时间，带 name；kind=saohua 随机一句剑三骚话；kind=auction 交易行（物价）里某个物品在某服的价格（金 / 银 / 铜），带 item 和 server，数据来自 JX3BOX（第三方）；kind=wbl_role 万宝楼在售角色，带 server，可选 sect 门派、shape 体型，价格从低到高列几个并给在售总数；kind=wbl_look 万宝楼在售外观，带 item（外观名，模糊匹配），server 可选，价格从低到高；kind=gold 某服的金价（万宝楼在售金币，1 元能买多少金，从最划算的开始），带 server。",
+    description: "只读：查剑网三（剑三）的公开游戏数据，来自第三方 JX3API（非官方，可能延迟或查不到）。kind=calendar 日常（大战、战场、矿车、福缘宠物、本周副本等），day 0 今天 1 明天，最多 6；kind=server 某个服务器现在开没开、上次开服和维护时间，必须带 server（如 梦江南、乾坤一掷）；kind=news 最新官方公告（标题、日期、链接，第一条带摘要），limit 1 到 5；kind=celebs 楚天社 / 云从社 / 披风会 / 穹野卫 接下来的公共任务时间，带 name；kind=saohua 随机一句剑三骚话；kind=auction 交易行（物价）里某个物品在某服的价格（金 / 银 / 铜），带 item 和 server，数据来自 JX3BOX（第三方）；kind=wbl_role 万宝楼在售角色，带 server，可选 sect 门派、shape 体型，价格从低到高列几个并给在售总数；kind=wbl_look 万宝楼在售外观：带 item（外观名，模糊匹配）就按价格从低到高，不带 item 就按关注人数列热门的，可选 type 外观类型、server；kind=gold 某服的金价（万宝楼在售金币，1 元能买多少金，从最划算的开始），带 server。",
     parameters: {
       type: "object",
       properties: {
         kind: { type: "string", enum: [...JX3_KINDS], description: "查什么" },
         day: { type: "integer", description: "calendar 用：0 今天，1 明天，最多 6" },
         server: { type: "string", description: "server / auction / wbl_role / gold 必填，wbl_look 可选：服务器名" },
-        item: { type: "string", description: "auction 用：物品名；wbl_look 用：外观名（可只写一部分）" },
+        item: { type: "string", description: "auction 用：物品名；wbl_look 用，可选：外观名（可只写一部分），不带就看热门" },
+        type: { type: "string", enum: LOOK_TYPES, description: "wbl_look 用，可选：外观类型" },
         sect: { type: "string", description: "wbl_role 用，可选：门派，如 七秀、纯阳" },
         shape: { type: "string", enum: ["成男", "成女", "正太", "萝莉"], description: "wbl_role 用，可选：体型" },
         name: { type: "string", enum: JX3_CELEBS, description: "celebs 用：哪个活动" },
@@ -402,6 +403,17 @@ type OutputItem = {
 };
 
 // 从响应里取最终文字；如果引用的网址没出现在文字里，在末尾补上几条来源
+// 聊天气泡只显示纯文字：去掉模型偶尔写出来的 Markdown 和搜索结果链接上的 utm_source=openai
+export function plainText(s: string): string {
+  let t = s.replace(/https?:\/\/[^\s)\]（）]+/g, (u) => u.replace(/([?&])utm_source=openai(&?)/g, (_m, p, q) => (q ? p : "")).replace(/[?&]$/, ""));
+  // 「网址 ([文字](同一个网址))」：括号里重复的链接整段去掉
+  t = t.replace(/\s*[（(]\[[^\]\n]*\]\((https?:\/\/[^\s)]+)\)[）)]/g, (_m, url, off, all) => (all.slice(0, off).includes(url.replace(/\/$/, "")) ? "" : " " + url));
+  // [文字](网址) -> 文字 网址（文字就是网址时只留网址）
+  t = t.replace(/\[([^\]\n]*)\]\((https?:\/\/[^\s)]+)\)/g, (_m, label, url) => (!label || url.includes(label.replace(/\/$/, "")) ? url : label + " " + url));
+  t = t.replace(/\*\*([^*\n]+)\*\*/g, "$1").replace(/__([^_\n]+)__/g, "$1").replace(/`([^`\n]+)`/g, "$1").replace(/^#{1,6}\s+/gm, "");
+  return t.trim();
+}
+
 export function extractReply(output: OutputItem[]): string {
   let text = "";
   const cites = new Map<string, string>();
@@ -415,7 +427,7 @@ export function extractReply(output: OutputItem[]): string {
       }
     }
   }
-  text = text.trim();
+  text = plainText(text);
   const missing = [...cites.entries()].filter(([u]) => !text.includes(u)).slice(0, 4);
   if (text && missing.length) {
     text += "\n\n来源：\n" + missing.map(([u, t]) => "- " + (t ? t + " " : "") + u).join("\n");
