@@ -3,8 +3,13 @@
 import { authMsg, setAuthMode, show, showAuth } from './auth.js';
 import { buildEmojiPanel } from './composer.js';
 import { resolveConfig } from './config.js';
+import { closeChat } from './chat/view.js';
+import { initDesktop } from './desktop.js';
 import { bind } from './events.js';
-import { buildPlusPanel } from './plus.js';
+import { closeGroupInfo, groupInfoOpen } from './groups/info.js';
+import { closeApp } from './miniapps/host.js';
+import { closeLeaderboard } from './miniapps/leaderboard.js';
+import { buildPlusPanel, closePanels } from './plus.js';
 import { stopRealtime } from './realtime.js';
 import { enterApp, resetState } from './session.js';
 import { S, cfg, sb, setCfg, setSb } from './state.js';
@@ -20,6 +25,7 @@ export async function boot() {
   watchSystemTheme();
   setMascot($('bootHero'), 'normal');
   setMascot($('unconfHero'), 'normal');
+  setMascot($('deskHero'), 'normal');
   setCfg(resolveConfig());
   if (!cfg) return show('unconfigured');
   if (typeof supabase === 'undefined' || !supabase.createClient) {
@@ -30,6 +36,16 @@ export async function boot() {
   buildEmojiPanel();
   buildPlusPanel();
   bind();
+  // 桌面端双栏的键盘操作（Esc 一层层关、Alt+上下切会话）
+  initDesktop({
+    closePanels: closePanels, closeApp: closeApp, closeChat: closeChat,
+    closeOverlay: function () {
+      if (groupInfoOpen()) { closeGroupInfo(); return true; }
+      var lb = document.querySelector('#rankSheet:not([hidden])');
+      if (lb) { closeLeaderboard(); return true; }
+      return false;
+    }
+  });
   setAuthMode('login');
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () { /* 不支持就算了 */ });
   sb.auth.onAuthStateChange(function (event) {
