@@ -16,6 +16,7 @@ class Fx:
         s.col = hexrgb(cfg.get('color', '#d9a21e'))
         s.flat = float(cfg.get('flat', 0.82))
         s.w = float(cfg.get('width', 1.1))
+        s.hit = float(cfg.get('hit', 9.0))  # 敲响时钟身一亮的光斑半径
         yy, xx = scene.yy, scene.xx
         s.dist = np.hypot(xx - s.cx, (yy - s.cy) / s.flat).astype(np.float32)
         s.ang = np.arctan2(yy - s.cy, xx - s.cx).astype(np.float32)
@@ -37,7 +38,7 @@ class Fx:
         for k in range(s.tolls):
             age = ((t - k / s.tolls) % 1.0) / 0.12
             if age < 1:
-                g = np.exp(-0.5 * ((s.dist / 1.0) / 9.0) ** 2) * (1 - age) * 0.55
+                g = np.exp(-0.5 * ((s.dist / 1.0) / s.hit) ** 2) * (1 - age) * 0.55
                 alpha += g
         alpha = np.clip(alpha * s.op, 0, 0.9)[:, :, None]
         out += (s.col - out) * alpha

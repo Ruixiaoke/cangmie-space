@@ -32,6 +32,75 @@
      "ink_glow": true
     }
    ]
+  },
+  "wide": {
+   "day": {
+    "effects": [
+     {
+      "fx": "wanhua_flowers",
+      "count": 30,
+      "opacity": 0.95,
+      "ink": 8,
+      "ink_color": "#4b3a78",
+      "ink_opacity": 0.42,
+      "size": [
+       13,
+       20
+      ],
+      "sway": 30,
+      "ink_radius": 70,
+      "ink_fall": 110,
+      "ink_drop": 2.6,
+      "ink_flat": 0.4,
+      "ink_x": [
+       110,
+       1426
+      ],
+      "ink_y": [
+       630,
+       830
+      ]
+     }
+    ]
+   },
+   "night": {
+    "effects": [
+     {
+      "fx": "wanhua_flowers",
+      "count": 18,
+      "opacity": 0.9,
+      "colors": [
+       [
+        "#7f58c0",
+        "#d3bcf6",
+        "#3a2272"
+       ]
+      ],
+      "heart": "#f0dc90",
+      "ink": 10,
+      "ink_color": "#e6eaff",
+      "ink_opacity": 0.75,
+      "ink_glow": true,
+      "size": [
+       13,
+       20
+      ],
+      "sway": 30,
+      "ink_radius": 70,
+      "ink_fall": 110,
+      "ink_drop": 2.6,
+      "ink_flat": 0.4,
+      "ink_x": [
+       110,
+       1426
+      ],
+      "ink_y": [
+       630,
+       830
+      ]
+     }
+    ]
+   }
   }
  }
 }

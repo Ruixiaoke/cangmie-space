@@ -1,0 +1,137 @@
+{
+ "chunyang": {
+  "wide": {
+   "day": {
+    "particles": [
+     {
+      "kind": "snow",
+      "count": 220,
+      "size": [
+       1.8,
+       2.8
+      ],
+      "opacity": 0.7799999999999999,
+      "speed": 1,
+      "sway": 10,
+      "colors": [
+       "#ffffff"
+      ],
+      "top_bias": 0.1
+     },
+     {
+      "kind": "snow",
+      "count": 110,
+      "size": [
+       3,
+       4.4
+      ],
+      "opacity": 0.88,
+      "speed": 1,
+      "sway": 22,
+      "colors": [
+       "#ffffff"
+      ],
+      "top_bias": 0.1
+     },
+     {
+      "kind": "snow",
+      "count": 40,
+      "size": [
+       5,
+       7.5
+      ],
+      "opacity": 0.9299999999999999,
+      "speed": 1,
+      "sway": 38,
+      "colors": [
+       "#ffffff"
+      ],
+      "top_bias": 0.05
+     }
+    ],
+    "mist": [
+     {
+      "y": 0.74,
+      "spread": 0.07,
+      "opacity": 0.2,
+      "dir": 1,
+      "color": "#e8ecf8"
+     },
+     {
+      "y": 0.5,
+      "spread": 0.04,
+      "opacity": 0.14,
+      "dir": -1,
+      "color": "#e4e8f6"
+     }
+    ]
+   },
+   "night": {
+    "particles": [
+     {
+      "kind": "snow",
+      "count": 160,
+      "size": [
+       1.8,
+       2.8
+      ],
+      "opacity": 0.7799999999999999,
+      "speed": 1,
+      "sway": 10,
+      "colors": [
+       "#e8efff"
+      ],
+      "top_bias": 0.1
+     },
+     {
+      "kind": "snow",
+      "count": 80,
+      "size": [
+       3,
+       4.4
+      ],
+      "opacity": 0.86,
+      "speed": 1,
+      "sway": 22,
+      "colors": [
+       "#f0f4ff"
+      ],
+      "top_bias": 0.1
+     },
+     {
+      "kind": "snow",
+      "count": 30,
+      "size": [
+       5,
+       7.5
+      ],
+      "opacity": 0.88,
+      "speed": 1,
+      "sway": 38,
+      "colors": [
+       "#f4f7ff"
+      ],
+      "top_bias": 0.05
+     }
+    ],
+    "mist": [
+     {
+      "y": 0.74,
+      "spread": 0.07,
+      "opacity": 0.16,
+      "dir": 1,
+      "color": "#6c7aa8"
+     },
+     {
+      "y": 0.5,
+      "spread": 0.04,
+      "opacity": 0.1,
+      "dir": -1,
+      "color": "#6672a0"
+     }
+    ],
+    "glow": 0.3
+   }
+  }
+ }
+}

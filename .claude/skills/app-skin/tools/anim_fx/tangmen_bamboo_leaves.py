@@ -14,7 +14,7 @@ class Fx:
                 x0=float(rng.uniform(*sx)), y0=float(rng.uniform(*sy)), ph=float((i + rng.uniform(.1, .9)) / n),
                 dx=float(rng.uniform(*cfg.get('drift', [160, 420]))), dy=float(rng.uniform(*cfg.get('fall', [520, 720]))),
                 r=float(rng.uniform(*cfg.get('size', [7, 12]))), a=float(rng.uniform(0, math.tau)),
-                spin=int(rng.choice([-2, -1, 1, 2])), sway=float(rng.uniform(10, 26)), tone=float(rng.uniform(0, 1))))
+                spin=int(rng.choice([-2, -1, 1, 2])), sway=float(rng.uniform(*cfg.get('sway', [10, 26]))), tone=float(rng.uniform(0, 1))))
         rng.shuffle(self.items)
 
     def draw(self, out, t):
@@ -27,7 +27,7 @@ class Fx:
             u = (t + it['ph']) % 1.0
             env = math.sin(math.pi * u) ** .5
             x = it['x0'] + it['dx'] * u + it['sway'] * math.sin(math.tau * 2 * t + it['a'])
-            y = it['y0'] + it['dy'] * u + 5 * math.sin(math.tau * 3 * t + it['a'] * 1.3)
+            y = it['y0'] + it['dy'] * u + float(cfg.get('bob', 5)) * math.sin(math.tau * 3 * t + it['a'] * 1.3)
             ang = it['a'] + it['spin'] * math.tau * t + .6 * math.sin(math.tau * t + it['a'])
             ca, sa = math.cos(ang), math.sin(ang)
             tumble = .35 + .65 * abs(math.cos(math.tau * it['spin'] * t * .5 + it['a']))

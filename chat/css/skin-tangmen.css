@@ -173,3 +173,20 @@
 @supports not ((mask-image:none) or (-webkit-mask-image:none)){
   [data-skin="tangmen"] .panel::after,[data-skin="tangmen"] #auth .sub::after{display:none}
 }
+
+/* 桌面（宽度 ≥ 960px）：横屏高清版场景，动图是全彩 WebP；减少动态效果时用同尺寸静态图 */
+@media (min-width:960px){
+  :root[data-skin="tangmen"]{--scene-img:url(../skins/tangmen/scene-day-wide.webp);--scene-still:url(../skins/tangmen/scene-day-wide.jpg)}
+  :root[data-skin="tangmen"][data-theme="dark"]{--scene-img:url(../skins/tangmen/scene-night-wide.webp);--scene-still:url(../skins/tangmen/scene-night-wide.jpg)}
+  [data-skin="tangmen"] #shell{background-position:center}
+}
+@media (min-width:960px) and (prefers-color-scheme: dark){
+  :root[data-skin="tangmen"]:not([data-theme="light"]){--scene-img:url(../skins/tangmen/scene-night-wide.webp);--scene-still:url(../skins/tangmen/scene-night-wide.jpg)}
+}
+@media (min-width:960px) and (prefers-reduced-motion: reduce){
+  :root[data-skin="tangmen"]{--scene-img:url(../skins/tangmen/scene-day-wide.jpg)}
+  :root[data-skin="tangmen"][data-theme="dark"]{--scene-img:url(../skins/tangmen/scene-night-wide.jpg)}
+}
+@media (min-width:960px) and (prefers-reduced-motion: reduce) and (prefers-color-scheme: dark){
+  :root[data-skin="tangmen"]:not([data-theme="light"]){--scene-img:url(../skins/tangmen/scene-night-wide.jpg)}
+}

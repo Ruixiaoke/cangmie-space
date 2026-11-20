@@ -39,6 +39,74 @@
     }
    ],
    "glow": 0.4
+  },
+  "wide": {
+   "day": {
+    "effects": [
+     {
+      "fx": "tiance_sandstorm",
+      "lanes": 6,
+      "opacity": 0.36,
+      "step": 14,
+      "contrast": 0.2,
+      "colors": [
+       "#a77940",
+       "#94683a",
+       "#b88a50"
+      ],
+      "y_range": [
+       330,
+       830
+      ],
+      "slope": [
+       0.05,
+       0.11
+      ],
+      "width": [
+       12,
+       22
+      ],
+      "curl": [
+       8,
+       18
+      ],
+      "grain_len": 20
+     }
+    ]
+   },
+   "night": {
+    "effects": [
+     {
+      "fx": "tiance_sandstorm",
+      "lanes": 6,
+      "opacity": 0.28,
+      "step": 14,
+      "contrast": 0.2,
+      "colors": [
+       "#9a8466",
+       "#85735a"
+      ],
+      "y_range": [
+       340,
+       830
+      ],
+      "slope": [
+       0.05,
+       0.11
+      ],
+      "width": [
+       12,
+       22
+      ],
+      "curl": [
+       8,
+       18
+      ],
+      "grain_len": 20
+     }
+    ],
+    "glow": 0.4
+   }
   }
  }
 }

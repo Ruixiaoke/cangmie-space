@@ -77,7 +77,7 @@ class Flakes:
     def __init__(self, cfg, scene, rng):
         self.cfg = cfg; self.sc = scene
         self.items = [dict(x0=rng.uniform(6, W - 6), y0=rng.uniform(0, 1), R=rng.uniform(*cfg.get('size', [9, 18])),
-                           a=rng.uniform(0, TAU), A=rng.uniform(14, 30), b=rng.uniform(0, TAU), sp=int(rng.choice([-1, 1])))
+                           a=rng.uniform(0, TAU), A=rng.uniform(*cfg.get('sway', [14, 30])), b=rng.uniform(0, TAU), sp=int(rng.choice([-1, 1])))
                       for _ in range(int(cfg.get('count', 14)))]
 
     def draw(self, out, t):

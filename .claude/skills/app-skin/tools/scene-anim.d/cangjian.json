@@ -47,6 +47,60 @@
      ]
     }
    ]
+  },
+  "wide": {
+   "day": {
+    "effects": [
+     {
+      "fx": "cangjian_ginkgo",
+      "count": 70,
+      "opacity": 0.95,
+      "size": [
+       16,
+       26
+      ],
+      "sway": 36,
+      "colors": [
+       [
+        "#d6a21c",
+        "#ffd84a",
+        "#8d5a0c"
+       ],
+       [
+        "#e0ae2c",
+        "#ffe066",
+        "#946010"
+       ]
+      ],
+      "uniform_x": true,
+      "pad": 50
+     }
+    ]
+   },
+   "night": {
+    "glow": 0.16,
+    "effects": [
+     {
+      "fx": "cangjian_ginkgo",
+      "count": 32,
+      "opacity": 0.85,
+      "size": [
+       14,
+       22
+      ],
+      "sway": 32,
+      "colors": [
+       [
+        "#b88a28",
+        "#e8c050",
+        "#6a420c"
+       ]
+      ],
+      "uniform_x": true,
+      "pad": 44
+     }
+    ]
+   }
   }
  }
 }
